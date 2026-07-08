@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -15,7 +15,6 @@ import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
 export function LoginForm() {
   const t = useTranslations("auth");
-  const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
   const locale = params.locale as string;
@@ -47,8 +46,7 @@ export function LoginForm() {
     }
 
     const redirectTo = searchParams.get("redirect") || `/${locale}/dashboard`;
-    router.push(redirectTo);
-    router.refresh();
+    window.location.assign(redirectTo);
   }
 
   return (

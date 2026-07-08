@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 
@@ -9,8 +10,17 @@ export interface SessionContext {
   isActive: boolean;
 }
 
-/** Returns null if there's no authenticated user or no matching active profile. */
-export async function getSessionContext(): Promise<SessionContext | null> {
+/**
+ * Returns null if there's no authenticated user or no matching active profile.
+ *
+ * Wrapped in React's request-level cache so that the layout and page (and any
+ * other server components in the same render) share a single Supabase
+ * getUser() call. Without this, concurrent independent calls can each try to
+ * refresh the same one-time-use refresh token, and the loser fails with
+ * "Invalid Refresh Token" — surfacing as a random, hard-to-reproduce null
+ * session right after login.
+ */
+export const getSessionContext = cache(async (): Promise<SessionContext | null> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,7 +43,7 @@ export async function getSessionContext(): Promise<SessionContext | null> {
     role: profile.role,
     isActive: profile.is_active,
   };
-}
+});
 
 export async function requireMaster(): Promise<SessionContext> {
   const session = await getSessionContext();
