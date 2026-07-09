@@ -40,7 +40,8 @@
     "adminSection": "Admin",
     "adminStaff": "Staff Management",
     "adminRates": "Rate Settings",
-    "adminAuditLog": "Audit Log"
+    "adminAuditLog": "Audit Log",
+    "adminApprovals": "Signup Approvals"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -597,16 +598,15 @@
     "noAuditLogs": "No audit log entries recorded.",
     "dashboardTitle": "Dashboard",
     "welcome": "Welcome, {name}. Choose a task from the menu on the left.",
-    "approvalStatus": "Approval",
-    "approvalApproved": "Approved",
-    "approvalPending": "Pending",
     "approve": "Approve",
     "reject": "Reject",
     "approveSuccess": "Approved successfully",
     "approveError": "Failed to approve",
     "rejectSuccess": "Rejected successfully",
     "rejectError": "Failed to reject",
-    "rejectConfirm": "Reject {name}'s signup request? This cannot be undone."
+    "rejectConfirm": "Reject {name}'s signup request? This cannot be undone.",
+    "approvalsTitle": "Signup Approvals",
+    "noPendingApprovals": "No pending signup requests."
   },
   "documents": {
     "printSave": "Print / Save PDF"
@@ -648,6 +648,7 @@
     "chartAnnualTitle": "Annual Revenue",
     "chartAnnualCaption": "Sum of contract monthly fees by year",
     "chartSignupCancelTitle": "Signups/Cancellations by Month",
-    "chartSignupCancelCaption": "Signup = contract start date, Cancel = termination request save date"
+    "chartSignupCancelCaption": "Signup = contract start date, Cancel = termination request save date",
+    "cardAdminApprovalsDesc": "Approve or reject new staff signup requests."
   }
 }

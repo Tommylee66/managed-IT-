@@ -134,6 +134,9 @@ export default async function DashboardPage({
         <MenuSection title={tHome("sectionCustomerSales")}>
           <MenuCard href={p("/customers")} icon="🏢" color="blue" title={tNav("customers")} description={tHome("cardCustomersDesc")} />
           <MenuCard href={p("/agents")} icon="🧑‍💼" color="blue" title={tNav("agents")} description={tHome("cardAgentsDesc")} />
+          {isMaster && (
+            <MenuCard href={p("/admin/staff")} icon="👤" color="blue" title={tNav("adminStaff")} description={tHome("cardAdminStaffDesc")} />
+          )}
         </MenuSection>
 
         <MenuSection title={tHome("sectionApplicationContract")}>
@@ -154,7 +157,7 @@ export default async function DashboardPage({
           <MenuCard href={p("/invoices")} icon="💳" color="green" title={tNav("invoices")} description={tHome("cardInvoicesDesc")} />
           {isMaster && (
             <>
-              <MenuCard href={p("/admin/staff")} icon="👤" color="green" title={tNav("adminStaff")} description={tHome("cardAdminStaffDesc")} />
+              <MenuCard href={p("/admin/approvals")} icon="✅" color="green" title={tNav("adminApprovals")} description={tHome("cardAdminApprovalsDesc")} />
               <MenuCard href={p("/admin/rates")} icon="⚙️" color="green" title={tNav("adminRates")} description={tHome("cardAdminRatesDesc")} />
               <MenuCard href={p("/admin/audit-log")} icon="📋" color="green" title={tNav("adminAuditLog")} description={tHome("cardAdminAuditLogDesc")} />
             </>

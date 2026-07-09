@@ -40,7 +40,8 @@
     "adminSection": "관리자",
     "adminStaff": "직원 관리",
     "adminRates": "요율 설정",
-    "adminAuditLog": "감사 로그"
+    "adminAuditLog": "감사 로그",
+    "adminApprovals": "가입 승인"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -597,16 +598,15 @@
     "noAuditLogs": "기록된 감사 로그가 없습니다.",
     "dashboardTitle": "대시보드",
     "welcome": "{name}님, 환영합니다. 왼쪽 메뉴에서 업무를 선택하세요.",
-    "approvalStatus": "승인 상태",
-    "approvalApproved": "승인됨",
-    "approvalPending": "승인 대기",
     "approve": "승인",
     "reject": "거절",
     "approveSuccess": "승인되었습니다",
     "approveError": "승인에 실패했습니다",
     "rejectSuccess": "거절되었습니다",
     "rejectError": "거절에 실패했습니다",
-    "rejectConfirm": "{name}님의 가입 신청을 거절하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+    "rejectConfirm": "{name}님의 가입 신청을 거절하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "approvalsTitle": "가입 승인",
+    "noPendingApprovals": "승인 대기 중인 가입 신청이 없습니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"
@@ -648,6 +648,7 @@
     "chartAnnualTitle": "연매출",
     "chartAnnualCaption": "연도별 계약월 요금 합계",
     "chartSignupCancelTitle": "월별 가입/해지 현황",
-    "chartSignupCancelCaption": "가입=계약 시작일, 해지=해지신청 저장일 기준"
+    "chartSignupCancelCaption": "가입=계약 시작일, 해지=해지신청 저장일 기준",
+    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다."
   }
 }

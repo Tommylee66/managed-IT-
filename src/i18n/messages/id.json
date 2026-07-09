@@ -40,7 +40,8 @@
     "adminSection": "Admin",
     "adminStaff": "Manajemen Staf",
     "adminRates": "Pengaturan Tarif",
-    "adminAuditLog": "Log Audit"
+    "adminAuditLog": "Log Audit",
+    "adminApprovals": "Persetujuan Pendaftaran"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -597,16 +598,15 @@
     "noAuditLogs": "Belum ada log audit yang tercatat.",
     "dashboardTitle": "Dasbor",
     "welcome": "Selamat datang, {name}. Pilih tugas dari menu di sebelah kiri.",
-    "approvalStatus": "Status Persetujuan",
-    "approvalApproved": "Disetujui",
-    "approvalPending": "Menunggu Persetujuan",
     "approve": "Setujui",
     "reject": "Tolak",
     "approveSuccess": "Berhasil disetujui",
     "approveError": "Gagal menyetujui",
     "rejectSuccess": "Berhasil ditolak",
     "rejectError": "Gagal menolak",
-    "rejectConfirm": "Tolak pendaftaran {name}? Tindakan ini tidak dapat dibatalkan."
+    "rejectConfirm": "Tolak pendaftaran {name}? Tindakan ini tidak dapat dibatalkan.",
+    "approvalsTitle": "Persetujuan Pendaftaran",
+    "noPendingApprovals": "Tidak ada permintaan pendaftaran yang menunggu persetujuan."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"
@@ -648,6 +648,7 @@
     "chartAnnualTitle": "Pendapatan Tahunan",
     "chartAnnualCaption": "Total biaya bulanan kontrak per tahun",
     "chartSignupCancelTitle": "Status Pendaftaran/Pengakhiran per Bulan",
-    "chartSignupCancelCaption": "Daftar=tanggal mulai kontrak, Akhiri=tanggal pengajuan pengakhiran disimpan"
+    "chartSignupCancelCaption": "Daftar=tanggal mulai kontrak, Akhiri=tanggal pengajuan pengakhiran disimpan",
+    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru."
   }
 }
