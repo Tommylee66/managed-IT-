@@ -52,7 +52,22 @@
     "loginError": "Email atau kata sandi salah.",
     "logout": "Keluar",
     "emailInvalid": "Masukkan alamat email yang valid",
-    "passwordRequired": "Masukkan kata sandi Anda"
+    "passwordRequired": "Masukkan kata sandi Anda",
+    "fullName": "Nama Lengkap",
+    "fullNameRequired": "Nama lengkap wajib diisi",
+    "passwordTooShort": "Kata sandi harus minimal 8 karakter",
+    "signupTitle": "Daftar Akun",
+    "signupSubtitle": "Ajukan pendaftaran akun staf",
+    "signingUp": "Mendaftar...",
+    "signupButton": "Daftar",
+    "signupSuccessTitle": "Pendaftaran Berhasil",
+    "signupSuccessMessage": "Pendaftaran Anda telah dikirim. Anda dapat masuk setelah disetujui oleh admin.",
+    "backToLogin": "Kembali ke Login",
+    "signUpLink": "Belum punya akun? Daftar di sini",
+    "pendingTitle": "Menunggu Persetujuan",
+    "pendingMessage": "Pendaftaran Anda sedang menunggu persetujuan admin. Anda dapat masuk setelah disetujui.",
+    "deactivatedTitle": "Akun Dinonaktifkan",
+    "deactivatedMessage": "Akun ini telah dinonaktifkan. Silakan hubungi admin."
   },
   "roles": {
     "master": "Admin Utama",
@@ -581,7 +596,17 @@
     "details": "Detail",
     "noAuditLogs": "Belum ada log audit yang tercatat.",
     "dashboardTitle": "Dasbor",
-    "welcome": "Selamat datang, {name}. Pilih tugas dari menu di sebelah kiri."
+    "welcome": "Selamat datang, {name}. Pilih tugas dari menu di sebelah kiri.",
+    "approvalStatus": "Status Persetujuan",
+    "approvalApproved": "Disetujui",
+    "approvalPending": "Menunggu Persetujuan",
+    "approve": "Setujui",
+    "reject": "Tolak",
+    "approveSuccess": "Berhasil disetujui",
+    "approveError": "Gagal menyetujui",
+    "rejectSuccess": "Berhasil ditolak",
+    "rejectError": "Gagal menolak",
+    "rejectConfirm": "Tolak pendaftaran {name}? Tindakan ini tidak dapat dibatalkan."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

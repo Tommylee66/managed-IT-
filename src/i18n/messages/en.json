@@ -52,7 +52,22 @@
     "loginError": "Incorrect email or password.",
     "logout": "Log Out",
     "emailInvalid": "Enter a valid email address",
-    "passwordRequired": "Enter your password"
+    "passwordRequired": "Enter your password",
+    "fullName": "Full Name",
+    "fullNameRequired": "Full name is required",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "signupTitle": "Sign Up",
+    "signupSubtitle": "Request a staff account",
+    "signingUp": "Signing up...",
+    "signupButton": "Sign Up",
+    "signupSuccessTitle": "Request Submitted",
+    "signupSuccessMessage": "Your signup request has been submitted. You can log in once an admin approves your account.",
+    "backToLogin": "Back to Login",
+    "signUpLink": "Don't have an account? Sign up",
+    "pendingTitle": "Pending Approval",
+    "pendingMessage": "Your signup request is awaiting admin approval. You'll be able to log in once approved.",
+    "deactivatedTitle": "Account Deactivated",
+    "deactivatedMessage": "This account has been deactivated. Please contact an admin."
   },
   "roles": {
     "master": "Master Admin",
@@ -581,7 +596,17 @@
     "details": "Details",
     "noAuditLogs": "No audit log entries recorded.",
     "dashboardTitle": "Dashboard",
-    "welcome": "Welcome, {name}. Choose a task from the menu on the left."
+    "welcome": "Welcome, {name}. Choose a task from the menu on the left.",
+    "approvalStatus": "Approval",
+    "approvalApproved": "Approved",
+    "approvalPending": "Pending",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveSuccess": "Approved successfully",
+    "approveError": "Failed to approve",
+    "rejectSuccess": "Rejected successfully",
+    "rejectError": "Failed to reject",
+    "rejectConfirm": "Reject {name}'s signup request? This cannot be undone."
   },
   "documents": {
     "printSave": "Print / Save PDF"

@@ -21,3 +21,14 @@ export async function setProfileActive(
   if (error) throw error;
   return data as Profile;
 }
+
+export async function approveProfile(supabase: SupabaseClient, userId: string): Promise<Profile> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ is_approved: true })
+    .eq('id', userId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Profile;
+}

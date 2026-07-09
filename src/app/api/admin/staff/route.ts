@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name },
+    user_metadata: { full_name, pre_approved: true },
   });
   if (createError || !created.user) {
     return NextResponse.json({ error: createError?.message ?? 'Failed to create user' }, { status: 400 });

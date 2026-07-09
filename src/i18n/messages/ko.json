@@ -52,7 +52,22 @@
     "loginError": "이메일 또는 비밀번호가 올바르지 않습니다.",
     "logout": "로그아웃",
     "emailInvalid": "올바른 이메일 주소를 입력하세요",
-    "passwordRequired": "비밀번호를 입력하세요"
+    "passwordRequired": "비밀번호를 입력하세요",
+    "fullName": "이름",
+    "fullNameRequired": "이름을 입력하세요",
+    "passwordTooShort": "비밀번호는 8자 이상이어야 합니다",
+    "signupTitle": "가입 신청",
+    "signupSubtitle": "직원 계정 가입을 신청하세요",
+    "signingUp": "신청 중...",
+    "signupButton": "가입 신청",
+    "signupSuccessTitle": "신청 완료",
+    "signupSuccessMessage": "가입 신청이 완료되었습니다. 관리자 승인 후 로그인할 수 있습니다.",
+    "backToLogin": "로그인으로 돌아가기",
+    "signUpLink": "계정이 없으신가요? 가입 신청",
+    "pendingTitle": "승인 대기 중",
+    "pendingMessage": "가입 신청이 관리자 승인을 기다리고 있습니다. 승인이 완료되면 로그인할 수 있습니다.",
+    "deactivatedTitle": "계정 비활성화됨",
+    "deactivatedMessage": "이 계정은 비활성화되었습니다. 관리자에게 문의하세요."
   },
   "roles": {
     "master": "마스터 관리자",
@@ -581,7 +596,17 @@
     "details": "상세",
     "noAuditLogs": "기록된 감사 로그가 없습니다.",
     "dashboardTitle": "대시보드",
-    "welcome": "{name}님, 환영합니다. 왼쪽 메뉴에서 업무를 선택하세요."
+    "welcome": "{name}님, 환영합니다. 왼쪽 메뉴에서 업무를 선택하세요.",
+    "approvalStatus": "승인 상태",
+    "approvalApproved": "승인됨",
+    "approvalPending": "승인 대기",
+    "approve": "승인",
+    "reject": "거절",
+    "approveSuccess": "승인되었습니다",
+    "approveError": "승인에 실패했습니다",
+    "rejectSuccess": "거절되었습니다",
+    "rejectError": "거절에 실패했습니다",
+    "rejectConfirm": "{name}님의 가입 신청을 거절하시겠습니까? 이 작업은 되돌릴 수 없습니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"

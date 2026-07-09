@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,53 +14,77 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 
-export function LoginForm() {
+export function SignupForm() {
   const t = useTranslations("auth");
-  const searchParams = useSearchParams();
   const params = useParams();
   const locale = params.locale as string;
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const loginSchema = z.object({
+  const signupSchema = z.object({
+    fullName: z.string().min(1, t("fullNameRequired")),
     email: z.string().email(t("emailInvalid")),
-    password: z.string().min(1, t("passwordRequired")),
+    password: z.string().min(8, t("passwordTooShort")),
   });
-  type LoginValues = z.infer<typeof loginSchema>;
+  type SignupValues = z.infer<typeof signupSchema>;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
+  } = useForm<SignupValues>({ resolver: zodResolver(signupSchema) });
 
-  async function onSubmit(values: LoginValues) {
+  async function onSubmit(values: SignupValues) {
     setServerError(null);
     setIsSubmitting(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword(values);
+    const { error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: { data: { full_name: values.fullName } },
+    });
     setIsSubmitting(false);
 
     if (error) {
-      setServerError(t("loginError"));
+      setServerError(error.message);
       return;
     }
+    setSubmitted(true);
+  }
 
-    const redirectTo = searchParams.get("redirect") || `/${locale}/dashboard`;
-    window.location.assign(redirectTo);
+  if (submitted) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>{t("signupSuccessTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <p className="text-sm text-muted-foreground">{t("signupSuccessMessage")}</p>
+          <Link href={`/${locale}/login`} className="text-sm underline">
+            {t("backToLogin")}
+          </Link>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <Card className="w-full max-w-sm">
       <CardHeader className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <CardTitle>{t("title")}</CardTitle>
+          <CardTitle>{t("signupTitle")}</CardTitle>
           <LanguageSwitcher />
         </div>
-        <CardDescription>{t("subtitle")}</CardDescription>
+        <CardDescription>{t("signupSubtitle")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="fullName">{t("fullName")}</Label>
+            <Input id="fullName" autoComplete="name" {...register("fullName")} />
+            {errors.fullName && <p className="text-sm text-destructive">{errors.fullName.message}</p>}
+          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">{t("email")}</Label>
             <Input id="email" type="email" autoComplete="email" {...register("email")} />
@@ -71,7 +95,7 @@ export function LoginForm() {
             <Input
               id="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               {...register("password")}
             />
             {errors.password && (
@@ -80,10 +104,10 @@ export function LoginForm() {
           </div>
           {serverError && <p className="text-sm text-destructive">{serverError}</p>}
           <Button type="submit" disabled={isSubmitting} className="mt-2">
-            {isSubmitting ? t("loggingIn") : t("loginButton")}
+            {isSubmitting ? t("signingUp") : t("signupButton")}
           </Button>
-          <Link href={`/${locale}/signup`} className="text-center text-sm underline">
-            {t("signUpLink")}
+          <Link href={`/${locale}/login`} className="text-center text-sm underline">
+            {t("backToLogin")}
           </Link>
         </form>
       </CardContent>

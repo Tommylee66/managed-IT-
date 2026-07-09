@@ -16,6 +16,9 @@ export default async function DashboardLayout({
   if (!session) {
     redirect(`/${locale}/login`);
   }
+  if (!session.isApproved || !session.isActive) {
+    redirect(`/${locale}/pending`);
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col">

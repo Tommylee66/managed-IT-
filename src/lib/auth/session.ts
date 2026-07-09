@@ -8,6 +8,7 @@ export interface SessionContext {
   fullName: string;
   role: StaffRole;
   isActive: boolean;
+  isApproved: boolean;
 }
 
 /**
@@ -30,7 +31,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, role, is_active')
+    .select('full_name, role, is_active, is_approved')
     .eq('id', user.id)
     .single();
 
@@ -42,6 +43,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
     fullName: profile.full_name,
     role: profile.role,
     isActive: profile.is_active,
+    isApproved: profile.is_approved,
   };
 });
 

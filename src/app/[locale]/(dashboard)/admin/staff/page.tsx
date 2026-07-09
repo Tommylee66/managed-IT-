@@ -10,6 +10,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { CreateStaffDialog } from "@/components/admin/create-staff-dialog";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { ToggleActiveButton } from "@/components/admin/toggle-active-button";
+import { ApprovalActions } from "@/components/admin/approval-actions";
 
 export default async function AdminStaffPage({
   params,
@@ -48,6 +49,7 @@ export default async function AdminStaffPage({
               <TableHead>{t("email")}</TableHead>
               <TableHead>{t("role")}</TableHead>
               <TableHead>{t("status")}</TableHead>
+              <TableHead>{t("approvalStatus")}</TableHead>
               <TableHead>{t("actions")}</TableHead>
             </TableRow>
           </TableHeader>
@@ -66,13 +68,24 @@ export default async function AdminStaffPage({
                     {p.is_active ? t("active") : t("inactive")}
                   </Badge>
                 </TableCell>
+                <TableCell>
+                  <Badge variant={p.is_approved ? "success" : "warning"}>
+                    {p.is_approved ? t("approvalApproved") : t("approvalPending")}
+                  </Badge>
+                </TableCell>
                 <TableCell className="flex gap-2">
-                  <ResetPasswordDialog userId={p.id} name={p.full_name} />
-                  <ToggleActiveButton
-                    userId={p.id}
-                    active={p.is_active}
-                    disabled={p.id === session.userId}
-                  />
+                  {p.is_approved ? (
+                    <>
+                      <ResetPasswordDialog userId={p.id} name={p.full_name} />
+                      <ToggleActiveButton
+                        userId={p.id}
+                        active={p.is_active}
+                        disabled={p.id === session.userId}
+                      />
+                    </>
+                  ) : (
+                    <ApprovalActions userId={p.id} name={p.full_name} />
+                  )}
                 </TableCell>
               </TableRow>
             ))}

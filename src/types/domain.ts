@@ -40,6 +40,7 @@ export interface Profile {
   full_name: string;
   role: StaffRole;
   is_active: boolean;
+  is_approved: boolean;
   created_at: string;
   updated_at: string;
 }
