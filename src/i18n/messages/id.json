@@ -628,7 +628,12 @@
     "noEquipment": "Belum ada perangkat terdaftar.",
     "equipmentMonthlyRate": "Tarif Sewa Bulanan",
     "equipmentMonthlyCost": "Biaya Bulanan (Internal)",
-    "equipmentRateHint": "Jika tarif sewa bulanan diisi, item ini akan menjadi baris tagihan saat dipilih di penawaran/perubahan layanan. Jika dikosongkan, hanya untuk referensi spesifikasi."
+    "equipmentRateHint": "Jika tarif sewa bulanan diisi, item ini akan menjadi baris tagihan saat dipilih di penawaran/perubahan layanan. Jika dikosongkan, hanya untuk referensi spesifikasi.",
+    "equipmentPurchasePrice": "Harga Beli (Sekali Bayar)",
+    "equipmentPurchasePriceHint": "Jika harga beli diisi, tarif sewa/biaya bulanan akan diusulkan otomatis berdasarkan amortisasi 24 bulan. Usulan ini hanya referensi dan dapat diubah langsung di bawah.",
+    "equipmentEditDialogTitle": "Edit Perangkat",
+    "equipmentUpdateSuccess": "Perangkat berhasil diperbarui",
+    "equipmentUpdateError": "Gagal memperbarui perangkat"
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

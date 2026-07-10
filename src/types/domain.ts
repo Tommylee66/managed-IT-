@@ -180,6 +180,9 @@ export interface EquipmentCatalogItem {
   model_name: string;
   spec_id: string | null;
   spec_ko: string | null;
+  /** One-time acquisition cost, master-only — used only to suggest
+   * monthly_rate/monthly_cost in the admin UI, not stored anywhere else. */
+  purchase_price: number | null;
   /** Monthly rental rate charged to the customer. Null = spec-only
    * reference item (not a billable line, e.g. an AP model just documented
    * for the quote's equipment table). */

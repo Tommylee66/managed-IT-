@@ -628,7 +628,12 @@
     "noEquipment": "No equipment registered yet.",
     "equipmentMonthlyRate": "Monthly Rental Rate",
     "equipmentMonthlyCost": "Monthly Cost (Internal)",
-    "equipmentRateHint": "If a monthly rate is set, this item becomes a billable line when selected on a quote or change request. Leave blank to keep it spec-only."
+    "equipmentRateHint": "If a monthly rate is set, this item becomes a billable line when selected on a quote or change request. Leave blank to keep it spec-only.",
+    "equipmentPurchasePrice": "Purchase Price (One-time)",
+    "equipmentPurchasePriceHint": "If a purchase price is entered, the monthly rate/cost are auto-suggested based on 24-month amortization. The suggestion is just a starting point — edit it directly below.",
+    "equipmentEditDialogTitle": "Edit Equipment",
+    "equipmentUpdateSuccess": "Equipment updated successfully",
+    "equipmentUpdateError": "Failed to update equipment"
   },
   "documents": {
     "printSave": "Print / Save PDF"

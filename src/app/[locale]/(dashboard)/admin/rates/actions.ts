@@ -6,8 +6,10 @@ import { requireMaster } from '@/lib/auth/session';
 import { updateRates } from '@/lib/data-access/rates';
 import {
   createEquipmentCatalogItem,
+  updateEquipmentCatalogItem,
   setEquipmentCatalogActive,
   type CreateEquipmentInput,
+  type UpdateEquipmentInput,
 } from '@/lib/data-access/equipment';
 import type { Rates } from '@/types/domain';
 
@@ -25,6 +27,14 @@ export async function createEquipmentCatalogItemAction(
   const session = await requireMaster();
   const supabase = await createClient();
   const item = await createEquipmentCatalogItem(supabase, { ...input, created_by: session.userId });
+  revalidatePath('/admin/rates');
+  return item;
+}
+
+export async function updateEquipmentCatalogItemAction(id: string, input: UpdateEquipmentInput) {
+  await requireMaster();
+  const supabase = await createClient();
+  const item = await updateEquipmentCatalogItem(supabase, id, input);
   revalidatePath('/admin/rates');
   return item;
 }

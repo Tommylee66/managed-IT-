@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatRupiah } from "@/lib/utils/currency";
-import { CreateEquipmentDialog } from "@/components/admin/create-equipment-dialog";
+import { EquipmentDialog } from "@/components/admin/equipment-dialog";
 import { ToggleEquipmentActiveButton } from "@/components/admin/toggle-equipment-active-button";
 
 export default async function AdminRatesPage({
@@ -40,7 +40,7 @@ export default async function AdminRatesPage({
         <CardHeader>
           <CardTitle>{t("equipmentTitle")}</CardTitle>
           <CardAction>
-            <CreateEquipmentDialog />
+            <EquipmentDialog />
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -51,6 +51,7 @@ export default async function AdminRatesPage({
                 <TableHead>{t("equipmentModelName")}</TableHead>
                 <TableHead>{t("equipmentSpecId")}</TableHead>
                 <TableHead>{t("equipmentSpecKo")}</TableHead>
+                <TableHead className="text-right">{t("equipmentPurchasePrice")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
@@ -65,6 +66,9 @@ export default async function AdminRatesPage({
                   <TableCell>{item.spec_id ?? "-"}</TableCell>
                   <TableCell>{item.spec_ko ?? "-"}</TableCell>
                   <TableCell className="text-right">
+                    {item.purchase_price != null ? formatRupiah(item.purchase_price) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
                     {item.monthly_rate != null ? formatRupiah(item.monthly_rate) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
@@ -75,14 +79,15 @@ export default async function AdminRatesPage({
                       {item.is_active ? t("active") : t("inactive")}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="flex gap-2">
+                    <EquipmentDialog item={item} />
                     <ToggleEquipmentActiveButton id={item.id} active={item.is_active} />
                   </TableCell>
                 </TableRow>
               ))}
               {equipmentItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center text-muted-foreground">
                     {t("noEquipment")}
                   </TableCell>
                 </TableRow>

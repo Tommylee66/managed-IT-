@@ -628,7 +628,12 @@
     "noEquipment": "등록된 장비가 없습니다.",
     "equipmentMonthlyRate": "월 임대료",
     "equipmentMonthlyCost": "월 원가",
-    "equipmentRateHint": "월 임대료를 입력하면 견적/변경요청에서 선택 시 실제 청구 항목으로 반영됩니다. 비워두면 스펙 참고용으로만 쓰입니다."
+    "equipmentRateHint": "월 임대료를 입력하면 견적/변경요청에서 선택 시 실제 청구 항목으로 반영됩니다. 비워두면 스펙 참고용으로만 쓰입니다.",
+    "equipmentPurchasePrice": "구매가 (1회성)",
+    "equipmentPurchasePriceHint": "구매가를 입력하면 24개월 상각 기준으로 월 임대료/원가를 자동 제안합니다. 제안값은 참고용이며 아래에서 직접 수정할 수 있습니다.",
+    "equipmentEditDialogTitle": "장비 수정",
+    "equipmentUpdateSuccess": "장비 정보가 수정되었습니다",
+    "equipmentUpdateError": "장비 수정에 실패했습니다"
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"
