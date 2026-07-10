@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { listEquipmentCatalog } from "@/lib/data-access/equipment";
+import { formatRupiah } from "@/lib/utils/currency";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +43,8 @@ export default async function AdminEquipmentPage({
               <TableHead>{t("equipmentModelName")}</TableHead>
               <TableHead>{t("equipmentSpecId")}</TableHead>
               <TableHead>{t("equipmentSpecKo")}</TableHead>
+              <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
+              <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
               <TableHead>{t("status")}</TableHead>
               <TableHead>{t("actions")}</TableHead>
             </TableRow>
@@ -53,6 +56,12 @@ export default async function AdminEquipmentPage({
                 <TableCell>{item.model_name}</TableCell>
                 <TableCell>{item.spec_id ?? "-"}</TableCell>
                 <TableCell>{item.spec_ko ?? "-"}</TableCell>
+                <TableCell className="text-right">
+                  {item.monthly_rate != null ? formatRupiah(item.monthly_rate) : "-"}
+                </TableCell>
+                <TableCell className="text-right">
+                  {item.monthly_cost != null ? formatRupiah(item.monthly_cost) : "-"}
+                </TableCell>
                 <TableCell>
                   <Badge variant={item.is_active ? "default" : "secondary"}>
                     {item.is_active ? t("active") : t("inactive")}
@@ -65,7 +74,7 @@ export default async function AdminEquipmentPage({
             ))}
             {items.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   {t("noEquipment")}
                 </TableCell>
               </TableRow>

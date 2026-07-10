@@ -7,7 +7,12 @@
 import { differenceInCalendarDays } from 'date-fns';
 import type { AssetType, AssetOwner } from '@/types/domain';
 
-const NON_RECOVERABLE_TYPES: AssetType[] = ['cctv', 'starlink', 'pc_server', 'printer'];
+// CCTV/printer used to be hardcoded here too, back when they were always
+// the customer's own equipment (BCT only maintained them). Now BCT can also
+// supply/install rental CCTV and printers (see equipment_catalog), so those
+// two are recoverable exactly like AP/hub whenever `owner` is actually
+// 'bct' — ownership alone decides it, not the asset type.
+const NON_RECOVERABLE_TYPES: AssetType[] = ['starlink', 'pc_server'];
 
 export function isNonRecoverable(owner: AssetOwner, type: AssetType): boolean {
   return owner !== 'bct' || NON_RECOVERABLE_TYPES.includes(type);

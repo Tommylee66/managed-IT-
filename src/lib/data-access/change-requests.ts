@@ -1,6 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { ChangeRequest, Contract, QuoteInputs, Rates } from '@/types/domain';
+import type { ChangeRequest, Contract, EquipmentSelection, QuoteInputs, Rates } from '@/types/domain';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
+import { mergeEquipmentIntoCalc } from '@/lib/calc/equipment-pricing';
+import { calcProratedSettlement } from '@/lib/calc/proration';
 import { nextChangeRequestNo } from '@/lib/numbering';
 
 export async function listChangeRequests(supabase: SupabaseClient): Promise<ChangeRequest[]> {
@@ -29,6 +31,7 @@ export interface CreateChangeRequestInput {
   type: string;
   effective_date: string;
   new_inputs: QuoteInputs;
+  new_equipment_selections?: EquipmentSelection[];
   memo?: string;
   created_by: string;
 }
@@ -37,7 +40,13 @@ export interface CreateChangeRequestInput {
  * contract's monthly fee from the new service inputs (using the contract's
  * existing months — the pricing term doesn't restart), records the change,
  * and updates the contract's current billing figures + quote snapshot in
- * place so future invoices reflect the new amount immediately. */
+ * place so future invoices reflect the new amount immediately.
+ *
+ * Also settles the current partial month: the fee difference is prorated
+ * across the days remaining from `effective_date` to month end and stored
+ * as a one-time `settlement_amount` — the new monthly rate itself only
+ * takes effect starting next month's invoice (which reads contract.monthly_fee
+ * fresh each time, so no separate propagation is needed there). */
 export async function createChangeRequest(
   supabase: SupabaseClient,
   contract: Contract,
@@ -45,9 +54,15 @@ export async function createChangeRequest(
   input: CreateChangeRequestInput
 ): Promise<ChangeRequest> {
   const oldInputs = contract.quote_snapshot?.inputs as QuoteInputs | undefined;
+  const oldEquipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
   const oldMonthly = Number(contract.monthly_fee || 0);
-  const calc = calcQuoteForInputs(rates, input.new_inputs, contract.months);
+  const newEquipmentSelections = input.new_equipment_selections ?? [];
+  const calc = mergeEquipmentIntoCalc(
+    calcQuoteForInputs(rates, input.new_inputs, contract.months),
+    newEquipmentSelections
+  );
   const diff = calc.monthly - oldMonthly;
+  const settlementAmount = calcProratedSettlement(input.effective_date, diff);
   const no = await nextChangeRequestNo(supabase);
 
   const { data, error } = await supabase
@@ -65,6 +80,9 @@ export async function createChangeRequest(
       diff,
       old_inputs: oldInputs ?? null,
       new_inputs: input.new_inputs,
+      old_equipment_selections: oldEquipmentSelections,
+      new_equipment_selections: newEquipmentSelections,
+      settlement_amount: settlementAmount,
       memo: input.memo ?? null,
       created_by: input.created_by,
     })
@@ -75,6 +93,7 @@ export async function createChangeRequest(
   const updatedSnapshot = {
     ...contract.quote_snapshot,
     inputs: input.new_inputs,
+    equipment_selections: newEquipmentSelections,
     rows: calc.rows,
     monthly: calc.monthly,
     monthly_cost: calc.monthlyCost,
@@ -96,7 +115,7 @@ export async function createChangeRequest(
     date: input.effective_date,
     type: '변경신청',
     title: `${no} / ${input.type} / 월 ${oldMonthly} → ${calc.monthly}`,
-    memo: `월 증감액 ${diff}\n${input.memo ?? ''}`,
+    memo: `월 증감액 ${diff}, 당월 정산액 ${settlementAmount}\n${input.memo ?? ''}`,
     saved_by: input.created_by,
   });
 

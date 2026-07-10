@@ -185,7 +185,11 @@
     "createContractSuccess": "계약을 생성했습니다.",
     "createContractError": "계약 생성에 실패했습니다.",
     "equipmentSelectTitle": "제공 장비 선택",
-    "equipmentSelectEmpty": "등록된 장비가 없습니다. 관리자 메뉴에서 먼저 장비를 등록해주세요."
+    "equipmentSelectEmpty": "등록된 장비가 없습니다. 관리자 메뉴에서 먼저 장비를 등록해주세요.",
+    "editQuote": "견적 수정",
+    "saveChanges": "수정 사항 저장",
+    "updateSuccess": "견적이 수정되었습니다",
+    "updateError": "견적 수정에 실패했습니다"
   },
   "contracts": {
     "title": "계약",
@@ -501,7 +505,9 @@
     "typeServiceChange": "서비스 변경",
     "typeFeeChange": "요금 변경",
     "typeLocationChange": "로케이션 변경",
-    "typeOther": "기타"
+    "typeOther": "기타",
+    "settlementAmount": "당월 정산액",
+    "settlementHint": "당월 정산액은 변경 시행일부터 이번 달 말일까지 남은 일수만큼 요금 증감분을 일할 계산한 1회성 금액입니다. 다음 달부터는 변경된 월 요금이 그대로 청구됩니다."
   },
   "serviceLogs": {
     "title": "서비스 이력",
@@ -620,7 +626,10 @@
     "equipmentCreateDialogTitle": "장비 등록",
     "equipmentCreateSuccess": "등록되었습니다",
     "equipmentCreateError": "등록에 실패했습니다",
-    "noEquipment": "등록된 장비가 없습니다."
+    "noEquipment": "등록된 장비가 없습니다.",
+    "equipmentMonthlyRate": "월 임대료",
+    "equipmentMonthlyCost": "월 원가",
+    "equipmentRateHint": "월 임대료를 입력하면 견적/변경요청에서 선택 시 실제 청구 항목으로 반영됩니다. 비워두면 스펙 참고용으로만 쓰입니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"

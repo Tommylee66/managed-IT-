@@ -3,6 +3,7 @@ import type { Quote, QuoteInputs, Rates, EquipmentSelection } from '@/types/doma
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { bucketAmount, bucketMargin } from '@/lib/masking/staff-masking';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
+import { mergeEquipmentIntoCalc } from '@/lib/calc/equipment-pricing';
 import { nextQuoteNo } from '@/lib/numbering';
 
 function applyQuoteMasking(quote: Quote, role: StaffRole): Quote {
@@ -100,7 +101,10 @@ export async function createQuote(
   rates: Rates,
   input: CreateQuoteInput
 ): Promise<Quote> {
-  const calc = calcQuoteForInputs(rates, input.inputs, input.months);
+  const calc = mergeEquipmentIntoCalc(
+    calcQuoteForInputs(rates, input.inputs, input.months),
+    input.equipment_selections ?? []
+  );
   const no = await nextQuoteNo(supabase);
   const { data, error } = await supabase
     .from('quotes')
@@ -123,6 +127,56 @@ export async function createQuote(
       commission_base: calc.commissionBase,
       created_by: input.created_by,
     })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Quote;
+}
+
+export interface UpdateQuoteInput {
+  customer_code: string;
+  agent_code?: string;
+  start_date: string;
+  billing_date: string;
+  months: number;
+  inputs: QuoteInputs;
+  equipment_selections?: EquipmentSelection[];
+}
+
+/** Recomputes and overwrites an existing quote in place — same pricing rules
+ * as createQuote. `no`/`created_by`/`created_at` are left untouched; note
+ * this does not retroactively change any contract already created from this
+ * quote (contracts snapshot the quote at creation time). */
+export async function updateQuote(
+  supabase: SupabaseClient,
+  rates: Rates,
+  no: string,
+  input: UpdateQuoteInput
+): Promise<Quote> {
+  const calc = mergeEquipmentIntoCalc(
+    calcQuoteForInputs(rates, input.inputs, input.months),
+    input.equipment_selections ?? []
+  );
+  const { data, error } = await supabase
+    .from('quotes')
+    .update({
+      customer_code: input.customer_code,
+      agent_code: input.agent_code ?? null,
+      start_date: input.start_date,
+      billing_date: input.billing_date,
+      months: input.months,
+      inputs: input.inputs,
+      rows: calc.rows,
+      equipment_selections: input.equipment_selections ?? [],
+      monthly: calc.monthly,
+      monthly_cost: calc.monthlyCost,
+      init_cost: calc.initCost,
+      amort: calc.amort,
+      total_cost: calc.totalCost,
+      margin: calc.margin,
+      commission_base: calc.commissionBase,
+    })
+    .eq('no', no)
     .select('*')
     .single();
   if (error) throw error;

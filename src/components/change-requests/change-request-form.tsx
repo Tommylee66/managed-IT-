@@ -19,9 +19,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SummaryBox } from "@/components/ui/summary-box";
 import { formatRupiah } from "@/lib/utils/currency";
+import { EquipmentSelector, equipmentQtyToRequest } from "@/components/quotes/equipment-selector";
+import { calcProratedSettlement } from "@/lib/calc/proration";
 import { calculateQuotePreviewAction, type QuotePreview } from "@/app/[locale]/(dashboard)/quotes/actions";
 import { createChangeRequestAction } from "@/app/[locale]/(dashboard)/change-requests/actions";
-import type { Contract, QuoteInputs } from "@/types/domain";
+import type { Contract, EquipmentCatalogItem, QuoteInputs } from "@/types/domain";
 
 const TYPE_OPTIONS = [
   { value: "장비 추가", key: "typeEquipmentAdd" },
@@ -52,12 +54,15 @@ interface FormValues {
 export function ChangeRequestForm({
   contract,
   locationNames,
+  equipmentCatalog,
 }: {
   contract: Contract;
   locationNames: string[];
+  equipmentCatalog: EquipmentCatalogItem[];
 }) {
   const t = useTranslations("changeRequests");
   const tCalc = useTranslations("serviceCalculator");
+  const tQuotes = useTranslations("quotes");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
@@ -65,6 +70,13 @@ export function ChangeRequestForm({
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
+  const [equipmentQty, setEquipmentQty] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    (contract.quote_snapshot?.equipment_selections ?? []).forEach((s) => {
+      initial[s.catalogId] = s.qty;
+    });
+    return initial;
+  });
 
   const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -106,7 +118,11 @@ export function ChangeRequestForm({
     const v = getValues();
     startCalculating(async () => {
       try {
-        const result = await calculateQuotePreviewAction(toInputs(v), contract.months);
+        const result = await calculateQuotePreviewAction(
+          toInputs(v),
+          contract.months,
+          equipmentQtyToRequest(equipmentQty)
+        );
         setPreview(result);
       } catch {
         toast.error(t("calculateError"));
@@ -121,6 +137,7 @@ export function ChangeRequestForm({
         type: v.type,
         effective_date: v.effective_date,
         new_inputs: toInputs(v),
+        new_equipment_selections: equipmentQtyToRequest(equipmentQty),
         memo: v.memo,
       });
       toast.success(t("saveSuccess"));
@@ -133,6 +150,8 @@ export function ChangeRequestForm({
   }
 
   const diff = preview ? preview.monthly - contract.monthly_fee : null;
+  const effectiveDate = getValues("effective_date");
+  const settlement = preview && diff !== null ? calcProratedSettlement(effectiveDate, diff) : null;
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -201,6 +220,14 @@ export function ChangeRequestForm({
             </div>
           </div>
           <div className="flex flex-col gap-2">
+            <Label>{tQuotes("equipmentSelectTitle")}</Label>
+            {equipmentCatalog.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
+            ) : (
+              <EquipmentSelector catalog={equipmentCatalog} value={equipmentQty} onChange={setEquipmentQty} />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
             <Label htmlFor="memo">{tCalc("memo")}</Label>
             <Textarea id="memo" {...register("memo")} />
           </div>
@@ -227,9 +254,12 @@ export function ChangeRequestForm({
               metrics={[
                 { label: t("currentMonthly"), value: formatRupiah(contract.monthly_fee) },
                 { label: t("monthlyDiff"), value: formatRupiah(diff ?? 0) },
+                { label: t("settlementAmount"), value: formatRupiah(settlement ?? 0) },
               ]}
             />
-          ) : (
+          ) : null}
+          {preview && <p className="mt-2 text-xs text-muted-foreground">{t("settlementHint")}</p>}
+          {!preview && (
             <p className="text-muted-foreground">{t("resultPlaceholder")}</p>
           )}
         </CardContent>

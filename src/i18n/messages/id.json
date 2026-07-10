@@ -185,7 +185,11 @@
     "createContractSuccess": "Kontrak berhasil dibuat.",
     "createContractError": "Gagal membuat kontrak.",
     "equipmentSelectTitle": "Pilih Perangkat yang Disediakan",
-    "equipmentSelectEmpty": "Belum ada perangkat terdaftar. Silakan tambahkan perangkat di menu admin terlebih dahulu."
+    "equipmentSelectEmpty": "Belum ada perangkat terdaftar. Silakan tambahkan perangkat di menu admin terlebih dahulu.",
+    "editQuote": "Edit Penawaran",
+    "saveChanges": "Simpan Perubahan",
+    "updateSuccess": "Penawaran berhasil diperbarui",
+    "updateError": "Gagal memperbarui penawaran"
   },
   "contracts": {
     "title": "Kontrak",
@@ -501,7 +505,9 @@
     "typeServiceChange": "Perubahan Layanan",
     "typeFeeChange": "Perubahan Biaya",
     "typeLocationChange": "Perubahan Lokasi",
-    "typeOther": "Lainnya"
+    "typeOther": "Lainnya",
+    "settlementAmount": "Penyesuaian Bulan Ini",
+    "settlementHint": "Penyesuaian bulan ini adalah biaya satu kali, dihitung proporsional dari tanggal efektif hingga akhir bulan ini. Mulai bulan depan, tagihan menggunakan biaya bulanan yang baru."
   },
   "serviceLogs": {
     "title": "Riwayat Layanan",
@@ -620,7 +626,10 @@
     "equipmentCreateDialogTitle": "Tambah Perangkat Baru",
     "equipmentCreateSuccess": "Berhasil ditambahkan",
     "equipmentCreateError": "Gagal menambahkan",
-    "noEquipment": "Belum ada perangkat terdaftar."
+    "noEquipment": "Belum ada perangkat terdaftar.",
+    "equipmentMonthlyRate": "Tarif Sewa Bulanan",
+    "equipmentMonthlyCost": "Biaya Bulanan (Internal)",
+    "equipmentRateHint": "Jika tarif sewa bulanan diisi, item ini akan menjadi baris tagihan saat dipilih di penawaran/perubahan layanan. Jika dikosongkan, hanya untuk referensi spesifikasi."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

@@ -180,6 +180,12 @@ export interface EquipmentCatalogItem {
   model_name: string;
   spec_id: string | null;
   spec_ko: string | null;
+  /** Monthly rental rate charged to the customer. Null = spec-only
+   * reference item (not a billable line, e.g. an AP model just documented
+   * for the quote's equipment table). */
+  monthly_rate: number | null;
+  /** Internal monthly cost, master-only — null if not tracked. */
+  monthly_cost: number | null;
   is_active: boolean;
   created_by: string | null;
   created_at: string;
@@ -195,6 +201,9 @@ export interface EquipmentSelection {
   specId: string | null;
   specKo: string | null;
   qty: number;
+  /** Rate/cost snapshotted at selection time — see EquipmentCatalogItem. */
+  monthlyRate: number | null;
+  monthlyCost: number | null;
 }
 
 export interface QuoteRowRecord {
@@ -437,6 +446,11 @@ export interface ChangeRequest {
   diff: number | null;
   old_inputs: QuoteInputs | null;
   new_inputs: QuoteInputs | null;
+  old_equipment_selections: EquipmentSelection[] | null;
+  new_equipment_selections: EquipmentSelection[] | null;
+  /** Prorated one-time charge/credit for the remainder of the effective
+   * month, from the fee difference — see calc/proration.ts. */
+  settlement_amount: number | null;
   memo: string | null;
   created_by: string | null;
   created_at: string;

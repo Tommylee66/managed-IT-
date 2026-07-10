@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -17,18 +17,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { SummaryBox } from "@/components/ui/summary-box";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { renderQuoteRowLabel } from "@/lib/calc/quote-row-labels";
+import { EquipmentSelector, equipmentQtyToRequest } from "@/components/quotes/equipment-selector";
 import type { Locale } from "@/config/constants";
 import {
   calculateQuotePreviewAction,
   createQuoteAction,
+  updateQuoteAction,
   type QuotePreview,
 } from "@/app/[locale]/(dashboard)/quotes/actions";
 import type { Customer, Agent, QuoteInputs, EquipmentCatalogItem, EquipmentSelection } from "@/types/domain";
+
+export interface QuoteEditInitialValues {
+  no: string;
+  customer_code: string;
+  agent_code: string | null;
+  start_date: string;
+  billing_date: string;
+  months: number;
+  inputs: QuoteInputs;
+  equipment_selections: EquipmentSelection[];
+}
 
 interface FormValues {
   customer_code: string;
@@ -57,66 +69,49 @@ export function QuoteCalculatorForm({
   agents,
   locationNames,
   equipmentCatalog,
+  initialValues,
 }: {
   customers: Customer[];
   agents: Agent[];
   locationNames: string[];
   equipmentCatalog: EquipmentCatalogItem[];
+  initialValues?: QuoteEditInitialValues;
 }) {
   const t = useTranslations("serviceCalculator");
   const tQuotes = useTranslations("quotes");
-  const tCat = useTranslations("equipmentCategory");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
-  const [equipmentQty, setEquipmentQty] = useState<Record<string, number>>({});
-
-  function toggleEquipment(id: string, checked: boolean) {
-    setEquipmentQty((prev) => {
-      const next = { ...prev };
-      if (checked) next[id] = next[id] ?? 1;
-      else delete next[id];
-      return next;
+  const [equipmentQty, setEquipmentQty] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    initialValues?.equipment_selections.forEach((s) => {
+      initial[s.catalogId] = s.qty;
     });
-  }
-
-  function buildEquipmentSelections(): EquipmentSelection[] {
-    return Object.entries(equipmentQty)
-      .map(([id, qty]) => {
-        const item = equipmentCatalog.find((e) => e.id === id);
-        if (!item) return null;
-        return {
-          catalogId: item.id,
-          category: item.category,
-          modelName: item.model_name,
-          specId: item.spec_id,
-          specKo: item.spec_ko,
-          qty,
-        };
-      })
-      .filter((s): s is EquipmentSelection => s !== null);
-  }
+    return initial;
+  });
 
   const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
-      start_date: today,
-      billing_date: today,
-      months: 36,
-      emp: 20,
-      ap: 1,
-      hub: 1,
-      cctv: 8,
-      visit: 1,
-      locationIndex: 0,
-      vpn: "none",
-      vpnBranches: 0,
-      security: "none",
-      priority: "no",
-      discount: 0,
-      memo: "",
+      customer_code: initialValues?.customer_code ?? "",
+      agent_code: initialValues?.agent_code ?? "",
+      start_date: initialValues?.start_date ?? today,
+      billing_date: initialValues?.billing_date ?? today,
+      months: initialValues?.months ?? 36,
+      emp: initialValues?.inputs.emp ?? 20,
+      ap: initialValues?.inputs.ap ?? 1,
+      hub: initialValues?.inputs.hub ?? 1,
+      cctv: initialValues?.inputs.cctv ?? 8,
+      visit: initialValues?.inputs.visit ?? 1,
+      locationIndex: initialValues?.inputs.locationIndex ?? 0,
+      vpn: initialValues?.inputs.vpn ?? "none",
+      vpnBranches: initialValues?.inputs.vpnBranches ?? 0,
+      security: initialValues?.inputs.security ?? "none",
+      priority: initialValues?.inputs.priority ?? "no",
+      discount: initialValues?.inputs.discount ?? 0,
+      memo: initialValues?.inputs.memo ?? "",
     },
   });
 
@@ -141,13 +136,24 @@ export function QuoteCalculatorForm({
     const v = getValues();
     startCalculating(async () => {
       try {
-        const result = await calculateQuotePreviewAction(toInputs(v), Number(v.months));
+        const result = await calculateQuotePreviewAction(
+          toInputs(v),
+          Number(v.months),
+          equipmentQtyToRequest(equipmentQty)
+        );
         setPreview(result);
       } catch {
         toast.error(t("calculateError"));
       }
     });
   }
+
+  // Editing an existing quote: show its current numbers immediately instead
+  // of forcing an extra "계산하기" click before Save becomes usable.
+  useEffect(() => {
+    if (initialValues) recalculate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function onSave(v: FormValues) {
     if (!v.customer_code) {
@@ -156,19 +162,33 @@ export function QuoteCalculatorForm({
     }
     setIsSaving(true);
     try {
-      const quote = await createQuoteAction({
-        customer_code: v.customer_code,
-        agent_code: v.agent_code || undefined,
-        start_date: v.start_date,
-        billing_date: v.billing_date,
-        months: Number(v.months),
-        inputs: toInputs(v),
-        equipment_selections: buildEquipmentSelections(),
-      });
-      toast.success(t("saveSuccess"));
-      router.push(`/${locale}/quotes/${quote.no}`);
+      if (initialValues) {
+        await updateQuoteAction(initialValues.no, {
+          customer_code: v.customer_code,
+          agent_code: v.agent_code || undefined,
+          start_date: v.start_date,
+          billing_date: v.billing_date,
+          months: Number(v.months),
+          inputs: toInputs(v),
+          equipment_selections: equipmentQtyToRequest(equipmentQty),
+        });
+        toast.success(tQuotes("updateSuccess"));
+        router.push(`/${locale}/quotes/${initialValues.no}`);
+      } else {
+        const quote = await createQuoteAction({
+          customer_code: v.customer_code,
+          agent_code: v.agent_code || undefined,
+          start_date: v.start_date,
+          billing_date: v.billing_date,
+          months: Number(v.months),
+          inputs: toInputs(v),
+          equipment_selections: equipmentQtyToRequest(equipmentQty),
+        });
+        toast.success(t("saveSuccess"));
+        router.push(`/${locale}/quotes/${quote.no}`);
+      }
     } catch {
-      toast.error(t("saveError"));
+      toast.error(initialValues ? tQuotes("updateError") : t("saveError"));
     } finally {
       setIsSaving(false);
     }
@@ -184,7 +204,10 @@ export function QuoteCalculatorForm({
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{t("customer")}</Label>
-              <Select onValueChange={(v) => setValue("customer_code", v)}>
+              <Select
+                defaultValue={initialValues?.customer_code}
+                onValueChange={(v) => setValue("customer_code", v)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t("select")} />
                 </SelectTrigger>
@@ -199,7 +222,10 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{t("salesAgent")}</Label>
-              <Select onValueChange={(v) => setValue("agent_code", v)}>
+              <Select
+                defaultValue={initialValues?.agent_code ?? undefined}
+                onValueChange={(v) => setValue("agent_code", v)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t("noAgentSelected")} />
                 </SelectTrigger>
@@ -242,7 +268,10 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2">
               <Label>{t("visitFrequency")}</Label>
-              <Select defaultValue="1" onValueChange={(v) => setValue("visit", Number(v) as 1 | 2)}>
+              <Select
+                defaultValue={String(initialValues?.inputs.visit ?? 1)}
+                onValueChange={(v) => setValue("visit", Number(v) as 1 | 2)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -254,7 +283,10 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{t("location")}</Label>
-              <Select defaultValue="0" onValueChange={(v) => setValue("locationIndex", Number(v))}>
+              <Select
+                defaultValue={String(initialValues?.inputs.locationIndex ?? 0)}
+                onValueChange={(v) => setValue("locationIndex", Number(v))}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -269,7 +301,10 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2">
               <Label>{t("vpn")}</Label>
-              <Select defaultValue="none" onValueChange={(v) => setValue("vpn", v as "none" | "base")}>
+              <Select
+                defaultValue={initialValues?.inputs.vpn ?? "none"}
+                onValueChange={(v) => setValue("vpn", v as "none" | "base")}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -286,7 +321,7 @@ export function QuoteCalculatorForm({
             <div className="flex flex-col gap-2">
               <Label>{t("security")}</Label>
               <Select
-                defaultValue="none"
+                defaultValue={initialValues?.inputs.security ?? "none"}
                 onValueChange={(v) => setValue("security", v as "none" | "monitor" | "device")}
               >
                 <SelectTrigger>
@@ -301,7 +336,10 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2">
               <Label>{t("priorityResponse")}</Label>
-              <Select defaultValue="no" onValueChange={(v) => setValue("priority", v as "no" | "yes")}>
+              <Select
+                defaultValue={initialValues?.inputs.priority ?? "no"}
+                onValueChange={(v) => setValue("priority", v as "no" | "yes")}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -321,34 +359,7 @@ export function QuoteCalculatorForm({
             {equipmentCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
             ) : (
-              <div className="flex flex-col gap-2 rounded-md border p-3">
-                {equipmentCatalog.map((item) => {
-                  const checked = item.id in equipmentQty;
-                  return (
-                    <div key={item.id} className="flex items-center gap-3">
-                      <Checkbox
-                        checked={checked}
-                        onCheckedChange={(v) => toggleEquipment(item.id, v === true)}
-                      />
-                      <span className="flex-1 text-sm">
-                        <span className="text-muted-foreground">[{tCat(item.category)}]</span>{" "}
-                        {item.model_name}
-                        {item.spec_id && <span className="text-muted-foreground"> — {item.spec_id}</span>}
-                      </span>
-                      <Input
-                        type="number"
-                        min={1}
-                        className="w-20"
-                        disabled={!checked}
-                        value={equipmentQty[item.id] ?? 1}
-                        onChange={(e) =>
-                          setEquipmentQty((prev) => ({ ...prev, [item.id]: Number(e.target.value) }))
-                        }
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+              <EquipmentSelector catalog={equipmentCatalog} value={equipmentQty} onChange={setEquipmentQty} />
             )}
           </div>
           <div className="flex flex-col gap-2">
@@ -360,7 +371,11 @@ export function QuoteCalculatorForm({
               {isCalculating ? t("calculating") : t("calculate")}
             </Button>
             <Button type="button" onClick={handleSubmit(onSave)} disabled={isSaving || !preview}>
-              {isSaving ? t("saving") : t("saveQuote")}
+              {isSaving
+                ? t("saving")
+                : initialValues
+                  ? tQuotes("saveChanges")
+                  : t("saveQuote")}
             </Button>
           </div>
         </CardContent>

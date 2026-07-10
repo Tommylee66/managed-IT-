@@ -50,6 +50,8 @@ export function CreateEquipmentDialog() {
     model_name: z.string().min(1, t("equipmentModelRequired")),
     spec_id: z.string().optional(),
     spec_ko: z.string().optional(),
+    monthly_rate: z.string().optional(),
+    monthly_cost: z.string().optional(),
   });
   type FormValues = z.infer<typeof schema>;
 
@@ -63,7 +65,11 @@ export function CreateEquipmentDialog() {
 
   async function onSubmit(values: FormValues) {
     try {
-      await createEquipmentCatalogItemAction(values);
+      await createEquipmentCatalogItemAction({
+        ...values,
+        monthly_rate: values.monthly_rate ? Number(values.monthly_rate) : null,
+        monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
+      });
       toast.success(t("equipmentCreateSuccess"));
       reset();
       setOpen(false);
@@ -112,6 +118,17 @@ export function CreateEquipmentDialog() {
             <Label htmlFor="spec_ko">{t("equipmentSpecKo")}</Label>
             <Input id="spec_ko" {...register("spec_ko")} />
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="monthly_rate">{t("equipmentMonthlyRate")}</Label>
+              <Input id="monthly_rate" type="number" {...register("monthly_rate")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="monthly_cost">{t("equipmentMonthlyCost")}</Label>
+              <Input id="monthly_cost" type="number" {...register("monthly_cost")} />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">{t("equipmentRateHint")}</p>
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("creating") : t("create")}

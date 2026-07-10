@@ -4,10 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getSessionContext } from '@/lib/auth/session';
 import { getRates } from '@/lib/data-access/rates';
-import { createQuote } from '@/lib/data-access/quotes';
+import { createQuote, updateQuote } from '@/lib/data-access/quotes';
+import { listEquipmentCatalog } from '@/lib/data-access/equipment';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
+import { resolveEquipmentSelections, mergeEquipmentIntoCalc, type EquipmentSelectionRequest } from '@/lib/calc/equipment-pricing';
 import { bucketAmount, bucketMargin } from '@/lib/masking/staff-masking';
-import type { QuoteInputs, Rates, EquipmentSelection } from '@/types/domain';
+import type { QuoteInputs, Rates } from '@/types/domain';
 
 export interface QuotePreview {
   rows: {
@@ -32,16 +34,20 @@ export interface QuotePreview {
 
 /** Calculation always runs server-side against the real (unmasked) rates —
  * the browser never receives cost_fields/init_fields, only this
- * already-masked-if-staff preview. */
+ * already-masked-if-staff preview. Equipment pricing is resolved the same
+ * way: the client only ever sends {catalogId, qty}, never a rate. */
 export async function calculateQuotePreviewAction(
   inputs: QuoteInputs,
-  months: number
+  months: number,
+  equipment: EquipmentSelectionRequest[] = []
 ): Promise<QuotePreview> {
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
   const rates = (await getRates(supabase, 'master')) as Rates;
-  const calc = calcQuoteForInputs(rates, inputs, months);
+  const catalog = await listEquipmentCatalog(supabase, { role: 'master' });
+  const resolved = resolveEquipmentSelections(equipment, catalog);
+  const calc = mergeEquipmentIntoCalc(calcQuoteForInputs(rates, inputs, months), resolved);
   const ppn = Math.round((calc.monthly * rates.ppn) / 100);
 
   const rows = calc.rows.map((r) => ({
@@ -83,7 +89,7 @@ export interface CreateQuoteFormInput {
   billing_date: string;
   months: number;
   inputs: QuoteInputs;
-  equipment_selections?: EquipmentSelection[];
+  equipment_selections?: EquipmentSelectionRequest[];
 }
 
 export async function createQuoteAction(input: CreateQuoteFormInput) {
@@ -91,7 +97,26 @@ export async function createQuoteAction(input: CreateQuoteFormInput) {
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
   const rates = (await getRates(supabase, 'master')) as Rates;
-  const quote = await createQuote(supabase, rates, { ...input, created_by: session.userId });
+  const catalog = await listEquipmentCatalog(supabase, { role: 'master' });
+  const resolved = resolveEquipmentSelections(input.equipment_selections ?? [], catalog);
+  const quote = await createQuote(supabase, rates, {
+    ...input,
+    equipment_selections: resolved,
+    created_by: session.userId,
+  });
   revalidatePath('/quotes');
+  return quote;
+}
+
+export async function updateQuoteAction(no: string, input: CreateQuoteFormInput) {
+  const session = await getSessionContext();
+  if (!session) throw new Error('Unauthorized');
+  const supabase = await createClient();
+  const rates = (await getRates(supabase, 'master')) as Rates;
+  const catalog = await listEquipmentCatalog(supabase, { role: 'master' });
+  const resolved = resolveEquipmentSelections(input.equipment_selections ?? [], catalog);
+  const quote = await updateQuote(supabase, rates, no, { ...input, equipment_selections: resolved });
+  revalidatePath('/quotes');
+  revalidatePath(`/quotes/${no}`);
   return quote;
 }

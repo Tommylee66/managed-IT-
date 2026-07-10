@@ -19,6 +19,10 @@ export function QuoteDocument({
 }) {
   const ppn = Math.round((quote.monthly * ppnRate) / 100);
   const total = quote.monthly + ppn;
+  const cctvRentalSelected = quote.equipment_selections.some(
+    (e) => e.category === "cctv" && e.monthlyRate != null
+  );
+  const hasRentedEquipment = quote.equipment_selections.some((e) => e.monthlyRate != null);
 
   return (
     <DocumentShell
@@ -144,11 +148,26 @@ export function QuoteDocument({
             />
           </li>
           <li>
-            <Bilingual
-              id="Perangkat CCTV dan instalasi baru menjadi tanggung jawab Pelanggan; BCT hanya menyediakan pemeliharaan status operasional/jaringan/rekaman CCTV milik Pelanggan."
-              ko="CCTV 장비 및 신규 설치는 고객 부담이며, BCT는 고객 보유 CCTV의 작동/네트워크/녹화 상태 유지보수만 제공합니다."
-            />
+            {cctvRentalSelected ? (
+              <Bilingual
+                id="CCTV pada penawaran ini dibangun/dipasang langsung oleh BCT dan tetap menjadi milik BCT selama masa sewa; biaya sewa bulanan di atas sudah termasuk pemeliharaan. Untuk CCTV lain milik Pelanggan di luar penawaran ini, BCT hanya menyediakan pemeliharaan status operasional/jaringan/rekaman."
+                ko="본 견적에 포함된 CCTV는 BCT가 직접 구축·설치하며, 임대 기간 동안 BCT 소유입니다. 위 월 임대료에 유지보수가 포함되어 있습니다. 이 견적에 포함되지 않은 고객 보유 CCTV는 BCT가 작동/네트워크/녹화 상태 유지보수만 제공합니다."
+              />
+            ) : (
+              <Bilingual
+                id="Perangkat CCTV dan instalasi baru menjadi tanggung jawab Pelanggan; BCT hanya menyediakan pemeliharaan status operasional/jaringan/rekaman CCTV milik Pelanggan."
+                ko="CCTV 장비 및 신규 설치는 고객 부담이며, BCT는 고객 보유 CCTV의 작동/네트워크/녹화 상태 유지보수만 제공합니다."
+              />
+            )}
           </li>
+          {hasRentedEquipment && (
+            <li>
+              <Bilingual
+                id="Perangkat sewa pada tabel spesifikasi di atas (CCTV, printer, dll.) tetap menjadi milik BCT selama masa sewa. Jika kontrak berakhir lebih awal, nilai belum diamortisasi dari perangkat tersebut dapat ditagihkan sesuai ketentuan penalti terminasi."
+                ko="위 장비 사양 표에 포함된 임대 장비(CCTV, 프린터 등)는 임대 기간 동안 BCT 소유입니다. 계약이 중도 해지될 경우, 해당 장비의 미상각 잔액은 중도해지 패널티 조항에 따라 정산될 수 있습니다."
+              />
+            </li>
+          )}
           <li>
             <Bilingual
               id="Layanan bulanan mencakup pemeliharaan rutin serta dukungan jarak jauh/lapangan untuk seluruh PC karyawan dan perangkat jaringan yang tercakup dalam kontrak. Biaya suku cadang dan perbaikan akibat kerusakan (di luar pemeliharaan rutin) ditagihkan terpisah sesuai biaya riil (at-cost), tanpa markup."

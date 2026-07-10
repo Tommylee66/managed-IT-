@@ -185,7 +185,11 @@
     "createContractSuccess": "Contract created.",
     "createContractError": "Failed to create contract.",
     "equipmentSelectTitle": "Select Equipment Provided",
-    "equipmentSelectEmpty": "No equipment registered yet. Please add equipment in the admin menu first."
+    "equipmentSelectEmpty": "No equipment registered yet. Please add equipment in the admin menu first.",
+    "editQuote": "Edit Quote",
+    "saveChanges": "Save Changes",
+    "updateSuccess": "Quote updated successfully",
+    "updateError": "Failed to update quote"
   },
   "contracts": {
     "title": "Contracts",
@@ -501,7 +505,9 @@
     "typeServiceChange": "Service Change",
     "typeFeeChange": "Fee Change",
     "typeLocationChange": "Location Change",
-    "typeOther": "Other"
+    "typeOther": "Other",
+    "settlementAmount": "This Month's Settlement",
+    "settlementHint": "This is a one-time prorated amount for the days remaining this month from the effective date. Starting next month, the new monthly fee applies as-is."
   },
   "serviceLogs": {
     "title": "Service Logs",
@@ -620,7 +626,10 @@
     "equipmentCreateDialogTitle": "Register Equipment",
     "equipmentCreateSuccess": "Registered successfully",
     "equipmentCreateError": "Failed to register",
-    "noEquipment": "No equipment registered yet."
+    "noEquipment": "No equipment registered yet.",
+    "equipmentMonthlyRate": "Monthly Rental Rate",
+    "equipmentMonthlyCost": "Monthly Cost (Internal)",
+    "equipmentRateHint": "If a monthly rate is set, this item becomes a billable line when selected on a quote or change request. Leave blank to keep it spec-only."
   },
   "documents": {
     "printSave": "Print / Save PDF"

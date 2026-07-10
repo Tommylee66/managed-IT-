@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getContractRaw } from "@/lib/data-access/contracts";
 import { getRates } from "@/lib/data-access/rates";
+import { listEquipmentCatalog } from "@/lib/data-access/equipment";
 import { ChangeRequestForm } from "@/components/change-requests/change-request-form";
 import type { Rates } from "@/types/domain";
 
@@ -22,8 +23,9 @@ export default async function NewChangeRequestPage({
   const contract = await getContractRaw(supabase, contractNo);
   if (!contract) notFound();
 
-  const [rates, t] = await Promise.all([
+  const [rates, equipmentCatalog, t] = await Promise.all([
     getRates(supabase, "master") as Promise<Rates>,
+    listEquipmentCatalog(supabase, { activeOnly: true }),
     getTranslations("changeRequests"),
   ]);
   const locationNames = rates.locations.map((l) => l.name);
@@ -31,7 +33,7 @@ export default async function NewChangeRequestPage({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">{t("formTitle", { no: contract.no })}</h1>
-      <ChangeRequestForm contract={contract} locationNames={locationNames} />
+      <ChangeRequestForm contract={contract} locationNames={locationNames} equipmentCatalog={equipmentCatalog} />
     </div>
   );
 }

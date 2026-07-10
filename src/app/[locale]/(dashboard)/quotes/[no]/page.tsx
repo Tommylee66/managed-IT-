@@ -43,6 +43,9 @@ export default async function QuoteDetailPage({
         </h1>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
+            <Link href={`/${locale}/quotes/${quote.no}/edit`}>{tCommon("edit")}</Link>
+          </Button>
+          <Button variant="outline" asChild>
             <Link href={`/${locale}/quotes/${quote.no}/print`}>{tCommon("print")}</Link>
           </Button>
           <CreateContractButton quoteNo={quote.no} disabled={!quote.agent_code} />
