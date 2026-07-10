@@ -41,8 +41,7 @@
     "adminStaff": "Staff Management",
     "adminRates": "Rate Settings",
     "adminAuditLog": "Audit Log",
-    "adminApprovals": "Signup Approvals",
-    "adminEquipment": "Equipment Catalog"
+    "adminApprovals": "Signup Approvals"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -672,8 +671,7 @@
     "chartAnnualCaption": "Sum of contract monthly fees by year",
     "chartSignupCancelTitle": "Signups/Cancellations by Month",
     "chartSignupCancelCaption": "Signup = contract start date, Cancel = termination request save date",
-    "cardAdminApprovalsDesc": "Approve or reject new staff signup requests.",
-    "cardAdminEquipmentDesc": "Register equipment models and specs for use in quotes."
+    "cardAdminApprovalsDesc": "Approve or reject new staff signup requests."
   },
   "equipmentCategory": {
     "router": "Router",

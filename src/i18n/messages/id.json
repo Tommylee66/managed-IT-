@@ -41,8 +41,7 @@
     "adminStaff": "Manajemen Staf",
     "adminRates": "Pengaturan Tarif",
     "adminAuditLog": "Log Audit",
-    "adminApprovals": "Persetujuan Pendaftaran",
-    "adminEquipment": "Katalog Perangkat"
+    "adminApprovals": "Persetujuan Pendaftaran"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -672,8 +671,7 @@
     "chartAnnualCaption": "Total biaya bulanan kontrak per tahun",
     "chartSignupCancelTitle": "Status Pendaftaran/Pengakhiran per Bulan",
     "chartSignupCancelCaption": "Daftar=tanggal mulai kontrak, Akhiri=tanggal pengajuan pengakhiran disimpan",
-    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru.",
-    "cardAdminEquipmentDesc": "Daftarkan model dan spesifikasi perangkat untuk digunakan dalam penawaran."
+    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru."
   },
   "equipmentCategory": {
     "router": "Router",

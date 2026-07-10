@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { setEquipmentCatalogActiveAction } from "@/app/[locale]/(dashboard)/admin/equipment/actions";
+import { setEquipmentCatalogActiveAction } from "@/app/[locale]/(dashboard)/admin/rates/actions";
 
 export function ToggleEquipmentActiveButton({ id, active }: { id: string; active: boolean }) {
   const t = useTranslations("admin");

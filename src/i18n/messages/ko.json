@@ -41,8 +41,7 @@
     "adminStaff": "직원 관리",
     "adminRates": "요율 설정",
     "adminAuditLog": "감사 로그",
-    "adminApprovals": "가입 승인",
-    "adminEquipment": "장비 카탈로그"
+    "adminApprovals": "가입 승인"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -672,8 +671,7 @@
     "chartAnnualCaption": "연도별 계약월 요금 합계",
     "chartSignupCancelTitle": "월별 가입/해지 현황",
     "chartSignupCancelCaption": "가입=계약 시작일, 해지=해지신청 저장일 기준",
-    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다.",
-    "cardAdminEquipmentDesc": "견적서에 사용할 장비 모델과 스펙을 등록합니다."
+    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다."
   },
   "equipmentCategory": {
     "router": "라우터",

@@ -24,7 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { createEquipmentCatalogItemAction } from "@/app/[locale]/(dashboard)/admin/equipment/actions";
+import { createEquipmentCatalogItemAction } from "@/app/[locale]/(dashboard)/admin/rates/actions";
 import type { AssetType } from "@/types/domain";
 
 const CATEGORIES: AssetType[] = [
