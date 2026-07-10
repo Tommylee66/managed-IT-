@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { SummaryBox } from "@/components/ui/summary-box";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
@@ -27,7 +28,7 @@ import {
   createQuoteAction,
   type QuotePreview,
 } from "@/app/[locale]/(dashboard)/quotes/actions";
-import type { Customer, Agent, QuoteInputs } from "@/types/domain";
+import type { Customer, Agent, QuoteInputs, EquipmentCatalogItem, EquipmentSelection } from "@/types/domain";
 
 interface FormValues {
   customer_code: string;
@@ -55,19 +56,49 @@ export function QuoteCalculatorForm({
   customers,
   agents,
   locationNames,
+  equipmentCatalog,
 }: {
   customers: Customer[];
   agents: Agent[];
   locationNames: string[];
+  equipmentCatalog: EquipmentCatalogItem[];
 }) {
   const t = useTranslations("serviceCalculator");
   const tQuotes = useTranslations("quotes");
+  const tCat = useTranslations("equipmentCategory");
   const router = useRouter();
   const params = useParams();
   const locale = params.locale as string;
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
+  const [equipmentQty, setEquipmentQty] = useState<Record<string, number>>({});
+
+  function toggleEquipment(id: string, checked: boolean) {
+    setEquipmentQty((prev) => {
+      const next = { ...prev };
+      if (checked) next[id] = next[id] ?? 1;
+      else delete next[id];
+      return next;
+    });
+  }
+
+  function buildEquipmentSelections(): EquipmentSelection[] {
+    return Object.entries(equipmentQty)
+      .map(([id, qty]) => {
+        const item = equipmentCatalog.find((e) => e.id === id);
+        if (!item) return null;
+        return {
+          catalogId: item.id,
+          category: item.category,
+          modelName: item.model_name,
+          specId: item.spec_id,
+          specKo: item.spec_ko,
+          qty,
+        };
+      })
+      .filter((s): s is EquipmentSelection => s !== null);
+  }
 
   const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -132,6 +163,7 @@ export function QuoteCalculatorForm({
         billing_date: v.billing_date,
         months: Number(v.months),
         inputs: toInputs(v),
+        equipment_selections: buildEquipmentSelections(),
       });
       toast.success(t("saveSuccess"));
       router.push(`/${locale}/quotes/${quote.no}`);
@@ -283,6 +315,41 @@ export function QuoteCalculatorForm({
               <Label htmlFor="discount">{t("discount")}</Label>
               <Input id="discount" type="number" {...register("discount")} />
             </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>{tQuotes("equipmentSelectTitle")}</Label>
+            {equipmentCatalog.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
+            ) : (
+              <div className="flex flex-col gap-2 rounded-md border p-3">
+                {equipmentCatalog.map((item) => {
+                  const checked = item.id in equipmentQty;
+                  return (
+                    <div key={item.id} className="flex items-center gap-3">
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(v) => toggleEquipment(item.id, v === true)}
+                      />
+                      <span className="flex-1 text-sm">
+                        <span className="text-muted-foreground">[{tCat(item.category)}]</span>{" "}
+                        {item.model_name}
+                        {item.spec_id && <span className="text-muted-foreground"> — {item.spec_id}</span>}
+                      </span>
+                      <Input
+                        type="number"
+                        min={1}
+                        className="w-20"
+                        disabled={!checked}
+                        value={equipmentQty[item.id] ?? 1}
+                        onChange={(e) =>
+                          setEquipmentQty((prev) => ({ ...prev, [item.id]: Number(e.target.value) }))
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="memo">{t("memo")}</Label>

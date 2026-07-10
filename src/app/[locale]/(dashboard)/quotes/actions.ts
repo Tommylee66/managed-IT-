@@ -7,7 +7,7 @@ import { getRates } from '@/lib/data-access/rates';
 import { createQuote } from '@/lib/data-access/quotes';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
 import { bucketAmount, bucketMargin } from '@/lib/masking/staff-masking';
-import type { QuoteInputs, Rates } from '@/types/domain';
+import type { QuoteInputs, Rates, EquipmentSelection } from '@/types/domain';
 
 export interface QuotePreview {
   rows: {
@@ -83,6 +83,7 @@ export interface CreateQuoteFormInput {
   billing_date: string;
   months: number;
   inputs: QuoteInputs;
+  equipment_selections?: EquipmentSelection[];
 }
 
 export async function createQuoteAction(input: CreateQuoteFormInput) {

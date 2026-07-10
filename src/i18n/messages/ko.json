@@ -41,7 +41,8 @@
     "adminStaff": "직원 관리",
     "adminRates": "요율 설정",
     "adminAuditLog": "감사 로그",
-    "adminApprovals": "가입 승인"
+    "adminApprovals": "가입 승인",
+    "adminEquipment": "장비 카탈로그"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -182,7 +183,9 @@
     "monthlyTotal": "월 합계",
     "marginRate": "마진율",
     "createContractSuccess": "계약을 생성했습니다.",
-    "createContractError": "계약 생성에 실패했습니다."
+    "createContractError": "계약 생성에 실패했습니다.",
+    "equipmentSelectTitle": "제공 장비 선택",
+    "equipmentSelectEmpty": "등록된 장비가 없습니다. 관리자 메뉴에서 먼저 장비를 등록해주세요."
   },
   "contracts": {
     "title": "계약",
@@ -606,7 +609,18 @@
     "rejectError": "거절에 실패했습니다",
     "rejectConfirm": "{name}님의 가입 신청을 거절하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
     "approvalsTitle": "가입 승인",
-    "noPendingApprovals": "승인 대기 중인 가입 신청이 없습니다."
+    "noPendingApprovals": "승인 대기 중인 가입 신청이 없습니다.",
+    "equipmentTitle": "장비 카탈로그",
+    "equipmentCategory": "분류",
+    "equipmentModelName": "모델명",
+    "equipmentSpecId": "스펙 (인도네시아어)",
+    "equipmentSpecKo": "스펙 (한국어)",
+    "equipmentModelRequired": "모델명을 입력하세요",
+    "newEquipment": "장비 등록",
+    "equipmentCreateDialogTitle": "장비 등록",
+    "equipmentCreateSuccess": "등록되었습니다",
+    "equipmentCreateError": "등록에 실패했습니다",
+    "noEquipment": "등록된 장비가 없습니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"
@@ -649,6 +663,19 @@
     "chartAnnualCaption": "연도별 계약월 요금 합계",
     "chartSignupCancelTitle": "월별 가입/해지 현황",
     "chartSignupCancelCaption": "가입=계약 시작일, 해지=해지신청 저장일 기준",
-    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다."
+    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다.",
+    "cardAdminEquipmentDesc": "견적서에 사용할 장비 모델과 스펙을 등록합니다."
+  },
+  "equipmentCategory": {
+    "router": "라우터",
+    "ap": "AP(무선망)",
+    "hub_switch": "허브/스위치",
+    "cctv": "CCTV",
+    "security": "보안장비",
+    "vpn_config": "VPN 구성",
+    "starlink": "Starlink",
+    "pc_server": "PC/서버",
+    "printer": "프린터",
+    "other": "기타"
   }
 }

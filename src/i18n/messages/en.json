@@ -41,7 +41,8 @@
     "adminStaff": "Staff Management",
     "adminRates": "Rate Settings",
     "adminAuditLog": "Audit Log",
-    "adminApprovals": "Signup Approvals"
+    "adminApprovals": "Signup Approvals",
+    "adminEquipment": "Equipment Catalog"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -182,7 +183,9 @@
     "monthlyTotal": "Monthly Total",
     "marginRate": "Margin",
     "createContractSuccess": "Contract created.",
-    "createContractError": "Failed to create contract."
+    "createContractError": "Failed to create contract.",
+    "equipmentSelectTitle": "Select Equipment Provided",
+    "equipmentSelectEmpty": "No equipment registered yet. Please add equipment in the admin menu first."
   },
   "contracts": {
     "title": "Contracts",
@@ -606,7 +609,18 @@
     "rejectError": "Failed to reject",
     "rejectConfirm": "Reject {name}'s signup request? This cannot be undone.",
     "approvalsTitle": "Signup Approvals",
-    "noPendingApprovals": "No pending signup requests."
+    "noPendingApprovals": "No pending signup requests.",
+    "equipmentTitle": "Equipment Catalog",
+    "equipmentCategory": "Category",
+    "equipmentModelName": "Model Name",
+    "equipmentSpecId": "Spec (Indonesian)",
+    "equipmentSpecKo": "Spec (Korean)",
+    "equipmentModelRequired": "Model name is required",
+    "newEquipment": "New Equipment",
+    "equipmentCreateDialogTitle": "Register Equipment",
+    "equipmentCreateSuccess": "Registered successfully",
+    "equipmentCreateError": "Failed to register",
+    "noEquipment": "No equipment registered yet."
   },
   "documents": {
     "printSave": "Print / Save PDF"
@@ -649,6 +663,19 @@
     "chartAnnualCaption": "Sum of contract monthly fees by year",
     "chartSignupCancelTitle": "Signups/Cancellations by Month",
     "chartSignupCancelCaption": "Signup = contract start date, Cancel = termination request save date",
-    "cardAdminApprovalsDesc": "Approve or reject new staff signup requests."
+    "cardAdminApprovalsDesc": "Approve or reject new staff signup requests.",
+    "cardAdminEquipmentDesc": "Register equipment models and specs for use in quotes."
+  },
+  "equipmentCategory": {
+    "router": "Router",
+    "ap": "Access Point",
+    "hub_switch": "Hub/Switch",
+    "cctv": "CCTV",
+    "security": "Security Device",
+    "vpn_config": "VPN Configuration",
+    "starlink": "Starlink",
+    "pc_server": "PC/Server",
+    "printer": "Printer",
+    "other": "Other"
   }
 }

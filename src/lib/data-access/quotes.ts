@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Quote, QuoteInputs, Rates } from '@/types/domain';
+import type { Quote, QuoteInputs, Rates, EquipmentSelection } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { bucketAmount, bucketMargin } from '@/lib/masking/staff-masking';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
@@ -86,6 +86,7 @@ export interface CreateQuoteInput {
   billing_date: string;
   months: number;
   inputs: QuoteInputs;
+  equipment_selections?: EquipmentSelection[];
   created_by: string;
 }
 
@@ -112,6 +113,7 @@ export async function createQuote(
       months: input.months,
       inputs: input.inputs,
       rows: calc.rows,
+      equipment_selections: input.equipment_selections ?? [],
       monthly: calc.monthly,
       monthly_cost: calc.monthlyCost,
       init_cost: calc.initCost,

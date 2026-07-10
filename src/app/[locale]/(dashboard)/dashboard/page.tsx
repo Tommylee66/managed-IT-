@@ -158,6 +158,7 @@ export default async function DashboardPage({
           {isMaster && (
             <>
               <MenuCard href={p("/admin/approvals")} icon="✅" color="green" title={tNav("adminApprovals")} description={tHome("cardAdminApprovalsDesc")} />
+              <MenuCard href={p("/admin/equipment")} icon="📦" color="green" title={tNav("adminEquipment")} description={tHome("cardAdminEquipmentDesc")} />
               <MenuCard href={p("/admin/rates")} icon="⚙️" color="green" title={tNav("adminRates")} description={tHome("cardAdminRatesDesc")} />
               <MenuCard href={p("/admin/audit-log")} icon="📋" color="green" title={tNav("adminAuditLog")} description={tHome("cardAdminAuditLogDesc")} />
             </>

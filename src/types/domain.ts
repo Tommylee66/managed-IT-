@@ -174,6 +174,29 @@ export interface QuoteInputs {
   memo: string;
 }
 
+export interface EquipmentCatalogItem {
+  id: string;
+  category: AssetType;
+  model_name: string;
+  spec_id: string | null;
+  spec_ko: string | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Snapshot of a chosen catalog item, stored on the quote itself — see the
+ * comment in supabase/migrations/20260709000001_equipment_catalog.sql. */
+export interface EquipmentSelection {
+  catalogId: string;
+  category: AssetType;
+  modelName: string;
+  specId: string | null;
+  specKo: string | null;
+  qty: number;
+}
+
 export interface QuoteRowRecord {
   key: string;
   label: string;
@@ -197,6 +220,7 @@ export interface Quote {
   months: number;
   inputs: QuoteInputs;
   rows: QuoteRowRecord[];
+  equipment_selections: EquipmentSelection[];
   monthly: number;
   monthly_cost: number;
   init_cost: number;

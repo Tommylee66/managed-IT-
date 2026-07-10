@@ -3,6 +3,7 @@ import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
+import { EQUIPMENT_CATEGORY_LABEL } from "@/lib/calc/equipment-category-labels";
 import type { Quote } from "@/types/domain";
 
 export function QuoteDocument({
@@ -84,6 +85,53 @@ export function QuoteDocument({
         />
       </div>
 
+      {quote.equipment_selections.length > 0 && (
+        <div>
+          <h3 className="mb-1 font-semibold">
+            <Bilingual id="Spesifikasi Perangkat yang Disediakan" ko="제공 장비 사양" />
+          </h3>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <Bilingual id="Kategori" ko="분류" />
+                </TableHead>
+                <TableHead>
+                  <Bilingual id="Model" ko="모델명" />
+                </TableHead>
+                <TableHead>
+                  <Bilingual id="Spesifikasi" ko="스펙" />
+                </TableHead>
+                <TableHead className="text-right">
+                  <Bilingual id="Jumlah" ko="수량" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {quote.equipment_selections.map((eq, i) => {
+                const cat = EQUIPMENT_CATEGORY_LABEL[eq.category];
+                return (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Bilingual id={cat.id} ko={cat.ko} />
+                    </TableCell>
+                    <TableCell>{eq.modelName}</TableCell>
+                    <TableCell>
+                      {eq.specId || eq.specKo ? (
+                        <Bilingual id={eq.specId || "-"} ko={eq.specKo || "-"} />
+                      ) : (
+                        "-"
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">{eq.qty}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
       <div>
         <h3 className="mb-1 font-semibold">
           <Bilingual id="Ketentuan Utama" ko="주요 조건" />
@@ -99,6 +147,24 @@ export function QuoteDocument({
             <Bilingual
               id="Perangkat CCTV dan instalasi baru menjadi tanggung jawab Pelanggan; BCT hanya menyediakan pemeliharaan status operasional/jaringan/rekaman CCTV milik Pelanggan."
               ko="CCTV 장비 및 신규 설치는 고객 부담이며, BCT는 고객 보유 CCTV의 작동/네트워크/녹화 상태 유지보수만 제공합니다."
+            />
+          </li>
+          <li>
+            <Bilingual
+              id="Layanan bulanan mencakup pemeliharaan rutin serta dukungan jarak jauh/lapangan untuk seluruh PC karyawan dan perangkat jaringan yang tercakup dalam kontrak. Biaya suku cadang dan perbaikan akibat kerusakan (di luar pemeliharaan rutin) ditagihkan terpisah sesuai biaya riil (at-cost), tanpa markup."
+              ko="월 서비스 요금에는 계약에 포함된 전 직원 PC 및 네트워크 장비의 정기 유지보수와 원격/방문 지원이 포함됩니다. 고장으로 인한 부품 교체·수리 비용은 정기 유지보수와 별도로, 실제 소요 비용(실비) 기준으로 마진 없이 청구됩니다."
+            />
+          </li>
+          <li>
+            <Bilingual
+              id="VPN dasar menyediakan akses jarak jauh yang aman ke jaringan kantor pusat; VPN cabang (jika dipilih) memperluas akses ini ke lokasi cabang tambahan. Layanan keamanan mencakup pemantauan aktivitas jaringan, atau penyediaan dan pengelolaan perangkat keamanan setingkat FortiGate. Respons prioritas (jika dipilih) memberikan target waktu tanggap insiden yang lebih cepat dari layanan standar."
+              ko="기본 VPN은 본사 네트워크에 대한 안전한 원격 접속을 제공하며, 지사 VPN(선택 시)은 이 접속 범위를 추가 지사까지 확장합니다. 보안 서비스는 네트워크 활동 모니터링, 또는 FortiGate급 보안장비의 제공 및 운영관리 중 선택할 수 있습니다. 우선 장애대응(선택 시)은 일반 서비스보다 더 빠른 목표 대응 시간을 제공합니다."
+            />
+          </li>
+          <li>
+            <Bilingual
+              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, biaya penalti dihitung dari: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT, dihitung proporsional terhadap sisa bulan kontrak; (b) denda sebesar persentase tertentu dari nilai tersebut (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi. Rincian penuh tercantum dalam Perjanjian Kerja Sama."
+              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 패널티는 (a) BCT가 제공한 장비/설치비의 미상각 잔액을 계약 잔여기간에 비례하여 산정하고, (b) 해당 잔액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 벌금을 더하고, (c) 철거·회수비 및 행정비를 합산하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다."
             />
           </li>
           <li>

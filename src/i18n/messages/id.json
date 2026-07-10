@@ -41,7 +41,8 @@
     "adminStaff": "Manajemen Staf",
     "adminRates": "Pengaturan Tarif",
     "adminAuditLog": "Log Audit",
-    "adminApprovals": "Persetujuan Pendaftaran"
+    "adminApprovals": "Persetujuan Pendaftaran",
+    "adminEquipment": "Katalog Perangkat"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -182,7 +183,9 @@
     "monthlyTotal": "Total Bulanan",
     "marginRate": "Margin",
     "createContractSuccess": "Kontrak berhasil dibuat.",
-    "createContractError": "Gagal membuat kontrak."
+    "createContractError": "Gagal membuat kontrak.",
+    "equipmentSelectTitle": "Pilih Perangkat yang Disediakan",
+    "equipmentSelectEmpty": "Belum ada perangkat terdaftar. Silakan tambahkan perangkat di menu admin terlebih dahulu."
   },
   "contracts": {
     "title": "Kontrak",
@@ -606,7 +609,18 @@
     "rejectError": "Gagal menolak",
     "rejectConfirm": "Tolak pendaftaran {name}? Tindakan ini tidak dapat dibatalkan.",
     "approvalsTitle": "Persetujuan Pendaftaran",
-    "noPendingApprovals": "Tidak ada permintaan pendaftaran yang menunggu persetujuan."
+    "noPendingApprovals": "Tidak ada permintaan pendaftaran yang menunggu persetujuan.",
+    "equipmentTitle": "Katalog Perangkat",
+    "equipmentCategory": "Kategori",
+    "equipmentModelName": "Nama Model",
+    "equipmentSpecId": "Spesifikasi (Indonesia)",
+    "equipmentSpecKo": "Spesifikasi (Korea)",
+    "equipmentModelRequired": "Nama model wajib diisi",
+    "newEquipment": "Tambah Perangkat",
+    "equipmentCreateDialogTitle": "Tambah Perangkat Baru",
+    "equipmentCreateSuccess": "Berhasil ditambahkan",
+    "equipmentCreateError": "Gagal menambahkan",
+    "noEquipment": "Belum ada perangkat terdaftar."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"
@@ -649,6 +663,19 @@
     "chartAnnualCaption": "Total biaya bulanan kontrak per tahun",
     "chartSignupCancelTitle": "Status Pendaftaran/Pengakhiran per Bulan",
     "chartSignupCancelCaption": "Daftar=tanggal mulai kontrak, Akhiri=tanggal pengajuan pengakhiran disimpan",
-    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru."
+    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru.",
+    "cardAdminEquipmentDesc": "Daftarkan model dan spesifikasi perangkat untuk digunakan dalam penawaran."
+  },
+  "equipmentCategory": {
+    "router": "Router",
+    "ap": "Access Point",
+    "hub_switch": "Hub/Switch",
+    "cctv": "CCTV",
+    "security": "Perangkat Keamanan",
+    "vpn_config": "Konfigurasi VPN",
+    "starlink": "Starlink",
+    "pc_server": "PC/Server",
+    "printer": "Printer",
+    "other": "Lainnya"
   }
 }
