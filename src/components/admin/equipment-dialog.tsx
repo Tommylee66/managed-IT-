@@ -70,6 +70,8 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     purchase_price: z.string().optional(),
     monthly_rate: z.string().optional(),
     monthly_cost: z.string().optional(),
+    overage_rate: z.string().optional(),
+    overage_cost: z.string().optional(),
   });
   type FormValues = z.infer<typeof schema>;
 
@@ -89,6 +91,8 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       purchase_price: item?.purchase_price?.toString() ?? "",
       monthly_rate: item?.monthly_rate?.toString() ?? "",
       monthly_cost: item?.monthly_cost?.toString() ?? "",
+      overage_rate: item?.overage_rate?.toString() ?? "",
+      overage_cost: item?.overage_cost?.toString() ?? "",
     },
   });
 
@@ -110,6 +114,8 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       purchase_price: values.purchase_price ? Number(values.purchase_price) : null,
       monthly_rate: values.monthly_rate ? Number(values.monthly_rate) : null,
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
+      overage_rate: values.overage_rate ? Number(values.overage_rate) : null,
+      overage_cost: values.overage_cost ? Number(values.overage_cost) : null,
     };
     try {
       if (isEdit) {
@@ -203,6 +209,17 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">{t("equipmentRateHint")}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="overage_rate">{t("equipmentOverageRate")}</Label>
+              <Input id="overage_rate" type="number" {...register("overage_rate")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="overage_cost">{t("equipmentOverageCost")}</Label>
+              <Input id="overage_cost" type="number" {...register("overage_cost")} />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">{t("equipmentOverageHint")}</p>
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("creating") : isEdit ? tCommon("save") : t("create")}

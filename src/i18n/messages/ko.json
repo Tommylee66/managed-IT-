@@ -188,7 +188,8 @@
     "editQuote": "견적 수정",
     "saveChanges": "수정 사항 저장",
     "updateSuccess": "견적이 수정되었습니다",
-    "updateError": "견적 수정에 실패했습니다"
+    "updateError": "견적 수정에 실패했습니다",
+    "equipmentOverageQtyLabel": "추가 사용량 (장당 {rate})"
   },
   "contracts": {
     "title": "계약",
@@ -251,9 +252,6 @@
     "billingStartDate": "과금 시작일",
     "contractMonths": "계약 개월수",
     "employeeCount": "직원/PC 수",
-    "apCount": "AP 수",
-    "hubCount": "허브/스위치 수",
-    "cctvCount": "CCTV 대수",
     "visitFrequency": "방문점검",
     "visitOnce": "월 1회",
     "visitTwice": "월 2회",
@@ -573,9 +571,6 @@
     "baseMonthly": "기본 월 서비스료",
     "contract24Addon": "24개월 계약 추가요금",
     "employeeUnit": "직원/PC 추가 단가 (20명 초과분)",
-    "apUnit": "AP 추가 단가 (1대 초과분)",
-    "hubUnit": "허브/스위치 추가 단가 (1대 초과분)",
-    "cctvBlock": "CCTV 유지보수 블록 단가 (8대 초과, 8대당)",
     "visit2Addon": "월 2회 방문점검 추가요금",
     "priorityFee": "우선 장애대응 요금",
     "vpnBaseFee": "Managed VPN 기본 요금",
@@ -633,7 +628,10 @@
     "equipmentPurchasePriceHint": "구매가를 입력하면 24개월 상각 기준으로 월 임대료/원가를 자동 제안합니다. 제안값은 참고용이며 아래에서 직접 수정할 수 있습니다.",
     "equipmentEditDialogTitle": "장비 수정",
     "equipmentUpdateSuccess": "장비 정보가 수정되었습니다",
-    "equipmentUpdateError": "장비 수정에 실패했습니다"
+    "equipmentUpdateError": "장비 수정에 실패했습니다",
+    "equipmentOverageRate": "장당 추가요금",
+    "equipmentOverageCost": "장당 추가원가",
+    "equipmentOverageHint": "사용량 기준으로 추가 청구할 항목에만 입력하세요 (예: 프린터 기본 매수 초과분 장당 요금). 비워두면 추가요금 없이 월 임대료만 청구됩니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"

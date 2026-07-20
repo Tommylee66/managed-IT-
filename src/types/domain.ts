@@ -189,6 +189,11 @@ export interface EquipmentCatalogItem {
   monthly_rate: number | null;
   /** Internal monthly cost, master-only — null if not tracked. */
   monthly_cost: number | null;
+  /** Usage-based overage: customer price per extra unit beyond the flat
+   * monthly rate (e.g. per extra printed page). Null = no overage tier. */
+  overage_rate: number | null;
+  /** Internal cost per extra unit, master-only. */
+  overage_cost: number | null;
   is_active: boolean;
   created_by: string | null;
   created_at: string;
@@ -207,6 +212,11 @@ export interface EquipmentSelection {
   /** Rate/cost snapshotted at selection time — see EquipmentCatalogItem. */
   monthlyRate: number | null;
   monthlyCost: number | null;
+  /** Extra units used this period (e.g. pages printed beyond the base
+   * rental) and the per-unit rate/cost snapshotted at selection time. */
+  overageQty: number;
+  overageRate: number | null;
+  overageCost: number | null;
 }
 
 export interface QuoteRowRecord {

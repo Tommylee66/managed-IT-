@@ -19,7 +19,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SummaryBox } from "@/components/ui/summary-box";
 import { formatRupiah } from "@/lib/utils/currency";
-import { EquipmentSelector, equipmentQtyToRequest } from "@/components/quotes/equipment-selector";
+import {
+  EquipmentSelector,
+  equipmentQtyToRequest,
+  type EquipmentSelectionState,
+} from "@/components/quotes/equipment-selector";
 import { calcProratedSettlement } from "@/lib/calc/proration";
 import { calculateQuotePreviewAction, type QuotePreview } from "@/app/[locale]/(dashboard)/quotes/actions";
 import { createChangeRequestAction } from "@/app/[locale]/(dashboard)/change-requests/actions";
@@ -38,9 +42,6 @@ interface FormValues {
   type: string;
   effective_date: string;
   emp: number;
-  ap: number;
-  hub: number;
-  cctv: number;
   visit: 1 | 2;
   locationIndex: number;
   vpn: "none" | "base";
@@ -70,10 +71,10 @@ export function ChangeRequestForm({
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
-  const [equipmentQty, setEquipmentQty] = useState<Record<string, number>>(() => {
-    const initial: Record<string, number> = {};
+  const [equipmentQty, setEquipmentQty] = useState<Record<string, EquipmentSelectionState>>(() => {
+    const initial: Record<string, EquipmentSelectionState> = {};
     (contract.quote_snapshot?.equipment_selections ?? []).forEach((s) => {
-      initial[s.catalogId] = s.qty;
+      initial[s.catalogId] = { qty: s.qty, overageQty: s.overageQty };
     });
     return initial;
   });
@@ -83,9 +84,6 @@ export function ChangeRequestForm({
       type: TYPE_OPTIONS[2].value,
       effective_date: new Date().toISOString().slice(0, 10),
       emp: currentInputs?.emp ?? 20,
-      ap: currentInputs?.ap ?? 1,
-      hub: currentInputs?.hub ?? 1,
-      cctv: currentInputs?.cctv ?? 8,
       visit: currentInputs?.visit ?? 1,
       locationIndex: currentInputs?.locationIndex ?? 0,
       vpn: currentInputs?.vpn ?? "none",
@@ -100,9 +98,11 @@ export function ChangeRequestForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      ap: Number(v.ap),
-      hub: Number(v.hub),
-      cctv: Number(v.cctv),
+      // See quote-calculator-form.tsx — AP/Hub/CCTV are no longer priced as
+      // generic add-ons, only via equipment catalog selections below.
+      ap: 1,
+      hub: 1,
+      cctv: 8,
       visit: Number(v.visit) === 2 ? 2 : 1,
       locationIndex: Number(v.locationIndex),
       vpn: v.vpn,
@@ -183,18 +183,6 @@ export function ChangeRequestForm({
             <div className="flex flex-col gap-2">
               <Label htmlFor="emp">{tCalc("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ap">{tCalc("apCount")}</Label>
-              <Input id="ap" type="number" {...register("ap")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="hub">{tCalc("hubCount")}</Label>
-              <Input id="hub" type="number" {...register("hub")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="cctv">{tCalc("cctvCount")}</Label>
-              <Input id="cctv" type="number" {...register("cctv")} />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{tCalc("location")}</Label>

@@ -21,7 +21,11 @@ import { SummaryBox } from "@/components/ui/summary-box";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { renderQuoteRowLabel } from "@/lib/calc/quote-row-labels";
-import { EquipmentSelector, equipmentQtyToRequest } from "@/components/quotes/equipment-selector";
+import {
+  EquipmentSelector,
+  equipmentQtyToRequest,
+  type EquipmentSelectionState,
+} from "@/components/quotes/equipment-selector";
 import type { Locale } from "@/config/constants";
 import {
   calculateQuotePreviewAction,
@@ -49,9 +53,6 @@ interface FormValues {
   billing_date: string;
   months: number;
   emp: number;
-  ap: number;
-  hub: number;
-  cctv: number;
   visit: 1 | 2;
   locationIndex: number;
   vpn: "none" | "base";
@@ -85,10 +86,10 @@ export function QuoteCalculatorForm({
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
-  const [equipmentQty, setEquipmentQty] = useState<Record<string, number>>(() => {
-    const initial: Record<string, number> = {};
+  const [equipmentQty, setEquipmentQty] = useState<Record<string, EquipmentSelectionState>>(() => {
+    const initial: Record<string, EquipmentSelectionState> = {};
     initialValues?.equipment_selections.forEach((s) => {
-      initial[s.catalogId] = s.qty;
+      initial[s.catalogId] = { qty: s.qty, overageQty: s.overageQty };
     });
     return initial;
   });
@@ -101,9 +102,6 @@ export function QuoteCalculatorForm({
       billing_date: initialValues?.billing_date ?? today,
       months: initialValues?.months ?? 36,
       emp: initialValues?.inputs.emp ?? 20,
-      ap: initialValues?.inputs.ap ?? 1,
-      hub: initialValues?.inputs.hub ?? 1,
-      cctv: initialValues?.inputs.cctv ?? 8,
       visit: initialValues?.inputs.visit ?? 1,
       locationIndex: initialValues?.inputs.locationIndex ?? 0,
       vpn: initialValues?.inputs.vpn ?? "none",
@@ -118,9 +116,13 @@ export function QuoteCalculatorForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      ap: Number(v.ap),
-      hub: Number(v.hub),
-      cctv: Number(v.cctv),
+      // AP/Hub/CCTV no longer price as generic per-unit add-ons — equipment
+      // pricing now comes entirely from the equipment catalog selections
+      // below. These stay at their baseline (no-extra-charge) values only
+      // because QuoteInputs still carries the fields for old stored quotes.
+      ap: 1,
+      hub: 1,
+      cctv: 8,
       visit: Number(v.visit) === 2 ? 2 : 1,
       locationIndex: Number(v.locationIndex),
       vpn: v.vpn,
@@ -253,18 +255,6 @@ export function QuoteCalculatorForm({
             <div className="flex flex-col gap-2">
               <Label htmlFor="emp">{t("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ap">{t("apCount")}</Label>
-              <Input id="ap" type="number" {...register("ap")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="hub">{t("hubCount")}</Label>
-              <Input id="hub" type="number" {...register("hub")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="cctv">{t("cctvCount")}</Label>
-              <Input id="cctv" type="number" {...register("cctv")} />
             </div>
             <div className="flex flex-col gap-2">
               <Label>{t("visitFrequency")}</Label>

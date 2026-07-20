@@ -45,9 +45,6 @@ interface FormValues {
   billing_date: string;
   months: number;
   emp: number;
-  ap: number;
-  hub: number;
-  cctv: number;
   visit: 1 | 2;
   locationIndex: number;
   vpn: "none" | "base";
@@ -86,9 +83,6 @@ export function ApplicationForm({
       billing_date: today,
       months: 36,
       emp: 20,
-      ap: 1,
-      hub: 1,
-      cctv: 8,
       visit: 1,
       locationIndex: 0,
       vpn: "none",
@@ -103,9 +97,12 @@ export function ApplicationForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      ap: Number(v.ap),
-      hub: Number(v.hub),
-      cctv: Number(v.cctv),
+      // Application intake doesn't select specific equipment yet — that
+      // happens when the quote itself is built. AP/Hub/CCTV no longer price
+      // as generic add-ons either way, so these stay at baseline.
+      ap: 1,
+      hub: 1,
+      cctv: 8,
       visit: Number(v.visit) === 2 ? 2 : 1,
       locationIndex: Number(v.locationIndex),
       vpn: v.vpn,
@@ -258,18 +255,6 @@ export function ApplicationForm({
             <div className="flex flex-col gap-2">
               <Label htmlFor="emp">{tCalc("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="ap">{tCalc("apCount")}</Label>
-              <Input id="ap" type="number" {...register("ap")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="hub">{tCalc("hubCount")}</Label>
-              <Input id="hub" type="number" {...register("hub")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="cctv">{tCalc("cctvCount")}</Label>
-              <Input id="cctv" type="number" {...register("cctv")} />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{tCalc("location")}</Label>

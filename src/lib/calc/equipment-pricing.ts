@@ -8,6 +8,9 @@ import type { QuoteCalcResult } from '@/lib/calc/quote-calc';
 export interface EquipmentSelectionRequest {
   catalogId: string;
   qty: number;
+  /** Extra units used this period (e.g. pages printed), only meaningful for
+   * catalog items with an overage_rate set. */
+  overageQty?: number;
 }
 
 export function resolveEquipmentSelections(
@@ -27,6 +30,9 @@ export function resolveEquipmentSelections(
         qty: r.qty,
         monthlyRate: item.monthly_rate,
         monthlyCost: item.monthly_cost,
+        overageQty: r.overageQty ?? 0,
+        overageRate: item.overage_rate,
+        overageCost: item.overage_cost,
       };
     })
     .filter((s): s is EquipmentSelection => s !== null);
@@ -34,18 +40,35 @@ export function resolveEquipmentSelections(
 
 /** Only models with a monthly_rate set become a priced line — everything
  * else stays purely informational (rendered only in the quote document's
- * spec table, per the original equipment-catalog feature). */
+ * spec table, per the original equipment-catalog feature). A selection with
+ * overage usage gets a second row for that amount, kept separate from the
+ * flat rental line so the breakdown is transparent on the quote document
+ * (e.g. "HP LaserJet M15w" base line + "HP LaserJet M15w 추가 인쇄 120장"). */
 export function equipmentPricedRows(selections: EquipmentSelection[]): QuoteRowRecord[] {
-  return selections
-    .filter((s) => s.monthlyRate != null)
-    .map((s) => ({
-      key: `equipment:${s.catalogId}`,
-      label: s.modelName,
-      amount: (s.monthlyRate ?? 0) * s.qty,
-      cost: (s.monthlyCost ?? 0) * s.qty,
-      init: 0,
-      commissionable: true,
-    }));
+  const rows: QuoteRowRecord[] = [];
+  for (const s of selections) {
+    if (s.monthlyRate != null) {
+      rows.push({
+        key: `equipment:${s.catalogId}`,
+        label: s.qty > 1 ? `${s.modelName} × ${s.qty}` : s.modelName,
+        amount: s.monthlyRate * s.qty,
+        cost: (s.monthlyCost ?? 0) * s.qty,
+        init: 0,
+        commissionable: true,
+      });
+    }
+    if (s.overageQty > 0 && s.overageRate != null) {
+      rows.push({
+        key: `equipment-overage:${s.catalogId}`,
+        label: `${s.modelName} 추가 사용량 ${s.overageQty}`,
+        amount: s.overageRate * s.overageQty,
+        cost: (s.overageCost ?? 0) * s.overageQty,
+        init: 0,
+        commissionable: true,
+      });
+    }
+  }
+  return rows;
 }
 
 /** Folds priced equipment rows into an already-computed quote/change-request

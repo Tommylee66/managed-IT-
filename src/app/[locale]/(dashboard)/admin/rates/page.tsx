@@ -54,6 +54,7 @@ export default async function AdminRatesPage({
                 <TableHead className="text-right">{t("equipmentPurchasePrice")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
+                <TableHead className="text-right">{t("equipmentOverageRate")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
                 <TableHead>{t("actions")}</TableHead>
               </TableRow>
@@ -74,6 +75,9 @@ export default async function AdminRatesPage({
                   <TableCell className="text-right">
                     {item.monthly_cost != null ? formatRupiah(item.monthly_cost) : "-"}
                   </TableCell>
+                  <TableCell className="text-right">
+                    {item.overage_rate != null ? formatRupiah(item.overage_rate) : "-"}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={item.is_active ? "default" : "secondary"}>
                       {item.is_active ? t("active") : t("inactive")}
@@ -87,7 +91,7 @@ export default async function AdminRatesPage({
               ))}
               {equipmentItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center text-muted-foreground">
                     {t("noEquipment")}
                   </TableCell>
                 </TableRow>

@@ -188,7 +188,8 @@
     "editQuote": "Edit Penawaran",
     "saveChanges": "Simpan Perubahan",
     "updateSuccess": "Penawaran berhasil diperbarui",
-    "updateError": "Gagal memperbarui penawaran"
+    "updateError": "Gagal memperbarui penawaran",
+    "equipmentOverageQtyLabel": "Pemakaian tambahan (tarif {rate}/unit)"
   },
   "contracts": {
     "title": "Kontrak",
@@ -251,9 +252,6 @@
     "billingStartDate": "Tanggal Mulai Penagihan",
     "contractMonths": "Jangka Waktu Kontrak (bulan)",
     "employeeCount": "Jumlah Karyawan/PC",
-    "apCount": "Jumlah AP",
-    "hubCount": "Jumlah Hub/Switch",
-    "cctvCount": "Jumlah CCTV",
     "visitFrequency": "Kunjungan Pemeriksaan",
     "visitOnce": "1x per bulan",
     "visitTwice": "2x per bulan",
@@ -573,9 +571,6 @@
     "baseMonthly": "Biaya Layanan Bulanan Dasar",
     "contract24Addon": "Biaya Tambahan Kontrak 24 Bulan",
     "employeeUnit": "Tarif Tambahan per Karyawan/PC (di atas 20 orang)",
-    "apUnit": "Tarif Tambahan per AP (di atas 1 unit)",
-    "hubUnit": "Tarif Tambahan per Hub/Switch (di atas 1 unit)",
-    "cctvBlock": "Tarif Blok Pemeliharaan CCTV (di atas 8 unit, per 8 unit)",
     "visit2Addon": "Biaya Tambahan Kunjungan 2x/Bulan",
     "priorityFee": "Biaya Respons Gangguan Prioritas",
     "vpnBaseFee": "Biaya Dasar Managed VPN",
@@ -633,7 +628,10 @@
     "equipmentPurchasePriceHint": "Jika harga beli diisi, tarif sewa/biaya bulanan akan diusulkan otomatis berdasarkan amortisasi 24 bulan. Usulan ini hanya referensi dan dapat diubah langsung di bawah.",
     "equipmentEditDialogTitle": "Edit Perangkat",
     "equipmentUpdateSuccess": "Perangkat berhasil diperbarui",
-    "equipmentUpdateError": "Gagal memperbarui perangkat"
+    "equipmentUpdateError": "Gagal memperbarui perangkat",
+    "equipmentOverageRate": "Tarif Kelebihan per Unit",
+    "equipmentOverageCost": "Biaya Kelebihan per Unit",
+    "equipmentOverageHint": "Isi hanya untuk item dengan tagihan berbasis pemakaian (mis. tarif per lembar cetak di luar kuota dasar printer). Kosongkan jika hanya dikenakan tarif sewa bulanan."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

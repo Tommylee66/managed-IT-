@@ -15,7 +15,12 @@ export async function listEquipmentCatalog(
   if (error) throw error;
   const items = data as EquipmentCatalogItem[];
   if (role === 'master') return items;
-  return items.map((item) => ({ ...item, monthly_cost: null, purchase_price: null }));
+  return items.map((item) => ({
+    ...item,
+    monthly_cost: null,
+    purchase_price: null,
+    overage_cost: null,
+  }));
 }
 
 interface EquipmentFields {
@@ -26,6 +31,8 @@ interface EquipmentFields {
   purchase_price?: number | null;
   monthly_rate?: number | null;
   monthly_cost?: number | null;
+  overage_rate?: number | null;
+  overage_cost?: number | null;
 }
 
 export type CreateEquipmentInput = EquipmentFields & { created_by: string };
@@ -45,6 +52,8 @@ export async function createEquipmentCatalogItem(
       purchase_price: input.purchase_price ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
+      overage_rate: input.overage_rate ?? null,
+      overage_cost: input.overage_cost ?? null,
       created_by: input.created_by,
     })
     .select('*')
@@ -71,6 +80,8 @@ export async function updateEquipmentCatalogItem(
       purchase_price: input.purchase_price ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
+      overage_rate: input.overage_rate ?? null,
+      overage_cost: input.overage_cost ?? null,
     })
     .eq('id', id)
     .select('*')

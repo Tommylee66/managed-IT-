@@ -15,9 +15,6 @@ interface FormValues {
   base_monthly: number;
   contract24_addon: number;
   employee_unit: number;
-  ap_unit: number;
-  hub_unit: number;
-  cctv_block: number;
   visit2_addon: number;
   priority: number;
   vpn_base: number;
@@ -35,9 +32,6 @@ const PRICE_FIELD_KEYS: { key: keyof FormValues; labelKey: string }[] = [
   { key: "base_monthly", labelKey: "baseMonthly" },
   { key: "contract24_addon", labelKey: "contract24Addon" },
   { key: "employee_unit", labelKey: "employeeUnit" },
-  { key: "ap_unit", labelKey: "apUnit" },
-  { key: "hub_unit", labelKey: "hubUnit" },
-  { key: "cctv_block", labelKey: "cctvBlock" },
   { key: "visit2_addon", labelKey: "visit2Addon" },
   { key: "priority", labelKey: "priorityFee" },
   { key: "vpn_base", labelKey: "vpnBaseFee" },
@@ -54,9 +48,6 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
       base_monthly: rates.base_monthly,
       contract24_addon: rates.contract24_addon,
       employee_unit: rates.employee_unit,
-      ap_unit: rates.ap_unit,
-      hub_unit: rates.hub_unit,
-      cctv_block: rates.cctv_block,
       visit2_addon: rates.visit2_addon,
       priority: rates.priority,
       vpn_base: rates.vpn_base,

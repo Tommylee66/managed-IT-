@@ -188,7 +188,8 @@
     "editQuote": "Edit Quote",
     "saveChanges": "Save Changes",
     "updateSuccess": "Quote updated successfully",
-    "updateError": "Failed to update quote"
+    "updateError": "Failed to update quote",
+    "equipmentOverageQtyLabel": "Extra usage (@ {rate}/unit)"
   },
   "contracts": {
     "title": "Contracts",
@@ -251,9 +252,6 @@
     "billingStartDate": "Billing Start Date",
     "contractMonths": "Contract Term (months)",
     "employeeCount": "Employees/PCs",
-    "apCount": "Access Points",
-    "hubCount": "Hubs/Switches",
-    "cctvCount": "CCTV Units",
     "visitFrequency": "Site Visits",
     "visitOnce": "Once a month",
     "visitTwice": "Twice a month",
@@ -573,9 +571,6 @@
     "baseMonthly": "Base Monthly Service Fee",
     "contract24Addon": "24-Month Contract Add-on Fee",
     "employeeUnit": "Additional Employee/PC Rate (over 20)",
-    "apUnit": "Additional AP Rate (over 1 unit)",
-    "hubUnit": "Additional Hub/Switch Rate (over 1 unit)",
-    "cctvBlock": "CCTV Maintenance Block Rate (over 8 units, per 8)",
     "visit2Addon": "Twice-Monthly Visit Add-on Fee",
     "priorityFee": "Priority Incident Response Fee",
     "vpnBaseFee": "Managed VPN Base Fee",
@@ -633,7 +628,10 @@
     "equipmentPurchasePriceHint": "If a purchase price is entered, the monthly rate/cost are auto-suggested based on 24-month amortization. The suggestion is just a starting point — edit it directly below.",
     "equipmentEditDialogTitle": "Edit Equipment",
     "equipmentUpdateSuccess": "Equipment updated successfully",
-    "equipmentUpdateError": "Failed to update equipment"
+    "equipmentUpdateError": "Failed to update equipment",
+    "equipmentOverageRate": "Overage Rate (per unit)",
+    "equipmentOverageCost": "Overage Cost (per unit)",
+    "equipmentOverageHint": "Only fill in for usage-based billing (e.g. per-page rate beyond a printer's base allowance). Leave blank if only the flat monthly rate applies."
   },
   "documents": {
     "printSave": "Print / Save PDF"

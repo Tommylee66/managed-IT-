@@ -16,7 +16,7 @@ export interface QuoteCalcResult {
 }
 
 export function calcQuoteForInputs(
-  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'ap_unit' | 'hub_unit' | 'cctv_block' | 'visit2_addon' | 'priority' | 'vpn_base' | 'vpn_branch' | 'security_monitor' | 'security_device' | 'locations' | 'commission_items'> & {
+  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'visit2_addon' | 'priority' | 'vpn_base' | 'vpn_branch' | 'security_monitor' | 'security_device' | 'locations' | 'commission_items'> & {
     cost_fields?: Rates['cost_fields'];
     init_fields?: Rates['init_fields'];
   },
@@ -71,30 +71,6 @@ export function calcQuoteForInputs(
     add('employee', `직원/PC 추가 ${emp}명`, emp * rates.employee_unit, emp * cost.costEmp, 0, true, 'employeeExtra', {
       emp,
     });
-
-  const ap = Math.max(0, Number(inputs.ap || 0) - 1);
-  if (ap)
-    add('ap', `AP 추가 ${ap}대`, ap * rates.ap_unit, ap * cost.costAp, ap * init.initAp, true, 'apExtra', { ap });
-
-  const hub = Math.max(0, Number(inputs.hub || 0) - 1);
-  if (hub)
-    add('hub', `허브/스위치 추가 ${hub}대`, hub * rates.hub_unit, hub * cost.costHub, hub * init.initHub, true, 'hubExtra', {
-      hub,
-    });
-
-  const cctvExtra = Math.max(0, Number(inputs.cctv || 0) - 8);
-  if (cctvExtra) {
-    add(
-      'cctv',
-      `CCTV 유지보수 추가 ${cctvExtra}대`,
-      Math.ceil(cctvExtra / 8) * rates.cctv_block,
-      cctvExtra * cost.costCctv,
-      0,
-      true,
-      'cctvExtra',
-      { cctvExtra }
-    );
-  }
 
   if (Number(inputs.visit) === 2) {
     add('visit', '월 2회 방문점검 추가', rates.visit2_addon, cost.costVisit, 0, true, 'visitTwice');
