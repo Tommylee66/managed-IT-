@@ -40,8 +40,8 @@ export function contractClauses(contract: Contract): ClauseSection[] {
       heading: { id: '2. Lingkup Layanan', ko: '2. 서비스 범위' },
       items: [
         {
-          id: 'Layanan yang termasuk: konfigurasi dan pengelolaan router MikroTik, pemeliharaan AP/Hub, penanganan gangguan jaringan dasar, dukungan koneksi jaringan PC, pemeriksaan status jaringan/rekaman CCTV milik Pelanggan, Managed VPN, dan pemantauan perangkat keamanan — sesuai item yang tercantum dalam surat penawaran (quotation).',
-          ko: '포함 서비스: MikroTik 라우터 설정·관리, AP/Hub 유지보수, 기본 네트워크 장애 대응, PC 네트워크 접속 지원, 고객 보유 CCTV의 네트워크/녹화상태 점검, Managed VPN, 보안장비 관제 중 견적서에 명시된 항목.',
+          id: 'Layanan yang termasuk: konfigurasi dan pengelolaan router MikroTik, pemeliharaan AP/Hub (termasuk pengkabelan segmen router-AP), penanganan gangguan jaringan dasar, dukungan koneksi jaringan PC, pemeliharaan CCTV (4 unit) serta pemeriksaan status jaringan/rekaman CCTV milik Pelanggan, Managed VPN, dan pemantauan perangkat keamanan — sesuai item yang tercantum dalam surat penawaran (quotation).',
+          ko: '포함 서비스: MikroTik 라우터 설정·관리, AP/Hub 유지보수(라우터-AP 구간 배선공사 포함), 기본 네트워크 장애 대응, PC 네트워크 접속 지원, CCTV(4대) 유지보수 및 고객 보유 CCTV의 네트워크/녹화상태 점검, Managed VPN, 보안장비 관제 중 견적서에 명시된 항목.',
         },
         {
           id: 'Layanan yang tidak termasuk: instalasi baru dan pembelian perangkat CCTV, komponen/consumable/lisensi PC, instalasi ulang OS, pemulihan data, penanganan insiden ransomware/hacking, pekerjaan pengkabelan skala besar, perbaikan gangguan layanan pihak ketiga, kerusakan perangkat akibat kelalaian Pelanggan, serta konsultasi keamanan tambahan.',
