@@ -1,15 +1,18 @@
 "use client";
 
-import { useForm, useFieldArray } from "react-hook-form";
+import { useParams } from "next/navigation";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { updateRatesAction } from "@/app/[locale]/(dashboard)/admin/rates/actions";
 import type { Rates } from "@/types/domain";
+import type { Locale } from "@/config/constants";
 
 interface FormValues {
   base_monthly: number;
@@ -23,16 +26,17 @@ interface FormValues {
   commission_items_json: string;
 }
 
-const PRICE_FIELD_KEYS: { key: keyof FormValues; labelKey: string }[] = [
+const CURRENCY_FIELD_KEYS: { key: "base_monthly" | "contract24_addon" | "employee_unit" | "cctv_block"; labelKey: string }[] = [
   { key: "base_monthly", labelKey: "baseMonthly" },
   { key: "contract24_addon", labelKey: "contract24Addon" },
   { key: "employee_unit", labelKey: "employeeUnit" },
   { key: "cctv_block", labelKey: "cctvUnit" },
-  { key: "ppn", labelKey: "ppnRate" },
 ];
 
 export function EditRatesForm({ rates }: { rates: Rates }) {
   const t = useTranslations("admin");
+  const params = useParams();
+  const locale = params.locale as Locale;
   const { register, control, handleSubmit, formState: { isSubmitting } } = useForm<FormValues>({
     defaultValues: {
       base_monthly: rates.base_monthly,
@@ -71,12 +75,28 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
           <CardTitle className="text-base">{t("billingRates")}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3">
-          {PRICE_FIELD_KEYS.map((f) => (
+          {CURRENCY_FIELD_KEYS.map((f) => (
             <div key={f.key} className="flex flex-col gap-2">
               <Label htmlFor={f.key}>{t(f.labelKey)}</Label>
-              <Input id={f.key} type="number" {...register(f.key, { valueAsNumber: true })} />
+              <Controller
+                control={control}
+                name={f.key}
+                render={({ field }) => (
+                  <CurrencyInput
+                    id={f.key}
+                    locale={locale}
+                    value={String(field.value ?? "")}
+                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
           ))}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="ppn">{t("ppnRate")}</Label>
+            <Input id="ppn" type="number" {...register("ppn", { valueAsNumber: true })} />
+          </div>
         </CardContent>
       </Card>
 
@@ -85,18 +105,34 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
           <CardTitle className="text-base">{t("locationRates")}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
-          {fields.map((field, i) => (
-            <div key={field.id} className="grid grid-cols-[1fr_140px_140px_auto] gap-2">
+          {fields.map((locationField, i) => (
+            <div key={locationField.id} className="grid grid-cols-[1fr_140px_140px_auto] gap-2">
               <Input placeholder={t("locationName")} {...register(`locations.${i}.name` as const)} />
-              <Input
-                type="number"
-                placeholder={t("customerFee")}
-                {...register(`locations.${i}.fee` as const, { valueAsNumber: true })}
+              <Controller
+                control={control}
+                name={`locations.${i}.fee` as const}
+                render={({ field }) => (
+                  <CurrencyInput
+                    locale={locale}
+                    placeholder={t("customerFee")}
+                    value={String(field.value ?? "")}
+                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
-              <Input
-                type="number"
-                placeholder={t("internalCost")}
-                {...register(`locations.${i}.cost` as const, { valueAsNumber: true })}
+              <Controller
+                control={control}
+                name={`locations.${i}.cost` as const}
+                render={({ field }) => (
+                  <CurrencyInput
+                    locale={locale}
+                    placeholder={t("internalCost")}
+                    value={String(field.value ?? "")}
+                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <Button type="button" variant="outline" onClick={() => remove(i)}>
                 {t("delete")}

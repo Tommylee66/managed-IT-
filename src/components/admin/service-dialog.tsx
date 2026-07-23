@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useParams } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import type { Locale } from "@/config/constants";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +30,8 @@ import type { ServiceCatalogItem } from "@/types/domain";
 export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
   const t = useTranslations("admin");
   const tCommon = useTranslations("common");
+  const params = useParams();
+  const locale = params.locale as Locale;
   const [open, setOpen] = useState(false);
   const isEdit = !!item;
 
@@ -40,6 +45,7 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
@@ -103,11 +109,35 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <Label htmlFor="monthly_rate">{t("serviceMonthlyRate")}</Label>
-              <Input id="monthly_rate" type="number" {...register("monthly_rate")} />
+              <Controller
+                control={control}
+                name="monthly_rate"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="monthly_rate"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="monthly_cost">{t("serviceMonthlyCost")}</Label>
-              <Input id="monthly_cost" type="number" {...register("monthly_cost")} />
+              <Controller
+                control={control}
+                name="monthly_cost"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="monthly_cost"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
           </div>
           <p className="text-xs text-muted-foreground">{t("serviceRateHint")}</p>

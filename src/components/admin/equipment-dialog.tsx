@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useParams } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
+import type { Locale } from "@/config/constants";
 import {
   Select,
   SelectContent,
@@ -57,6 +60,8 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
   const t = useTranslations("admin");
   const tCommon = useTranslations("common");
   const tCat = useTranslations("equipmentCategory");
+  const params = useParams();
+  const locale = params.locale as Locale;
   const [open, setOpen] = useState(false);
   const isEdit = !!item;
   const [rateTouched, setRateTouched] = useState(!!item?.monthly_rate);
@@ -77,6 +82,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
 
   const {
     register,
+    control,
     handleSubmit,
     setValue,
     reset,
@@ -183,28 +189,61 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="purchase_price">{t("equipmentPurchasePrice")}</Label>
-            <Input
-              id="purchase_price"
-              type="number"
-              {...register("purchase_price", { onChange: (e) => onPurchasePriceChange(e.target.value) })}
+            <Controller
+              control={control}
+              name="purchase_price"
+              render={({ field }) => (
+                <CurrencyInput
+                  id="purchase_price"
+                  locale={locale}
+                  value={field.value ?? ""}
+                  onChange={(digits) => {
+                    field.onChange(digits);
+                    onPurchasePriceChange(digits);
+                  }}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
             <p className="text-xs text-muted-foreground">{t("equipmentPurchasePriceHint")}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <Label htmlFor="monthly_rate">{t("equipmentMonthlyRate")}</Label>
-              <Input
-                id="monthly_rate"
-                type="number"
-                {...register("monthly_rate", { onChange: () => setRateTouched(true) })}
+              <Controller
+                control={control}
+                name="monthly_rate"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="monthly_rate"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={(digits) => {
+                      field.onChange(digits);
+                      setRateTouched(true);
+                    }}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="monthly_cost">{t("equipmentMonthlyCost")}</Label>
-              <Input
-                id="monthly_cost"
-                type="number"
-                {...register("monthly_cost", { onChange: () => setCostTouched(true) })}
+              <Controller
+                control={control}
+                name="monthly_cost"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="monthly_cost"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={(digits) => {
+                      field.onChange(digits);
+                      setCostTouched(true);
+                    }}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
             </div>
           </div>
@@ -212,11 +251,35 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
               <Label htmlFor="overage_rate">{t("equipmentOverageRate")}</Label>
-              <Input id="overage_rate" type="number" {...register("overage_rate")} />
+              <Controller
+                control={control}
+                name="overage_rate"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="overage_rate"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="overage_cost">{t("equipmentOverageCost")}</Label>
-              <Input id="overage_cost" type="number" {...register("overage_cost")} />
+              <Controller
+                control={control}
+                name="overage_cost"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="overage_cost"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
           </div>
           <p className="text-xs text-muted-foreground">{t("equipmentOverageHint")}</p>
