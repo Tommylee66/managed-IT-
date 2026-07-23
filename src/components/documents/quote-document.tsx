@@ -84,8 +84,8 @@ export function QuoteDocument({
 
       <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
         <Bilingual
-          id="Pemberitahuan Starlink: Layanan internet Starlink didaftarkan atas nama Pelanggan dan Pelanggan membayar langsung biaya ke Starlink. BCT tidak menjual kembali layanan internet Starlink, namun menyediakan dukungan instalasi, konfigurasi jaringan, pengelolaan MikroTik/AP/Hub, pemeliharaan PC/CCTV, serta layanan VPN/pemantauan keamanan."
-          ko="Starlink 고지: Starlink 인터넷 서비스는 고객 명의로 가입하고 고객이 직접 Starlink에 요금을 납부합니다. BCT는 Starlink 인터넷 서비스를 재판매하지 않으며, 설치지원·네트워크 구성·MikroTik/AP/Hub 관리·PC/CCTV 유지보수·VPN/보안관제 서비스를 제공합니다."
+          id="Pemberitahuan Starlink: Layanan internet Starlink didaftarkan atas nama Pelanggan dan Pelanggan membayar langsung biaya ke Starlink. BCT tidak menjual kembali layanan internet Starlink, namun menyediakan dukungan instalasi, konfigurasi jaringan (termasuk pengkabelan segmen router-AP), pengelolaan MikroTik/AP/Hub, pemeliharaan PC serta CCTV (4 unit), dan layanan VPN/pemantauan keamanan."
+          ko="Starlink 고지: Starlink 인터넷 서비스는 고객 명의로 가입하고 고객이 직접 Starlink에 요금을 납부합니다. BCT는 Starlink 인터넷 서비스를 재판매하지 않으며, 설치지원·네트워크 구성(라우터-AP 구간 배선공사 포함)·MikroTik/AP/Hub 관리·PC 및 CCTV(4대) 유지보수·VPN/보안관제 서비스를 제공합니다."
         />
       </div>
 
