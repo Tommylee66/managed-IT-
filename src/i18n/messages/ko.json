@@ -41,7 +41,8 @@
     "adminStaff": "직원 관리",
     "adminRates": "요율 설정",
     "adminAuditLog": "감사 로그",
-    "adminApprovals": "가입 승인"
+    "adminApprovals": "가입 승인",
+    "incidentLogs": "장애처리 및 정기점검"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -92,7 +93,10 @@
   },
   "roles": {
     "master": "마스터 관리자",
-    "staff": "직원"
+    "staff": "직원",
+    "admin_dept": "관리부서",
+    "activation_dept": "개통부서",
+    "sales_agent": "영업대리점"
   },
   "customers": {
     "title": "고객",
@@ -749,7 +753,8 @@
     "chartAnnualCaption": "연도별 계약월 요금 합계",
     "chartSignupCancelTitle": "월별 가입/해지 현황",
     "chartSignupCancelCaption": "가입=계약 시작일, 해지=해지신청 저장일 기준",
-    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다."
+    "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다.",
+    "cardIncidentLogsDesc": "고객별 장애처리 및 정기점검 내용을 기록하고 월간 리포트를 생성합니다."
   },
   "equipmentCategory": {
     "router": "라우터",
@@ -762,5 +767,47 @@
     "pc_server": "PC/서버",
     "printer": "프린터",
     "other": "기타"
+  },
+  "incidentLogs": {
+    "title": "장애처리 및 정기점검",
+    "newLog": "기록 추가",
+    "formTitle": "장애처리/정기점검 기록",
+    "customer": "고객",
+    "select": "선택",
+    "selectCustomerError": "고객을 선택해주세요",
+    "type": "구분",
+    "typeIncident": "장애처리",
+    "typeInspection": "정기점검",
+    "occurredDate": "발생/점검일",
+    "logTitle": "제목",
+    "titlePlaceholder": "예: 인터넷 단절 장애",
+    "description": "상세 내용",
+    "resolution": "조치 내용 / 점검 결과",
+    "engineer": "담당자",
+    "memoLabel": "메모",
+    "saving": "저장 중...",
+    "save": "저장",
+    "saveSuccess": "기록이 저장되었습니다",
+    "saveError": "저장에 실패했습니다",
+    "empty": "기록이 없습니다",
+    "monthlyReportTitle": "월간 리포트",
+    "selectCustomerMonth": "고객 및 월 선택",
+    "month": "월",
+    "loading": "불러오는 중...",
+    "loadRecords": "기록 불러오기",
+    "recordsFound": "이번 달 기록 {count}건",
+    "draftTitle": "리포트 초안",
+    "generateDraft": "AI 초안 생성",
+    "generating": "생성 중...",
+    "draftSourceTemplate": "※ AI 키가 설정되지 않아 기본 템플릿으로 생성되었습니다. 필요시 직접 수정해주세요.",
+    "draftSourceAi": "AI({source})로 생성된 초안입니다. 발송 전 반드시 내용을 확인해주세요.",
+    "emailSubject": "이메일 제목",
+    "emailBody": "이메일 본문 (직접 수정 가능)",
+    "draftPlaceholder": "AI 초안 생성 버튼을 누르거나 직접 작성하세요",
+    "draftRequiredError": "이메일 본문을 입력해주세요",
+    "sendConfirm": "이 내용으로 고객에게 실제 이메일을 발송합니다. 계속하시겠습니까?",
+    "sendEmail": "이메일 발송",
+    "sending": "발송 중...",
+    "sendSuccess": "{email}로 발송되었습니다"
   }
 }

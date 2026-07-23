@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { updateSession } from '@/lib/supabase/middleware';
+import { canAccessPath } from '@/lib/auth/permissions';
 import { LOCALES, DEFAULT_LOCALE, type Locale } from '@/config/constants';
+import type { StaffRole } from '@/types/domain';
 
 const intlMiddleware = createMiddleware({
   locales: LOCALES,
@@ -9,7 +11,7 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'always',
 });
 
-const PROTECTED_PREFIXES = ['/dashboard', '/customers', '/agents', '/applications', '/quotes', '/contracts', '/activations', '/assets', '/change-requests', '/invoices', '/termination', '/service-logs', '/admin'];
+const PROTECTED_PREFIXES = ['/dashboard', '/customers', '/agents', '/applications', '/quotes', '/contracts', '/activations', '/assets', '/change-requests', '/invoices', '/termination', '/service-logs', '/incident-logs', '/admin'];
 const AUTH_ROUTES = ['/login'];
 
 export async function proxy(request: NextRequest) {
@@ -35,7 +37,7 @@ export async function proxy(request: NextRequest) {
     return intlResponse;
   }
 
-  const { supabaseResponse, user } = await updateSession(request);
+  const { supabaseResponse, user, role } = await updateSession(request);
 
   if (isProtectedRoute && !user) {
     const loginUrl = new URL(`/${locale}/login`, request.url);
@@ -45,6 +47,17 @@ export async function proxy(request: NextRequest) {
 
   if (isAuthRoute && user) {
     return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+  }
+
+  // Role-based menu access — e.g. sales_agent can't reach /activations even
+  // though they're a signed-in, approved staff member. /dashboard itself
+  // stays reachable by everyone regardless (it's the universal landing
+  // page), and non-role-gated pages (pending/signup/etc, not in
+  // PROTECTED_PREFIXES) never reach this check at all.
+  if (isProtectedRoute && user && role && pathWithoutLocale !== '/dashboard') {
+    if (!canAccessPath(role as StaffRole, pathWithoutLocale)) {
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+    }
   }
 
   // Carry over next-intl's own cookies (e.g. NEXT_LOCALE) onto the Supabase

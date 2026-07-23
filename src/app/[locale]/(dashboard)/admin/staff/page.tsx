@@ -58,9 +58,7 @@ export default async function AdminStaffPage({
                 <TableCell>{p.full_name}</TableCell>
                 <TableCell>{emailById.get(p.id) ?? "-"}</TableCell>
                 <TableCell>
-                  <Badge variant={p.role === "master" ? "default" : "secondary"}>
-                    {p.role === "master" ? tRoles("master") : tRoles("staff")}
-                  </Badge>
+                  <Badge variant={p.role === "master" ? "default" : "secondary"}>{tRoles(p.role)}</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={p.is_active ? "default" : "secondary"}>

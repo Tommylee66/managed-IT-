@@ -41,7 +41,8 @@
     "adminStaff": "Manajemen Staf",
     "adminRates": "Pengaturan Tarif",
     "adminAuditLog": "Log Audit",
-    "adminApprovals": "Persetujuan Pendaftaran"
+    "adminApprovals": "Persetujuan Pendaftaran",
+    "incidentLogs": "Penanganan Gangguan & Pemeriksaan Rutin"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -92,7 +93,10 @@
   },
   "roles": {
     "master": "Admin Utama",
-    "staff": "Staf"
+    "staff": "Staf",
+    "admin_dept": "Departemen Administrasi",
+    "activation_dept": "Departemen Aktivasi",
+    "sales_agent": "Agen Penjualan"
   },
   "customers": {
     "title": "Pelanggan",
@@ -749,7 +753,8 @@
     "chartAnnualCaption": "Total biaya bulanan kontrak per tahun",
     "chartSignupCancelTitle": "Status Pendaftaran/Pengakhiran per Bulan",
     "chartSignupCancelCaption": "Daftar=tanggal mulai kontrak, Akhiri=tanggal pengajuan pengakhiran disimpan",
-    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru."
+    "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru.",
+    "cardIncidentLogsDesc": "Catat penanganan gangguan dan pemeriksaan rutin per pelanggan, dan buat laporan bulanan."
   },
   "equipmentCategory": {
     "router": "Router",
@@ -762,5 +767,47 @@
     "pc_server": "PC/Server",
     "printer": "Printer",
     "other": "Lainnya"
+  },
+  "incidentLogs": {
+    "title": "Penanganan Gangguan & Pemeriksaan Rutin",
+    "newLog": "Tambah Catatan",
+    "formTitle": "Catatan Gangguan/Pemeriksaan",
+    "customer": "Pelanggan",
+    "select": "Pilih",
+    "selectCustomerError": "Silakan pilih pelanggan",
+    "type": "Jenis",
+    "typeIncident": "Penanganan Gangguan",
+    "typeInspection": "Pemeriksaan Rutin",
+    "occurredDate": "Tanggal Kejadian/Pemeriksaan",
+    "logTitle": "Judul",
+    "titlePlaceholder": "Contoh: Gangguan koneksi internet",
+    "description": "Detail",
+    "resolution": "Tindakan / Hasil Pemeriksaan",
+    "engineer": "Petugas",
+    "memoLabel": "Catatan",
+    "saving": "Menyimpan...",
+    "save": "Simpan",
+    "saveSuccess": "Catatan berhasil disimpan",
+    "saveError": "Gagal menyimpan",
+    "empty": "Tidak ada catatan",
+    "monthlyReportTitle": "Laporan Bulanan",
+    "selectCustomerMonth": "Pilih Pelanggan dan Bulan",
+    "month": "Bulan",
+    "loading": "Memuat...",
+    "loadRecords": "Muat Catatan",
+    "recordsFound": "{count} catatan bulan ini",
+    "draftTitle": "Draf Laporan",
+    "generateDraft": "Buat Draf dengan AI",
+    "generating": "Membuat...",
+    "draftSourceTemplate": "※ Kunci AI belum diatur, draf dibuat menggunakan templat dasar. Silakan edit sesuai kebutuhan.",
+    "draftSourceAi": "Draf ini dibuat oleh AI ({source}). Pastikan untuk memeriksa isinya sebelum mengirim.",
+    "emailSubject": "Subjek Email",
+    "emailBody": "Isi Email (dapat diedit)",
+    "draftPlaceholder": "Klik tombol buat draf AI atau tulis sendiri",
+    "draftRequiredError": "Silakan isi konten email",
+    "sendConfirm": "Email ini akan benar-benar dikirim ke pelanggan. Lanjutkan?",
+    "sendEmail": "Kirim Email",
+    "sending": "Mengirim...",
+    "sendSuccess": "Berhasil dikirim ke {email}"
   }
 }

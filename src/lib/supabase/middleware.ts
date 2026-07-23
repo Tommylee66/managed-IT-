@@ -34,5 +34,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return { supabaseResponse, user };
+  // Only needed for the role-based path check in proxy.ts — skip the extra
+  // query when there's no session at all.
+  let role: string | null = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    role = profile?.role ?? null;
+  }
+
+  return { supabaseResponse, user, role };
 }

@@ -26,11 +26,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+const ROLES = ["admin_dept", "activation_dept", "sales_agent", "master"] as const;
+
 type FormValues = {
   full_name: string;
   email: string;
   password: string;
-  role: "master" | "staff";
+  role: (typeof ROLES)[number];
 };
 
 export function CreateStaffDialog() {
@@ -43,7 +45,7 @@ export function CreateStaffDialog() {
     full_name: z.string().min(1, t("nameRequired")),
     email: z.string().email(t("emailInvalid")),
     password: z.string().min(8, t("passwordTooShort")),
-    role: z.enum(["master", "staff"]),
+    role: z.enum(ROLES),
   });
 
   const {
@@ -52,7 +54,7 @@ export function CreateStaffDialog() {
     reset,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { role: "staff" } });
+  } = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { role: "admin_dept" } });
 
   async function onSubmit(values: FormValues) {
     const res = await fetch("/api/admin/staff", {
@@ -98,13 +100,16 @@ export function CreateStaffDialog() {
           </div>
           <div className="flex flex-col gap-2">
             <Label>{t("role")}</Label>
-            <Select defaultValue="staff" onValueChange={(v) => setValue("role", v as "master" | "staff")}>
+            <Select defaultValue="admin_dept" onValueChange={(v) => setValue("role", v as FormValues["role"])}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="staff">{tRoles("staff")}</SelectItem>
-                <SelectItem value="master">{tRoles("master")}</SelectItem>
+                {ROLES.map((r) => (
+                  <SelectItem key={r} value={r}>
+                    {tRoles(r)}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

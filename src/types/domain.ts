@@ -3,7 +3,11 @@
 // environment — no Docker/podman — so these are maintained by hand whenever
 // the schema changes).
 
-export type StaffRole = 'master' | 'staff';
+/** master: full access (max 2 accounts, enforced in the staff-creation API).
+ * admin_dept: everything except rates/activations/incident-logs.
+ * activation_dept: customer lookup + activations + incident-logs only.
+ * sales_agent: customer/quote/contract/change-request only. */
+export type StaffRole = 'master' | 'admin_dept' | 'activation_dept' | 'sales_agent';
 export type CustomerStatus = 'draft' | 'contracted' | 'activated';
 export type ContractStatus = 'contracted' | 'activated' | 'terminated';
 export type ApplicationStatus =
@@ -369,6 +373,24 @@ export interface AssetHistory {
   items: Asset[];
   saved_by: string | null;
   saved_at: string;
+}
+
+export type IncidentLogType = 'incident' | 'inspection';
+
+/** 장애처리 및 정기점검 — structured (unlike the free-text ServiceLog) so a
+ * month's records can be assembled into a customer-facing report. */
+export interface IncidentLog {
+  id: string;
+  customer_code: string;
+  type: IncidentLogType;
+  occurred_date: string;
+  title: string;
+  description: string;
+  resolution: string | null;
+  engineer: string | null;
+  memo: string | null;
+  created_by: string | null;
+  created_at: string;
 }
 
 export interface ServiceLog {

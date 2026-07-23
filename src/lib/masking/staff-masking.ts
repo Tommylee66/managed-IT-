@@ -9,7 +9,9 @@
  * one of these before reaching a `staff`-role caller.
  */
 
-export type StaffRole = 'master' | 'staff';
+// Re-exported so every masking check (`role === 'master'`) automatically
+// covers all non-master tiers — see the type's own doc comment in domain.ts.
+export type { StaffRole } from '@/types/domain';
 
 /** Tax ID (NPWP/NIB): staff sees only the last 4 digits, to visually
  * confirm against physical documents without seeing the full number. */

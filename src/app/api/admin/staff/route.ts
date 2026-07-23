@@ -8,8 +8,10 @@ const createStaffSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   full_name: z.string().min(1),
-  role: z.enum(['master', 'staff']).default('staff'),
+  role: z.enum(['master', 'admin_dept', 'activation_dept', 'sales_agent']).default('admin_dept'),
 });
+
+const MAX_MASTER_ACCOUNTS = 2;
 
 export async function POST(request: Request) {
   let master;
@@ -26,6 +28,24 @@ export async function POST(request: Request) {
   }
   const { email, password, full_name, role } = parsed.data;
 
+  const supabase = await createClient();
+  if (role === 'master') {
+    const { count, error: countError } = await supabase
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'master')
+      .eq('is_active', true);
+    if (countError) {
+      return NextResponse.json({ error: countError.message }, { status: 400 });
+    }
+    if ((count ?? 0) >= MAX_MASTER_ACCOUNTS) {
+      return NextResponse.json(
+        { error: `마스터 관리자는 최대 ${MAX_MASTER_ACCOUNTS}명까지만 가능합니다.` },
+        { status: 400 }
+      );
+    }
+  }
+
   const admin = createAdminClient();
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
@@ -37,7 +57,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: createError?.message ?? 'Failed to create user' }, { status: 400 });
   }
 
-  const supabase = await createClient();
   if (role === 'master') {
     const { error: roleError } = await supabase
       .from('profiles')

@@ -10,6 +10,7 @@ import { MenuSection } from "@/components/home/menu-section";
 import { MiniBarChart } from "@/components/home/mini-bar-chart";
 import { DualBarChart } from "@/components/home/dual-bar-chart";
 import { KpiStrip } from "@/components/home/kpi-strip";
+import { canAccessPath } from "@/lib/auth/permissions";
 import type { Locale } from "@/config/constants";
 
 function monthKey(date: Date) {
@@ -79,6 +80,7 @@ export default async function DashboardPage({
   }));
 
   const isMaster = session!.role === "master";
+  const can = (path: string) => canAccessPath(session!.role, path);
 
   const p = (path: string) => `/${locale}${path}`;
 
@@ -133,29 +135,54 @@ export default async function DashboardPage({
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.05fr_1.25fr_1.05fr_0.95fr]">
         <MenuSection title={tHome("sectionCustomerSales")}>
-          <MenuCard href={p("/customers")} icon="🏢" color="blue" title={tNav("customers")} description={tHome("cardCustomersDesc")} />
-          <MenuCard href={p("/agents")} icon="🧑‍💼" color="blue" title={tNav("agents")} description={tHome("cardAgentsDesc")} />
+          {can("/customers") && (
+            <MenuCard href={p("/customers")} icon="🏢" color="blue" title={tNav("customers")} description={tHome("cardCustomersDesc")} />
+          )}
+          {can("/agents") && (
+            <MenuCard href={p("/agents")} icon="🧑‍💼" color="blue" title={tNav("agents")} description={tHome("cardAgentsDesc")} />
+          )}
+          {can("/assets") && (
+            <MenuCard href={p("/assets")} icon="🧰" color="blue" title={tNav("assets")} description={tHome("cardAssetsDesc")} />
+          )}
           {isMaster && (
             <MenuCard href={p("/admin/staff")} icon="👤" color="blue" title={tNav("adminStaff")} description={tHome("cardAdminStaffDesc")} />
           )}
         </MenuSection>
 
         <MenuSection title={tHome("sectionApplicationContract")}>
-          <MenuCard href={p("/customers")} icon="🔎" color="purple" title={tNav("applications")} description={tHome("cardApplicationsDesc")} />
-          <MenuCard href={p("/quotes")} icon="🧾" color="purple" title={tNav("quotes")} description={tHome("cardQuotesDesc")} />
-          <MenuCard href={p("/contracts")} icon="📄" color="purple" title={tNav("contracts")} description={tHome("cardContractsDesc")} />
-          <MenuCard href={p("/change-requests")} icon="🔁" color="purple" title={tNav("changeRequests")} description={tHome("cardChangeRequestsDesc")} />
+          {can("/customers") && (
+            <MenuCard href={p("/customers")} icon="🔎" color="purple" title={tNav("applications")} description={tHome("cardApplicationsDesc")} />
+          )}
+          {can("/quotes") && (
+            <MenuCard href={p("/quotes")} icon="🧾" color="purple" title={tNav("quotes")} description={tHome("cardQuotesDesc")} />
+          )}
+          {can("/contracts") && (
+            <MenuCard href={p("/contracts")} icon="📄" color="purple" title={tNav("contracts")} description={tHome("cardContractsDesc")} />
+          )}
+          {can("/change-requests") && (
+            <MenuCard href={p("/change-requests")} icon="🔁" color="purple" title={tNav("changeRequests")} description={tHome("cardChangeRequestsDesc")} />
+          )}
         </MenuSection>
 
         <MenuSection title={tHome("sectionOperations")}>
-          <MenuCard href={p("/activations")} icon="🛠️" color="orange" title={tNav("activations")} description={tHome("cardActivationsDesc")} />
-          <MenuCard href={p("/assets")} icon="🧰" color="orange" title={tNav("assets")} description={tHome("cardAssetsDesc")} />
-          <MenuCard href={p("/service-logs")} icon="📝" color="orange" title={tNav("serviceLogs")} description={tHome("cardServiceLogsDesc")} />
-          <MenuCard href={p("/termination")} icon="⚠️" color="orange" title={tNav("termination")} description={tHome("cardTerminationDesc")} />
+          {can("/activations") && (
+            <MenuCard href={p("/activations")} icon="🛠️" color="orange" title={tNav("activations")} description={tHome("cardActivationsDesc")} />
+          )}
+          {can("/incident-logs") && (
+            <MenuCard href={p("/incident-logs")} icon="🚨" color="orange" title={tNav("incidentLogs")} description={tHome("cardIncidentLogsDesc")} />
+          )}
+          {can("/service-logs") && (
+            <MenuCard href={p("/service-logs")} icon="📝" color="orange" title={tNav("serviceLogs")} description={tHome("cardServiceLogsDesc")} />
+          )}
+          {can("/termination") && (
+            <MenuCard href={p("/termination")} icon="⚠️" color="orange" title={tNav("termination")} description={tHome("cardTerminationDesc")} />
+          )}
         </MenuSection>
 
         <MenuSection title={tHome("sectionBillingAdmin")}>
-          <MenuCard href={p("/invoices")} icon="💳" color="green" title={tNav("invoices")} description={tHome("cardInvoicesDesc")} />
+          {can("/invoices") && (
+            <MenuCard href={p("/invoices")} icon="💳" color="green" title={tNav("invoices")} description={tHome("cardInvoicesDesc")} />
+          )}
           {isMaster && (
             <>
               <MenuCard href={p("/admin/approvals")} icon="✅" color="green" title={tNav("adminApprovals")} description={tHome("cardAdminApprovalsDesc")} />
