@@ -77,6 +77,9 @@ export function LoginForm() {
             {errors.password && (
               <p className="text-sm text-destructive">{errors.password.message}</p>
             )}
+            <Link href={`/${locale}/forgot-password`} className="self-end text-xs underline text-muted-foreground">
+              {t("forgotPasswordLink")}
+            </Link>
           </div>
           {serverError && <p className="text-sm text-destructive">{serverError}</p>}
           <Button type="submit" disabled={isSubmitting} className="mt-2">
