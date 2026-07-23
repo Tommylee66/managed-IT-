@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { listContracts } from "@/lib/data-access/contracts";
+import { listAgents } from "@/lib/data-access/agents";
 import { calcMonthlyCommissionReport } from "@/lib/calc/commission-report";
 import { formatRupiah } from "@/lib/utils/currency";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,9 +34,14 @@ export default async function AgentCommissionPage({
   const month = monthParam || currentMonthKey();
 
   const supabase = await createClient();
-  const [contracts, t] = await Promise.all([listContracts(supabase, "master"), getTranslations("agents")]);
+  const [contracts, agents, t] = await Promise.all([
+    listContracts(supabase, "master"),
+    listAgents(supabase, "master"),
+    getTranslations("agents"),
+  ]);
+  const npwpByAgentCode = new Map(agents.map((a) => [a.code, a.npwp]));
 
-  const groups = calcMonthlyCommissionReport(contracts, month);
+  const groups = calcMonthlyCommissionReport(contracts, month, npwpByAgentCode);
   const grandTotal = groups.reduce((s, g) => s + g.subtotal, 0);
 
   return (
@@ -55,7 +61,7 @@ export default async function AgentCommissionPage({
               href={`/api/agents/commission?month=${month}`}
               className="inline-flex h-9 items-center rounded-md border border-border bg-card px-3 text-sm font-medium hover:bg-secondary"
             >
-              {t("downloadCsv")}
+              {t("downloadExcel")}
             </a>
           </CardAction>
         </CardHeader>
@@ -79,6 +85,7 @@ export default async function AgentCommissionPage({
               <TableRow>
                 <TableHead>{t("code")}</TableHead>
                 <TableHead>{t("name")}</TableHead>
+                <TableHead>{t("npwp")}</TableHead>
                 <TableHead>{t("commissionContractNo")}</TableHead>
                 <TableHead>{t("commissionCustomerName")}</TableHead>
                 <TableHead className="text-right">{t("commissionAmount")}</TableHead>
@@ -91,6 +98,7 @@ export default async function AgentCommissionPage({
                     <TableRow key={r.contractNo}>
                       <TableCell>{g.agentCode}</TableCell>
                       <TableCell>{g.agentName}</TableCell>
+                      <TableCell>{g.npwp || "-"}</TableCell>
                       <TableCell>
                         <Link href={`/${locale}/contracts/${r.contractNo}`} className="hover:underline">
                           {r.contractNo}
@@ -101,14 +109,14 @@ export default async function AgentCommissionPage({
                     </TableRow>
                   ))}
                   <TableRow className="bg-muted/40 font-semibold">
-                    <TableCell colSpan={4}>{t("agentSubtotal", { name: g.agentName })}</TableCell>
+                    <TableCell colSpan={5}>{t("agentSubtotal", { name: g.agentName })}</TableCell>
                     <TableCell className="text-right">{formatRupiah(g.subtotal)}</TableCell>
                   </TableRow>
                 </Fragment>
               ))}
               {groups.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     {t("noCommission")}
                   </TableCell>
                 </TableRow>

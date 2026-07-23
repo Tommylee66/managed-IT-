@@ -204,13 +204,18 @@
     "backToAgents": "Kembali ke Agen Penjualan",
     "selectMonth": "Pilih Bulan",
     "apply": "Terapkan",
-    "downloadCsv": "Unduh CSV",
     "commissionContractNo": "No. Kontrak",
     "commissionCustomerName": "Nama Pelanggan",
     "commissionAmount": "Komisi",
     "agentSubtotal": "Subtotal {name}",
     "grandTotal": "Total Keseluruhan",
-    "noCommission": "Tidak ada komisi penjualan untuk bulan ini"
+    "noCommission": "Tidak ada komisi penjualan untuk bulan ini",
+    "downloadExcel": "Unduh Excel",
+    "npwp": "NPWP",
+    "ktp": "KTP",
+    "address": "Alamat",
+    "editInfo": "Edit Informasi",
+    "updateSuccess": "Informasi berhasil diperbarui"
   },
   "quotes": {
     "title": "Penawaran",

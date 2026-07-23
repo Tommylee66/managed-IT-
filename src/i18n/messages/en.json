@@ -204,13 +204,18 @@
     "backToAgents": "Back to Agents",
     "selectMonth": "Select Month",
     "apply": "Apply",
-    "downloadCsv": "Download CSV",
     "commissionContractNo": "Contract No.",
     "commissionCustomerName": "Customer",
     "commissionAmount": "Commission",
     "agentSubtotal": "{name} Subtotal",
     "grandTotal": "Grand Total",
-    "noCommission": "No sales commission for this month"
+    "noCommission": "No sales commission for this month",
+    "downloadExcel": "Download Excel",
+    "npwp": "NPWP (Tax ID)",
+    "ktp": "KTP (National ID)",
+    "address": "Address",
+    "editInfo": "Edit Info",
+    "updateSuccess": "Info updated"
   },
   "quotes": {
     "title": "Quotes",

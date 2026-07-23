@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Agent, AgentBank, AgentRateHistoryEntry } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
-import { maskBankAccount, maskPhoneNumber } from '@/lib/masking/staff-masking';
+import { maskBankAccount, maskPhoneNumber, maskTaxId } from '@/lib/masking/staff-masking';
 import { nextAgentCode } from '@/lib/numbering';
 
 function applyAgentMasking(agent: Agent, role: StaffRole): Agent {
@@ -10,6 +10,8 @@ function applyAgentMasking(agent: Agent, role: StaffRole): Agent {
     ...agent,
     phone: maskPhoneNumber(agent.phone),
     bank: maskBankAccount(agent.bank) as AgentBank | null,
+    npwp: agent.npwp ? maskTaxId(agent.npwp) : agent.npwp,
+    ktp: agent.ktp ? maskTaxId(agent.ktp) : agent.ktp,
   };
 }
 
@@ -36,6 +38,9 @@ export interface CreateAgentInput {
   first_date?: string;
   phone?: string;
   bank?: AgentBank;
+  npwp?: string;
+  ktp?: string;
+  address?: string;
   memo?: string;
 }
 
@@ -76,6 +81,34 @@ export async function changeAgentRate(
   const { data, error } = await supabase
     .from('agents')
     .update({ rate: newRate, change_date: effectiveDate, history })
+    .eq('code', code)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Agent;
+}
+
+export interface UpdateAgentInfoInput {
+  phone?: string;
+  bank?: AgentBank;
+  npwp?: string;
+  ktp?: string;
+  address?: string;
+  memo?: string;
+}
+
+/** Master-only in the UI layer — same reasoning as EditCustomerForm: a
+ * staff viewer only ever sees masked npwp/ktp/bank values, so letting them
+ * submit this form would silently overwrite the real values with masked
+ * placeholders. */
+export async function updateAgentInfo(
+  supabase: SupabaseClient,
+  code: string,
+  input: UpdateAgentInfoInput
+): Promise<Agent> {
+  const { data, error } = await supabase
+    .from('agents')
+    .update(input)
     .eq('code', code)
     .select('*')
     .single();

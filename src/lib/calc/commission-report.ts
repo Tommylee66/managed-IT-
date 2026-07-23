@@ -11,6 +11,10 @@ export interface ContractCommissionRow {
 export interface AgentCommissionGroup {
   agentCode: string;
   agentName: string;
+  /** Tax ID for withholding-tax (PPh) filing on this payout — null if the
+   * agent hasn't registered one. Always the unmasked value: this report is
+   * master-only by nature (commission figures are hidden from staff). */
+  npwp: string | null;
   rows: ContractCommissionRow[];
   subtotal: number;
 }
@@ -82,8 +86,16 @@ export function calcContractCommissionForMonth(contract: Contract, monthKey: str
 
 /** Builds the full monthly report: one row per contract that earned any
  * commission that month, grouped by agent with a subtotal. Contracts with
- * no agent (direct/house accounts) are excluded — there's no one to pay. */
-export function calcMonthlyCommissionReport(contracts: Contract[], monthKey: string): AgentCommissionGroup[] {
+ * no agent (direct/house accounts) are excluded — there's no one to pay.
+ * `npwpByAgentCode` is an optional lookup (agent code -> unmasked NPWP) so
+ * the report can carry the tax ID needed to file withholding tax on each
+ * payout, without this pure calc function needing to know about the
+ * agents table itself. */
+export function calcMonthlyCommissionReport(
+  contracts: Contract[],
+  monthKey: string,
+  npwpByAgentCode: Map<string, string | null> = new Map()
+): AgentCommissionGroup[] {
   const rows: ContractCommissionRow[] = [];
   for (const c of contracts) {
     if (!c.agent_code || !c.agent_name) continue;
@@ -108,6 +120,7 @@ export function calcMonthlyCommissionReport(contracts: Contract[], monthKey: str
       groups.set(row.agentCode, {
         agentCode: row.agentCode,
         agentName: row.agentName,
+        npwp: npwpByAgentCode.get(row.agentCode) ?? null,
         rows: [row],
         subtotal: row.amount,
       });

@@ -66,6 +66,13 @@ export interface Agent {
   change_date: string | null;
   phone: string | null;
   bank: AgentBank | null;
+  /** Tax ID (Nomor Pokok Wajib Pajak) — needed to withhold and remit PPh on
+   * commission payouts. Null for agents not yet registered for tax. */
+  npwp: string | null;
+  /** National ID (Kartu Tanda Penduduk) — fallback identifier for
+   * individuals without an NPWP, still required for tax paperwork. */
+  ktp: string | null;
+  address: string | null;
   memo: string | null;
   active: boolean;
   history: AgentRateHistoryEntry[];

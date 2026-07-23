@@ -31,6 +31,9 @@ export function CreateAgentDialog() {
     bankName: z.string().optional(),
     accountNumber: z.string().optional(),
     holderName: z.string().optional(),
+    npwp: z.string().optional(),
+    ktp: z.string().optional(),
+    address: z.string().optional(),
     memo: z.string().optional(),
   });
   type FormValues = z.infer<typeof schema>;
@@ -48,6 +51,9 @@ export function CreateAgentDialog() {
         name: values.name,
         rate: values.rate,
         phone: values.phone,
+        npwp: values.npwp,
+        ktp: values.ktp,
+        address: values.address,
         memo: values.memo,
         first_date: new Date().toISOString().slice(0, 10),
         bank: {
@@ -101,6 +107,20 @@ export function CreateAgentDialog() {
               <Label htmlFor="holderName">{t("holderName")}</Label>
               <Input id="holderName" {...register("holderName")} />
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="npwp">{t("npwp")}</Label>
+              <Input id="npwp" {...register("npwp")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="ktp">{t("ktp")}</Label>
+              <Input id="ktp" {...register("ktp")} />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="address">{t("address")}</Label>
+            <Input id="address" {...register("address")} />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="memo">{t("memo")}</Label>

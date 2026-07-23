@@ -204,13 +204,18 @@
     "backToAgents": "영업 대리점으로 돌아가기",
     "selectMonth": "조회 월 선택",
     "apply": "조회",
-    "downloadCsv": "CSV 다운로드",
     "commissionContractNo": "계약번호",
     "commissionCustomerName": "고객명",
     "commissionAmount": "수수료",
     "agentSubtotal": "{name} 소계",
     "grandTotal": "총 합계",
-    "noCommission": "해당 월에 지급할 영업수수료가 없습니다"
+    "noCommission": "해당 월에 지급할 영업수수료가 없습니다",
+    "downloadExcel": "엑셀 다운로드",
+    "npwp": "NPWP (세금번호)",
+    "ktp": "KTP (주민등록번호)",
+    "address": "주소",
+    "editInfo": "정보 수정",
+    "updateSuccess": "정보가 수정되었습니다"
   },
   "quotes": {
     "title": "견적",

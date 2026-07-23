@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AgentDetailActions } from "@/components/agents/agent-detail-actions";
+import { EditAgentForm } from "@/components/agents/edit-agent-form";
 
 export default async function AgentDetailPage({
   params,
@@ -59,6 +60,18 @@ export default async function AgentDetailPage({
                 : "-"}
             </p>
           </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("npwp")}</p>
+            <p>{agent.npwp || "-"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("ktp")}</p>
+            <p>{agent.ktp || "-"}</p>
+          </div>
+          <div className="col-span-2 md:col-span-4">
+            <p className="text-xs text-muted-foreground">{t("address")}</p>
+            <p>{agent.address || "-"}</p>
+          </div>
         </CardContent>
       </Card>
 
@@ -95,6 +108,7 @@ export default async function AgentDetailPage({
         </CardContent>
       </Card>
 
+      {session!.role === "master" && <EditAgentForm agent={agent} />}
       {session!.role === "master" && <AgentDetailActions code={agent.code} active={agent.active} />}
     </div>
   );
