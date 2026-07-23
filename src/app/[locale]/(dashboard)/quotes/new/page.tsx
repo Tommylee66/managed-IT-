@@ -5,6 +5,7 @@ import { listCustomers } from "@/lib/data-access/customers";
 import { listAgents } from "@/lib/data-access/agents";
 import { getRates } from "@/lib/data-access/rates";
 import { listEquipmentCatalog } from "@/lib/data-access/equipment";
+import { listServiceCatalog } from "@/lib/data-access/services";
 import { QuoteCalculatorForm } from "@/components/quotes/quote-calculator-form";
 
 export default async function NewQuotePage({
@@ -16,11 +17,12 @@ export default async function NewQuotePage({
   setRequestLocale(locale);
   const session = await getSessionContext();
   const supabase = await createClient();
-  const [customers, agents, rates, equipmentCatalog, t] = await Promise.all([
+  const [customers, agents, rates, equipmentCatalog, serviceCatalog, t] = await Promise.all([
     listCustomers(supabase, session!.role),
     listAgents(supabase, session!.role),
     getRates(supabase, session!.role),
     listEquipmentCatalog(supabase, { activeOnly: true }),
+    listServiceCatalog(supabase, { activeOnly: true }),
     getTranslations("quotes"),
   ]);
   const locationNames = rates.locations.map((l) => l.name);
@@ -33,6 +35,7 @@ export default async function NewQuotePage({
         agents={agents}
         locationNames={locationNames}
         equipmentCatalog={equipmentCatalog}
+        serviceCatalog={serviceCatalog}
       />
     </div>
   );

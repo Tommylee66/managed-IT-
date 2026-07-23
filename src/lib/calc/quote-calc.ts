@@ -16,7 +16,7 @@ export interface QuoteCalcResult {
 }
 
 export function calcQuoteForInputs(
-  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'visit2_addon' | 'priority' | 'vpn_base' | 'vpn_branch' | 'security_monitor' | 'security_device' | 'locations' | 'commission_items'> & {
+  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'locations' | 'commission_items'> & {
     cost_fields?: Rates['cost_fields'];
     init_fields?: Rates['init_fields'];
   },
@@ -72,50 +72,16 @@ export function calcQuoteForInputs(
       emp,
     });
 
-  if (Number(inputs.visit) === 2) {
-    add('visit', '월 2회 방문점검 추가', rates.visit2_addon, cost.costVisit, 0, true, 'visitTwice');
-  } else {
-    add('visit', '월 1회 방문점검 원가 반영', 0, cost.costVisit, 0, false, 'visitOnceCost');
-  }
+  // Visit frequency, priority response, VPN, and security add-ons no longer
+  // price as hardcoded rate fields — they've moved to master-managed
+  // service_catalog selections (see calc/service-pricing.ts), same as
+  // AP/Hub/CCTV moved to equipment_catalog. The baseline internal cost of at
+  // least one monthly visit still applies regardless of what's selected.
+  add('visit', '월 1회 방문점검 원가 반영', 0, cost.costVisit, 0, false, 'visitOnceCost');
 
   const loc = (rates.locations || [])[Number(inputs.locationIndex || 0)] || rates.locations[0];
   if (loc && (loc.fee || loc.cost)) {
     add('location', `로케이션: ${loc.name}`, loc.fee, loc.cost, 0, true, 'location', { name: loc.name });
-  }
-
-  if (inputs.priority === 'yes')
-    add('priority', '우선 장애대응', rates.priority, 250_000, 0, true, 'priority');
-
-  if (inputs.vpn === 'base')
-    add('vpn', 'Managed VPN 기본', rates.vpn_base, cost.costVpnBase, 1_500_000, true, 'vpnBase');
-
-  const branches = Number(inputs.vpnBranches || 0);
-  if (branches > 0) {
-    add(
-      'vpn',
-      `VPN 추가 지점 ${branches}곳`,
-      branches * rates.vpn_branch,
-      branches * cost.costVpnBranch,
-      branches * 500_000,
-      true,
-      'vpnBranchExtra',
-      { branches }
-    );
-  }
-
-  if (inputs.security === 'monitor') {
-    add('security', '고객 보유 보안장비 관제', rates.security_monitor, cost.costSecMonitor, 0, true, 'securityMonitor');
-  }
-  if (inputs.security === 'device') {
-    add(
-      'security',
-      'FortiGate 등 보안장비 제공+관제',
-      rates.security_device,
-      cost.costSecDevice,
-      init.initSecurityDevice,
-      true,
-      'securityDevice'
-    );
   }
 
   const discount = Number(inputs.discount || 0);

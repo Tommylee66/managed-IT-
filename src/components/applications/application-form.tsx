@@ -45,12 +45,7 @@ interface FormValues {
   billing_date: string;
   months: number;
   emp: number;
-  visit: 1 | 2;
   locationIndex: number;
-  vpn: "none" | "base";
-  vpnBranches: number;
-  security: "none" | "monitor" | "device";
-  priority: "no" | "yes";
   discount: number;
   memo: string;
 }
@@ -83,12 +78,7 @@ export function ApplicationForm({
       billing_date: today,
       months: 36,
       emp: 20,
-      visit: 1,
       locationIndex: 0,
-      vpn: "none",
-      vpnBranches: 0,
-      security: "none",
-      priority: "no",
       discount: 0,
       memo: "",
     },
@@ -97,18 +87,20 @@ export function ApplicationForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      // Application intake doesn't select specific equipment yet — that
-      // happens when the quote itself is built. AP/Hub/CCTV no longer price
-      // as generic add-ons either way, so these stay at baseline.
+      // Application intake doesn't select specific equipment or additional
+      // services yet — that happens when the quote itself is built (see
+      // quote-calculator-form.tsx). AP/Hub/CCTV/visit/VPN/security/priority
+      // no longer price as generic add-ons either way, so these stay at
+      // baseline.
       ap: 1,
       hub: 1,
       cctv: 8,
-      visit: Number(v.visit) === 2 ? 2 : 1,
+      visit: 1,
       locationIndex: Number(v.locationIndex),
-      vpn: v.vpn,
-      vpnBranches: Number(v.vpnBranches),
-      security: v.security,
-      priority: v.priority,
+      vpn: "none",
+      vpnBranches: 0,
+      security: "none",
+      priority: "no",
       discount: Number(v.discount),
       memo: v.memo,
     };

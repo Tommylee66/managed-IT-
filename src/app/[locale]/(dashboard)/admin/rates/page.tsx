@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getRates } from "@/lib/data-access/rates";
 import { listEquipmentCatalog } from "@/lib/data-access/equipment";
+import { listServiceCatalog } from "@/lib/data-access/services";
 import type { Rates } from "@/types/domain";
 import { EditRatesForm } from "@/components/rates/edit-rates-form";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,6 +13,8 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { formatRupiah } from "@/lib/utils/currency";
 import { EquipmentDialog } from "@/components/admin/equipment-dialog";
 import { ToggleEquipmentActiveButton } from "@/components/admin/toggle-equipment-active-button";
+import { ServiceDialog } from "@/components/admin/service-dialog";
+import { ToggleServiceActiveButton } from "@/components/admin/toggle-service-active-button";
 
 export default async function AdminRatesPage({
   params,
@@ -24,9 +27,10 @@ export default async function AdminRatesPage({
   if (!session || session.role !== "master") redirect("/dashboard");
 
   const supabase = await createClient();
-  const [rates, equipmentItems, t, tCat] = await Promise.all([
+  const [rates, equipmentItems, serviceItems, t, tCat] = await Promise.all([
     getRates(supabase, "master") as Promise<Rates>,
     listEquipmentCatalog(supabase),
+    listServiceCatalog(supabase),
     getTranslations("admin"),
     getTranslations("equipmentCategory"),
   ]);
@@ -93,6 +97,59 @@ export default async function AdminRatesPage({
                 <TableRow>
                   <TableCell colSpan={10} className="text-center text-muted-foreground">
                     {t("noEquipment")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("serviceTitle")}</CardTitle>
+          <CardAction>
+            <ServiceDialog />
+          </CardAction>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("serviceName")}</TableHead>
+                <TableHead>{t("serviceDescription")}</TableHead>
+                <TableHead className="text-right">{t("serviceMonthlyRate")}</TableHead>
+                <TableHead className="text-right">{t("serviceMonthlyCost")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead>{t("actions")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {serviceItems.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.description ?? "-"}</TableCell>
+                  <TableCell className="text-right">
+                    {item.monthly_rate != null ? formatRupiah(item.monthly_rate) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.monthly_cost != null ? formatRupiah(item.monthly_cost) : "-"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={item.is_active ? "default" : "secondary"}>
+                      {item.is_active ? t("active") : t("inactive")}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <ServiceDialog item={item} />
+                    <ToggleServiceActiveButton id={item.id} active={item.is_active} />
+                  </TableCell>
+                </TableRow>
+              ))}
+              {serviceItems.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                    {t("noService")}
                   </TableCell>
                 </TableRow>
               )}

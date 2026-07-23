@@ -24,10 +24,15 @@ import {
   equipmentQtyToRequest,
   type EquipmentSelectionState,
 } from "@/components/quotes/equipment-selector";
+import {
+  ServiceSelector,
+  serviceQtyToRequest,
+  type ServiceSelectionState,
+} from "@/components/quotes/service-selector";
 import { calcProratedSettlement } from "@/lib/calc/proration";
 import { calculateQuotePreviewAction, type QuotePreview } from "@/app/[locale]/(dashboard)/quotes/actions";
 import { createChangeRequestAction } from "@/app/[locale]/(dashboard)/change-requests/actions";
-import type { Contract, EquipmentCatalogItem, QuoteInputs } from "@/types/domain";
+import type { Contract, EquipmentCatalogItem, ServiceCatalogItem, QuoteInputs } from "@/types/domain";
 
 const TYPE_OPTIONS = [
   { value: "장비 추가", key: "typeEquipmentAdd" },
@@ -42,12 +47,7 @@ interface FormValues {
   type: string;
   effective_date: string;
   emp: number;
-  visit: 1 | 2;
   locationIndex: number;
-  vpn: "none" | "base";
-  vpnBranches: number;
-  security: "none" | "monitor" | "device";
-  priority: "no" | "yes";
   discount: number;
   memo: string;
 }
@@ -56,10 +56,12 @@ export function ChangeRequestForm({
   contract,
   locationNames,
   equipmentCatalog,
+  serviceCatalog,
 }: {
   contract: Contract;
   locationNames: string[];
   equipmentCatalog: EquipmentCatalogItem[];
+  serviceCatalog: ServiceCatalogItem[];
 }) {
   const t = useTranslations("changeRequests");
   const tCalc = useTranslations("serviceCalculator");
@@ -78,18 +80,20 @@ export function ChangeRequestForm({
     });
     return initial;
   });
+  const [serviceQty, setServiceQty] = useState<Record<string, ServiceSelectionState>>(() => {
+    const initial: Record<string, ServiceSelectionState> = {};
+    (contract.quote_snapshot?.service_selections ?? []).forEach((s) => {
+      initial[s.catalogId] = { qty: s.qty };
+    });
+    return initial;
+  });
 
   const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
       type: TYPE_OPTIONS[2].value,
       effective_date: new Date().toISOString().slice(0, 10),
       emp: currentInputs?.emp ?? 20,
-      visit: currentInputs?.visit ?? 1,
       locationIndex: currentInputs?.locationIndex ?? 0,
-      vpn: currentInputs?.vpn ?? "none",
-      vpnBranches: currentInputs?.vpnBranches ?? 0,
-      security: currentInputs?.security ?? "none",
-      priority: currentInputs?.priority ?? "no",
       discount: currentInputs?.discount ?? 0,
       memo: "",
     },
@@ -98,17 +102,18 @@ export function ChangeRequestForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      // See quote-calculator-form.tsx — AP/Hub/CCTV are no longer priced as
-      // generic add-ons, only via equipment catalog selections below.
+      // See quote-calculator-form.tsx — AP/Hub/CCTV price only via equipment
+      // catalog selections, and visit/vpn/security/priority only via service
+      // catalog selections, below.
       ap: 1,
       hub: 1,
       cctv: 8,
-      visit: Number(v.visit) === 2 ? 2 : 1,
+      visit: 1,
       locationIndex: Number(v.locationIndex),
-      vpn: v.vpn,
-      vpnBranches: Number(v.vpnBranches),
-      security: v.security,
-      priority: v.priority,
+      vpn: "none",
+      vpnBranches: 0,
+      security: "none",
+      priority: "no",
       discount: Number(v.discount),
       memo: v.memo,
     };
@@ -121,7 +126,8 @@ export function ChangeRequestForm({
         const result = await calculateQuotePreviewAction(
           toInputs(v),
           contract.months,
-          equipmentQtyToRequest(equipmentQty)
+          equipmentQtyToRequest(equipmentQty),
+          serviceQtyToRequest(serviceQty)
         );
         setPreview(result);
       } catch {
@@ -138,6 +144,7 @@ export function ChangeRequestForm({
         effective_date: v.effective_date,
         new_inputs: toInputs(v),
         new_equipment_selections: equipmentQtyToRequest(equipmentQty),
+        new_service_selections: serviceQtyToRequest(serviceQty),
         memo: v.memo,
       });
       toast.success(t("saveSuccess"));
@@ -207,8 +214,22 @@ export function ChangeRequestForm({
               <Input id="discount" type="number" {...register("discount")} />
             </div>
           </div>
+          <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
+            <Label className="text-sm font-semibold">{tQuotes("baseServiceTitle")}</Label>
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
+              {tQuotes("baseServiceDescription")}
+            </p>
+          </div>
           <div className="flex flex-col gap-2">
-            <Label>{tQuotes("equipmentSelectTitle")}</Label>
+            <Label className="text-sm font-semibold">{tQuotes("serviceSelectTitle")}</Label>
+            {serviceCatalog.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{tQuotes("serviceSelectEmpty")}</p>
+            ) : (
+              <ServiceSelector catalog={serviceCatalog} value={serviceQty} onChange={setServiceQty} />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label className="text-sm font-semibold">{tQuotes("equipmentSelectTitle")}</Label>
             {equipmentCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
             ) : (

@@ -26,6 +26,11 @@ import {
   equipmentQtyToRequest,
   type EquipmentSelectionState,
 } from "@/components/quotes/equipment-selector";
+import {
+  ServiceSelector,
+  serviceQtyToRequest,
+  type ServiceSelectionState,
+} from "@/components/quotes/service-selector";
 import type { Locale } from "@/config/constants";
 import {
   calculateQuotePreviewAction,
@@ -33,7 +38,15 @@ import {
   updateQuoteAction,
   type QuotePreview,
 } from "@/app/[locale]/(dashboard)/quotes/actions";
-import type { Customer, Agent, QuoteInputs, EquipmentCatalogItem, EquipmentSelection } from "@/types/domain";
+import type {
+  Customer,
+  Agent,
+  QuoteInputs,
+  EquipmentCatalogItem,
+  EquipmentSelection,
+  ServiceCatalogItem,
+  ServiceSelection,
+} from "@/types/domain";
 
 export interface QuoteEditInitialValues {
   no: string;
@@ -44,6 +57,7 @@ export interface QuoteEditInitialValues {
   months: number;
   inputs: QuoteInputs;
   equipment_selections: EquipmentSelection[];
+  service_selections: ServiceSelection[];
 }
 
 interface FormValues {
@@ -53,12 +67,7 @@ interface FormValues {
   billing_date: string;
   months: number;
   emp: number;
-  visit: 1 | 2;
   locationIndex: number;
-  vpn: "none" | "base";
-  vpnBranches: number;
-  security: "none" | "monitor" | "device";
-  priority: "no" | "yes";
   discount: number;
   memo: string;
 }
@@ -70,12 +79,14 @@ export function QuoteCalculatorForm({
   agents,
   locationNames,
   equipmentCatalog,
+  serviceCatalog,
   initialValues,
 }: {
   customers: Customer[];
   agents: Agent[];
   locationNames: string[];
   equipmentCatalog: EquipmentCatalogItem[];
+  serviceCatalog: ServiceCatalogItem[];
   initialValues?: QuoteEditInitialValues;
 }) {
   const t = useTranslations("serviceCalculator");
@@ -93,6 +104,13 @@ export function QuoteCalculatorForm({
     });
     return initial;
   });
+  const [serviceQty, setServiceQty] = useState<Record<string, ServiceSelectionState>>(() => {
+    const initial: Record<string, ServiceSelectionState> = {};
+    initialValues?.service_selections.forEach((s) => {
+      initial[s.catalogId] = { qty: s.qty };
+    });
+    return initial;
+  });
 
   const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
@@ -102,12 +120,7 @@ export function QuoteCalculatorForm({
       billing_date: initialValues?.billing_date ?? today,
       months: initialValues?.months ?? 36,
       emp: initialValues?.inputs.emp ?? 20,
-      visit: initialValues?.inputs.visit ?? 1,
       locationIndex: initialValues?.inputs.locationIndex ?? 0,
-      vpn: initialValues?.inputs.vpn ?? "none",
-      vpnBranches: initialValues?.inputs.vpnBranches ?? 0,
-      security: initialValues?.inputs.security ?? "none",
-      priority: initialValues?.inputs.priority ?? "no",
       discount: initialValues?.inputs.discount ?? 0,
       memo: initialValues?.inputs.memo ?? "",
     },
@@ -116,19 +129,21 @@ export function QuoteCalculatorForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      // AP/Hub/CCTV no longer price as generic per-unit add-ons — equipment
-      // pricing now comes entirely from the equipment catalog selections
-      // below. These stay at their baseline (no-extra-charge) values only
-      // because QuoteInputs still carries the fields for old stored quotes.
+      // AP/Hub/CCTV no longer price as generic per-unit add-ons (equipment
+      // catalog selections instead), and visit frequency/VPN/security/
+      // priority-response no longer price as hardcoded rate fields (service
+      // catalog selections instead, see ServiceSelector below). These stay
+      // at their baseline (no-extra-charge) values only because QuoteInputs
+      // still carries the fields for old stored quotes.
       ap: 1,
       hub: 1,
       cctv: 8,
-      visit: Number(v.visit) === 2 ? 2 : 1,
+      visit: 1,
       locationIndex: Number(v.locationIndex),
-      vpn: v.vpn,
-      vpnBranches: Number(v.vpnBranches),
-      security: v.security,
-      priority: v.priority,
+      vpn: "none",
+      vpnBranches: 0,
+      security: "none",
+      priority: "no",
       discount: Number(v.discount),
       memo: v.memo,
     };
@@ -141,7 +156,8 @@ export function QuoteCalculatorForm({
         const result = await calculateQuotePreviewAction(
           toInputs(v),
           Number(v.months),
-          equipmentQtyToRequest(equipmentQty)
+          equipmentQtyToRequest(equipmentQty),
+          serviceQtyToRequest(serviceQty)
         );
         setPreview(result);
       } catch {
@@ -173,6 +189,7 @@ export function QuoteCalculatorForm({
           months: Number(v.months),
           inputs: toInputs(v),
           equipment_selections: equipmentQtyToRequest(equipmentQty),
+          service_selections: serviceQtyToRequest(serviceQty),
         });
         toast.success(tQuotes("updateSuccess"));
         router.push(`/${locale}/quotes/${initialValues.no}`);
@@ -185,6 +202,7 @@ export function QuoteCalculatorForm({
           months: Number(v.months),
           inputs: toInputs(v),
           equipment_selections: equipmentQtyToRequest(equipmentQty),
+          service_selections: serviceQtyToRequest(serviceQty),
         });
         toast.success(t("saveSuccess"));
         router.push(`/${locale}/quotes/${quote.no}`);
@@ -256,21 +274,6 @@ export function QuoteCalculatorForm({
               <Label htmlFor="emp">{t("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
             </div>
-            <div className="flex flex-col gap-2">
-              <Label>{t("visitFrequency")}</Label>
-              <Select
-                defaultValue={String(initialValues?.inputs.visit ?? 1)}
-                onValueChange={(v) => setValue("visit", Number(v) as 1 | 2)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">{t("visitOnce")}</SelectItem>
-                  <SelectItem value="2">{t("visitTwice")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{t("location")}</Label>
               <Select
@@ -290,62 +293,29 @@ export function QuoteCalculatorForm({
               </Select>
             </div>
             <div className="flex flex-col gap-2">
-              <Label>{t("vpn")}</Label>
-              <Select
-                defaultValue={initialValues?.inputs.vpn ?? "none"}
-                onValueChange={(v) => setValue("vpn", v as "none" | "base")}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">{t("vpnNone")}</SelectItem>
-                  <SelectItem value="base">{t("vpnBase")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="vpnBranches">{t("vpnBranchCount")}</Label>
-              <Input id="vpnBranches" type="number" {...register("vpnBranches")} />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label>{t("security")}</Label>
-              <Select
-                defaultValue={initialValues?.inputs.security ?? "none"}
-                onValueChange={(v) => setValue("security", v as "none" | "monitor" | "device")}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">{t("securityNone")}</SelectItem>
-                  <SelectItem value="monitor">{t("securityMonitor")}</SelectItem>
-                  <SelectItem value="device">{t("securityDevice")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label>{t("priorityResponse")}</Label>
-              <Select
-                defaultValue={initialValues?.inputs.priority ?? "no"}
-                onValueChange={(v) => setValue("priority", v as "no" | "yes")}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="no">{t("priorityNo")}</SelectItem>
-                  <SelectItem value="yes">{t("priorityYes")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex flex-col gap-2">
               <Label htmlFor="discount">{t("discount")}</Label>
               <Input id="discount" type="number" {...register("discount")} />
             </div>
           </div>
+
+          <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
+            <Label className="text-sm font-semibold">{tQuotes("baseServiceTitle")}</Label>
+            <p className="text-sm text-muted-foreground whitespace-pre-line">
+              {tQuotes("baseServiceDescription")}
+            </p>
+          </div>
+
           <div className="flex flex-col gap-2">
-            <Label>{tQuotes("equipmentSelectTitle")}</Label>
+            <Label className="text-sm font-semibold">{tQuotes("serviceSelectTitle")}</Label>
+            {serviceCatalog.length === 0 ? (
+              <p className="text-sm text-muted-foreground">{tQuotes("serviceSelectEmpty")}</p>
+            ) : (
+              <ServiceSelector catalog={serviceCatalog} value={serviceQty} onChange={setServiceQty} />
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label className="text-sm font-semibold">{tQuotes("equipmentSelectTitle")}</Label>
             {equipmentCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
             ) : (

@@ -1,9 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Quote, QuoteInputs, Rates, EquipmentSelection } from '@/types/domain';
+import type { Quote, QuoteInputs, Rates, EquipmentSelection, ServiceSelection } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { bucketAmount, bucketMargin } from '@/lib/masking/staff-masking';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
 import { mergeEquipmentIntoCalc } from '@/lib/calc/equipment-pricing';
+import { mergeServiceIntoCalc } from '@/lib/calc/service-pricing';
 import { nextQuoteNo } from '@/lib/numbering';
 
 function applyQuoteMasking(quote: Quote, role: StaffRole): Quote {
@@ -88,6 +89,7 @@ export interface CreateQuoteInput {
   months: number;
   inputs: QuoteInputs;
   equipment_selections?: EquipmentSelection[];
+  service_selections?: ServiceSelection[];
   created_by: string;
 }
 
@@ -101,9 +103,12 @@ export async function createQuote(
   rates: Rates,
   input: CreateQuoteInput
 ): Promise<Quote> {
-  const calc = mergeEquipmentIntoCalc(
-    calcQuoteForInputs(rates, input.inputs, input.months),
-    input.equipment_selections ?? []
+  const calc = mergeServiceIntoCalc(
+    mergeEquipmentIntoCalc(
+      calcQuoteForInputs(rates, input.inputs, input.months),
+      input.equipment_selections ?? []
+    ),
+    input.service_selections ?? []
   );
   const no = await nextQuoteNo(supabase);
   const { data, error } = await supabase
@@ -118,6 +123,7 @@ export async function createQuote(
       inputs: input.inputs,
       rows: calc.rows,
       equipment_selections: input.equipment_selections ?? [],
+      service_selections: input.service_selections ?? [],
       monthly: calc.monthly,
       monthly_cost: calc.monthlyCost,
       init_cost: calc.initCost,
@@ -141,6 +147,7 @@ export interface UpdateQuoteInput {
   months: number;
   inputs: QuoteInputs;
   equipment_selections?: EquipmentSelection[];
+  service_selections?: ServiceSelection[];
 }
 
 /** Recomputes and overwrites an existing quote in place — same pricing rules
@@ -153,9 +160,12 @@ export async function updateQuote(
   no: string,
   input: UpdateQuoteInput
 ): Promise<Quote> {
-  const calc = mergeEquipmentIntoCalc(
-    calcQuoteForInputs(rates, input.inputs, input.months),
-    input.equipment_selections ?? []
+  const calc = mergeServiceIntoCalc(
+    mergeEquipmentIntoCalc(
+      calcQuoteForInputs(rates, input.inputs, input.months),
+      input.equipment_selections ?? []
+    ),
+    input.service_selections ?? []
   );
   const { data, error } = await supabase
     .from('quotes')
@@ -168,6 +178,7 @@ export async function updateQuote(
       inputs: input.inputs,
       rows: calc.rows,
       equipment_selections: input.equipment_selections ?? [],
+      service_selections: input.service_selections ?? [],
       monthly: calc.monthly,
       monthly_cost: calc.monthlyCost,
       init_cost: calc.initCost,

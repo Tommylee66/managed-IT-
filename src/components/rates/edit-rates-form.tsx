@@ -15,12 +15,6 @@ interface FormValues {
   base_monthly: number;
   contract24_addon: number;
   employee_unit: number;
-  visit2_addon: number;
-  priority: number;
-  vpn_base: number;
-  vpn_branch: number;
-  security_monitor: number;
-  security_device: number;
   ppn: number;
   locations: { name: string; fee: number; cost: number }[];
   cost_fields_json: string;
@@ -32,12 +26,6 @@ const PRICE_FIELD_KEYS: { key: keyof FormValues; labelKey: string }[] = [
   { key: "base_monthly", labelKey: "baseMonthly" },
   { key: "contract24_addon", labelKey: "contract24Addon" },
   { key: "employee_unit", labelKey: "employeeUnit" },
-  { key: "visit2_addon", labelKey: "visit2Addon" },
-  { key: "priority", labelKey: "priorityFee" },
-  { key: "vpn_base", labelKey: "vpnBaseFee" },
-  { key: "vpn_branch", labelKey: "vpnBranchFee" },
-  { key: "security_monitor", labelKey: "securityMonitorFee" },
-  { key: "security_device", labelKey: "securityDeviceFee" },
   { key: "ppn", labelKey: "ppnRate" },
 ];
 
@@ -48,12 +36,6 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
       base_monthly: rates.base_monthly,
       contract24_addon: rates.contract24_addon,
       employee_unit: rates.employee_unit,
-      visit2_addon: rates.visit2_addon,
-      priority: rates.priority,
-      vpn_base: rates.vpn_base,
-      vpn_branch: rates.vpn_branch,
-      security_monitor: rates.security_monitor,
-      security_device: rates.security_device,
       ppn: rates.ppn,
       locations: rates.locations,
       cost_fields_json: JSON.stringify(rates.cost_fields, null, 2),

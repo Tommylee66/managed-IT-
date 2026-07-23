@@ -219,6 +219,32 @@ export interface EquipmentSelection {
   overageCost: number | null;
 }
 
+export interface ServiceCatalogItem {
+  id: string;
+  name: string;
+  description: string | null;
+  /** Monthly rate charged to the customer. Null = not yet priced. */
+  monthly_rate: number | null;
+  /** Internal monthly cost, master-only — null if not tracked. */
+  monthly_cost: number | null;
+  is_active: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Snapshot of a chosen service catalog item, stored on the quote/change
+ * request itself — see supabase/migrations/20260713000001_service_catalog.sql. */
+export interface ServiceSelection {
+  catalogId: string;
+  name: string;
+  description: string | null;
+  qty: number;
+  /** Rate/cost snapshotted at selection time — see ServiceCatalogItem. */
+  monthlyRate: number | null;
+  monthlyCost: number | null;
+}
+
 export interface QuoteRowRecord {
   key: string;
   label: string;
@@ -243,6 +269,7 @@ export interface Quote {
   inputs: QuoteInputs;
   rows: QuoteRowRecord[];
   equipment_selections: EquipmentSelection[];
+  service_selections: ServiceSelection[];
   monthly: number;
   monthly_cost: number;
   init_cost: number;
@@ -461,6 +488,8 @@ export interface ChangeRequest {
   new_inputs: QuoteInputs | null;
   old_equipment_selections: EquipmentSelection[] | null;
   new_equipment_selections: EquipmentSelection[] | null;
+  old_service_selections: ServiceSelection[] | null;
+  new_service_selections: ServiceSelection[] | null;
   /** Prorated one-time charge/credit for the remainder of the effective
    * month, from the fee difference — see calc/proration.ts. */
   settlement_amount: number | null;

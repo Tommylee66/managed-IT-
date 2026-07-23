@@ -6,8 +6,10 @@ import { getSessionContext } from '@/lib/auth/session';
 import { getRates } from '@/lib/data-access/rates';
 import { createQuote, updateQuote } from '@/lib/data-access/quotes';
 import { listEquipmentCatalog } from '@/lib/data-access/equipment';
+import { listServiceCatalog } from '@/lib/data-access/services';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
 import { resolveEquipmentSelections, mergeEquipmentIntoCalc, type EquipmentSelectionRequest } from '@/lib/calc/equipment-pricing';
+import { resolveServiceSelections, mergeServiceIntoCalc, type ServiceSelectionRequest } from '@/lib/calc/service-pricing';
 import { bucketAmount, bucketMargin } from '@/lib/masking/staff-masking';
 import type { QuoteInputs, Rates } from '@/types/domain';
 
@@ -39,15 +41,21 @@ export interface QuotePreview {
 export async function calculateQuotePreviewAction(
   inputs: QuoteInputs,
   months: number,
-  equipment: EquipmentSelectionRequest[] = []
+  equipment: EquipmentSelectionRequest[] = [],
+  services: ServiceSelectionRequest[] = []
 ): Promise<QuotePreview> {
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
   const rates = (await getRates(supabase, 'master')) as Rates;
   const catalog = await listEquipmentCatalog(supabase, { role: 'master' });
+  const serviceCatalog = await listServiceCatalog(supabase, { role: 'master' });
   const resolved = resolveEquipmentSelections(equipment, catalog);
-  const calc = mergeEquipmentIntoCalc(calcQuoteForInputs(rates, inputs, months), resolved);
+  const resolvedServices = resolveServiceSelections(services, serviceCatalog);
+  const calc = mergeServiceIntoCalc(
+    mergeEquipmentIntoCalc(calcQuoteForInputs(rates, inputs, months), resolved),
+    resolvedServices
+  );
   const ppn = Math.round((calc.monthly * rates.ppn) / 100);
 
   const rows = calc.rows.map((r) => ({
@@ -90,6 +98,7 @@ export interface CreateQuoteFormInput {
   months: number;
   inputs: QuoteInputs;
   equipment_selections?: EquipmentSelectionRequest[];
+  service_selections?: ServiceSelectionRequest[];
 }
 
 export async function createQuoteAction(input: CreateQuoteFormInput) {
@@ -98,10 +107,13 @@ export async function createQuoteAction(input: CreateQuoteFormInput) {
   const supabase = await createClient();
   const rates = (await getRates(supabase, 'master')) as Rates;
   const catalog = await listEquipmentCatalog(supabase, { role: 'master' });
+  const serviceCatalog = await listServiceCatalog(supabase, { role: 'master' });
   const resolved = resolveEquipmentSelections(input.equipment_selections ?? [], catalog);
+  const resolvedServices = resolveServiceSelections(input.service_selections ?? [], serviceCatalog);
   const quote = await createQuote(supabase, rates, {
     ...input,
     equipment_selections: resolved,
+    service_selections: resolvedServices,
     created_by: session.userId,
   });
   revalidatePath('/quotes');
@@ -114,8 +126,14 @@ export async function updateQuoteAction(no: string, input: CreateQuoteFormInput)
   const supabase = await createClient();
   const rates = (await getRates(supabase, 'master')) as Rates;
   const catalog = await listEquipmentCatalog(supabase, { role: 'master' });
+  const serviceCatalog = await listServiceCatalog(supabase, { role: 'master' });
   const resolved = resolveEquipmentSelections(input.equipment_selections ?? [], catalog);
-  const quote = await updateQuote(supabase, rates, no, { ...input, equipment_selections: resolved });
+  const resolvedServices = resolveServiceSelections(input.service_selections ?? [], serviceCatalog);
+  const quote = await updateQuote(supabase, rates, no, {
+    ...input,
+    equipment_selections: resolved,
+    service_selections: resolvedServices,
+  });
   revalidatePath('/quotes');
   revalidatePath(`/quotes/${no}`);
   return quote;

@@ -1,7 +1,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { ChangeRequest, Contract, EquipmentSelection, QuoteInputs, Rates } from '@/types/domain';
+import type { ChangeRequest, Contract, EquipmentSelection, ServiceSelection, QuoteInputs, Rates } from '@/types/domain';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
 import { mergeEquipmentIntoCalc } from '@/lib/calc/equipment-pricing';
+import { mergeServiceIntoCalc } from '@/lib/calc/service-pricing';
 import { calcProratedSettlement } from '@/lib/calc/proration';
 import { nextChangeRequestNo } from '@/lib/numbering';
 
@@ -32,6 +33,7 @@ export interface CreateChangeRequestInput {
   effective_date: string;
   new_inputs: QuoteInputs;
   new_equipment_selections?: EquipmentSelection[];
+  new_service_selections?: ServiceSelection[];
   memo?: string;
   created_by: string;
 }
@@ -55,11 +57,16 @@ export async function createChangeRequest(
 ): Promise<ChangeRequest> {
   const oldInputs = contract.quote_snapshot?.inputs as QuoteInputs | undefined;
   const oldEquipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
+  const oldServiceSelections = contract.quote_snapshot?.service_selections ?? [];
   const oldMonthly = Number(contract.monthly_fee || 0);
   const newEquipmentSelections = input.new_equipment_selections ?? [];
-  const calc = mergeEquipmentIntoCalc(
-    calcQuoteForInputs(rates, input.new_inputs, contract.months),
-    newEquipmentSelections
+  const newServiceSelections = input.new_service_selections ?? [];
+  const calc = mergeServiceIntoCalc(
+    mergeEquipmentIntoCalc(
+      calcQuoteForInputs(rates, input.new_inputs, contract.months),
+      newEquipmentSelections
+    ),
+    newServiceSelections
   );
   const diff = calc.monthly - oldMonthly;
   const settlementAmount = calcProratedSettlement(input.effective_date, diff);
@@ -82,6 +89,8 @@ export async function createChangeRequest(
       new_inputs: input.new_inputs,
       old_equipment_selections: oldEquipmentSelections,
       new_equipment_selections: newEquipmentSelections,
+      old_service_selections: oldServiceSelections,
+      new_service_selections: newServiceSelections,
       settlement_amount: settlementAmount,
       memo: input.memo ?? null,
       created_by: input.created_by,
@@ -94,6 +103,7 @@ export async function createChangeRequest(
     ...contract.quote_snapshot,
     inputs: input.new_inputs,
     equipment_selections: newEquipmentSelections,
+    service_selections: newServiceSelections,
     rows: calc.rows,
     monthly: calc.monthly,
     monthly_cost: calc.monthlyCost,
