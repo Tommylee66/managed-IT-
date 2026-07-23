@@ -45,6 +45,7 @@ interface FormValues {
   billing_date: string;
   months: number;
   emp: number;
+  cctv: number;
   locationIndex: number;
   discount: number;
   memo: string;
@@ -78,6 +79,7 @@ export function ApplicationForm({
       billing_date: today,
       months: 36,
       emp: 20,
+      cctv: 4,
       locationIndex: 0,
       discount: 0,
       memo: "",
@@ -89,12 +91,13 @@ export function ApplicationForm({
       emp: Number(v.emp),
       // Application intake doesn't select specific equipment or additional
       // services yet — that happens when the quote itself is built (see
-      // quote-calculator-form.tsx). AP/Hub/CCTV/visit/VPN/security/priority
-      // no longer price as generic add-ons either way, so these stay at
-      // baseline.
+      // quote-calculator-form.tsx). AP/Hub/visit/VPN/security/priority no
+      // longer price as generic add-ons either way, so these stay at
+      // baseline. CCTV is a real input (base includes 4 units, extra billed
+      // per unit), same as employee count.
       ap: 1,
       hub: 1,
-      cctv: 8,
+      cctv: Number(v.cctv),
       visit: 1,
       locationIndex: Number(v.locationIndex),
       vpn: "none",
@@ -247,6 +250,10 @@ export function ApplicationForm({
             <div className="flex flex-col gap-2">
               <Label htmlFor="emp">{tCalc("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="cctv">{tCalc("cctvCount")}</Label>
+              <Input id="cctv" type="number" {...register("cctv")} />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{tCalc("location")}</Label>

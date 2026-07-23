@@ -208,7 +208,7 @@
     "updateError": "견적 수정에 실패했습니다",
     "equipmentOverageQtyLabel": "추가 사용량 (장당 {rate})",
     "baseServiceTitle": "① 기본 서비스 (기본요금 포함 항목)",
-    "baseServiceDescription": "월 기본요금에는 원격 모니터링/지원, 월 1회 정기 방문점검, 라우터·AP·허브 등 기본 네트워크 장비 유지보수, CCTV 4대 유지보수, 라우터-AP 구간 통신공사비, 직원/PC 20명까지의 이용이 포함됩니다. 24개월 미만 계약 시 계약기간 할증료가 별도로 적용될 수 있습니다.",
+    "baseServiceDescription": "월 기본요금에는 원격 모니터링/지원, 월 1회 정기 방문점검, 라우터·AP·허브 등 기본 네트워크 장비 유지보수, CCTV 4대 유지보수(4대 초과 시 대당 추가요금 부과), 라우터-AP 구간 통신공사비, 직원/PC 20명까지의 이용이 포함됩니다. 24개월 미만 계약 시 계약기간 할증료가 별도로 적용될 수 있습니다.",
     "serviceSelectTitle": "② 추가 서비스 선택",
     "serviceSelectEmpty": "등록된 추가 서비스가 없습니다. 요율설정에서 서비스를 등록해주세요."
   },
@@ -308,7 +308,8 @@
     "selectCustomerError": "고객을 선택하세요.",
     "calculateError": "계산에 실패했습니다.",
     "saveError": "저장에 실패했습니다.",
-    "saveSuccess": "견적을 저장했습니다."
+    "saveSuccess": "견적을 저장했습니다.",
+    "cctvCount": "CCTV 대수"
   },
   "activations": {
     "title": "개통",
@@ -661,7 +662,8 @@
     "serviceCreateError": "서비스 등록에 실패했습니다",
     "serviceUpdateSuccess": "서비스가 수정되었습니다",
     "serviceUpdateError": "서비스 수정에 실패했습니다",
-    "noService": "등록된 서비스가 없습니다"
+    "noService": "등록된 서비스가 없습니다",
+    "cctvUnit": "CCTV 추가 대당 요금 (4대 초과분)"
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"

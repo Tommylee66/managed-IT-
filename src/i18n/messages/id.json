@@ -208,7 +208,7 @@
     "updateError": "Gagal memperbarui penawaran",
     "equipmentOverageQtyLabel": "Pemakaian tambahan (tarif {rate}/unit)",
     "baseServiceTitle": "① Layanan Dasar (termasuk dalam biaya dasar)",
-    "baseServiceDescription": "Biaya bulanan dasar mencakup pemantauan/dukungan jarak jauh, kunjungan pemeriksaan rutin 1x/bulan, pemeliharaan perangkat jaringan dasar (router, AP, hub), pemeliharaan 4 unit CCTV, biaya instalasi kabel router-AP, dan penggunaan hingga 20 karyawan/PC. Biaya tambahan masa kontrak dapat berlaku untuk kontrak di bawah 24 bulan.",
+    "baseServiceDescription": "Biaya bulanan dasar mencakup pemantauan/dukungan jarak jauh, kunjungan pemeriksaan rutin 1x/bulan, pemeliharaan perangkat jaringan dasar (router, AP, hub), pemeliharaan 4 unit CCTV (biaya tambahan per unit berlaku di atas 4 unit), biaya instalasi kabel router-AP, dan penggunaan hingga 20 karyawan/PC. Biaya tambahan masa kontrak dapat berlaku untuk kontrak di bawah 24 bulan.",
     "serviceSelectTitle": "② Pilihan Layanan Tambahan",
     "serviceSelectEmpty": "Belum ada layanan tambahan terdaftar. Silakan daftarkan layanan di Pengaturan Tarif."
   },
@@ -308,7 +308,8 @@
     "selectCustomerError": "Pilih pelanggan terlebih dahulu.",
     "calculateError": "Gagal menghitung.",
     "saveError": "Gagal menyimpan.",
-    "saveSuccess": "Penawaran berhasil disimpan."
+    "saveSuccess": "Penawaran berhasil disimpan.",
+    "cctvCount": "Jumlah CCTV"
   },
   "activations": {
     "title": "Aktivasi",
@@ -661,7 +662,8 @@
     "serviceCreateError": "Gagal mendaftarkan layanan",
     "serviceUpdateSuccess": "Layanan berhasil diperbarui",
     "serviceUpdateError": "Gagal memperbarui layanan",
-    "noService": "Belum ada layanan terdaftar"
+    "noService": "Belum ada layanan terdaftar",
+    "cctvUnit": "Tarif Tambahan per Unit CCTV (di atas 4 unit)"
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

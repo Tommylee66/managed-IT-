@@ -47,6 +47,7 @@ interface FormValues {
   type: string;
   effective_date: string;
   emp: number;
+  cctv: number;
   locationIndex: number;
   discount: number;
   memo: string;
@@ -93,6 +94,7 @@ export function ChangeRequestForm({
       type: TYPE_OPTIONS[2].value,
       effective_date: new Date().toISOString().slice(0, 10),
       emp: currentInputs?.emp ?? 20,
+      cctv: currentInputs?.cctv ?? 4,
       locationIndex: currentInputs?.locationIndex ?? 0,
       discount: currentInputs?.discount ?? 0,
       memo: "",
@@ -102,12 +104,13 @@ export function ChangeRequestForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      // See quote-calculator-form.tsx — AP/Hub/CCTV price only via equipment
+      // See quote-calculator-form.tsx — AP/Hub price only via equipment
       // catalog selections, and visit/vpn/security/priority only via service
-      // catalog selections, below.
+      // catalog selections, below. CCTV is a real input (base includes 4
+      // units, extra billed per unit).
       ap: 1,
       hub: 1,
-      cctv: 8,
+      cctv: Number(v.cctv),
       visit: 1,
       locationIndex: Number(v.locationIndex),
       vpn: "none",
@@ -190,6 +193,10 @@ export function ChangeRequestForm({
             <div className="flex flex-col gap-2">
               <Label htmlFor="emp">{tCalc("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="cctv">{tCalc("cctvCount")}</Label>
+              <Input id="cctv" type="number" {...register("cctv")} />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{tCalc("location")}</Label>

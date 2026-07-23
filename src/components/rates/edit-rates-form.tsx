@@ -15,6 +15,7 @@ interface FormValues {
   base_monthly: number;
   contract24_addon: number;
   employee_unit: number;
+  cctv_block: number;
   ppn: number;
   locations: { name: string; fee: number; cost: number }[];
   cost_fields_json: string;
@@ -26,6 +27,7 @@ const PRICE_FIELD_KEYS: { key: keyof FormValues; labelKey: string }[] = [
   { key: "base_monthly", labelKey: "baseMonthly" },
   { key: "contract24_addon", labelKey: "contract24Addon" },
   { key: "employee_unit", labelKey: "employeeUnit" },
+  { key: "cctv_block", labelKey: "cctvUnit" },
   { key: "ppn", labelKey: "ppnRate" },
 ];
 
@@ -36,6 +38,7 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
       base_monthly: rates.base_monthly,
       contract24_addon: rates.contract24_addon,
       employee_unit: rates.employee_unit,
+      cctv_block: rates.cctv_block,
       ppn: rates.ppn,
       locations: rates.locations,
       cost_fields_json: JSON.stringify(rates.cost_fields, null, 2),

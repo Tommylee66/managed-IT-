@@ -16,7 +16,7 @@ export interface QuoteCalcResult {
 }
 
 export function calcQuoteForInputs(
-  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'locations' | 'commission_items'> & {
+  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'cctv_block' | 'locations' | 'commission_items'> & {
     cost_fields?: Rates['cost_fields'];
     init_fields?: Rates['init_fields'];
   },
@@ -71,6 +71,22 @@ export function calcQuoteForInputs(
     add('employee', `직원/PC 추가 ${emp}명`, emp * rates.employee_unit, emp * cost.costEmp, 0, true, 'employeeExtra', {
       emp,
     });
+
+  // Base service includes 4 CCTV units (see baseServiceDescription in the
+  // i18n messages) — same "N included, extra billed per unit" shape as
+  // employee/PC count above, not the old block-based cctv_block pricing.
+  const cctvExtra = Math.max(0, Number(inputs.cctv || 0) - 4);
+  if (cctvExtra)
+    add(
+      'cctv',
+      `CCTV 추가 ${cctvExtra}대`,
+      cctvExtra * rates.cctv_block,
+      cctvExtra * cost.costCctv,
+      0,
+      true,
+      'cctvExtra',
+      { cctvExtra }
+    );
 
   // Visit frequency, priority response, VPN, and security add-ons no longer
   // price as hardcoded rate fields — they've moved to master-managed

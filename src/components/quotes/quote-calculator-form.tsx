@@ -67,6 +67,7 @@ interface FormValues {
   billing_date: string;
   months: number;
   emp: number;
+  cctv: number;
   locationIndex: number;
   discount: number;
   memo: string;
@@ -120,6 +121,7 @@ export function QuoteCalculatorForm({
       billing_date: initialValues?.billing_date ?? today,
       months: initialValues?.months ?? 36,
       emp: initialValues?.inputs.emp ?? 20,
+      cctv: initialValues?.inputs.cctv ?? 4,
       locationIndex: initialValues?.inputs.locationIndex ?? 0,
       discount: initialValues?.inputs.discount ?? 0,
       memo: initialValues?.inputs.memo ?? "",
@@ -129,15 +131,17 @@ export function QuoteCalculatorForm({
   function toInputs(v: FormValues): QuoteInputs {
     return {
       emp: Number(v.emp),
-      // AP/Hub/CCTV no longer price as generic per-unit add-ons (equipment
+      // AP/Hub no longer price as generic per-unit add-ons (equipment
       // catalog selections instead), and visit frequency/VPN/security/
       // priority-response no longer price as hardcoded rate fields (service
       // catalog selections instead, see ServiceSelector below). These stay
       // at their baseline (no-extra-charge) values only because QuoteInputs
-      // still carries the fields for old stored quotes.
+      // still carries the fields for old stored quotes. CCTV, however, is a
+      // real input again — base service includes 4 units, extra billed per
+      // unit (see quote-calc.ts).
       ap: 1,
       hub: 1,
-      cctv: 8,
+      cctv: Number(v.cctv),
       visit: 1,
       locationIndex: Number(v.locationIndex),
       vpn: "none",
@@ -273,6 +277,10 @@ export function QuoteCalculatorForm({
             <div className="flex flex-col gap-2">
               <Label htmlFor="emp">{t("employeeCount")}</Label>
               <Input id="emp" type="number" {...register("emp")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="cctv">{t("cctvCount")}</Label>
+              <Input id="cctv" type="number" {...register("cctv")} />
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{t("location")}</Label>

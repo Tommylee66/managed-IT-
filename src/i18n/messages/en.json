@@ -208,7 +208,7 @@
     "updateError": "Failed to update quote",
     "equipmentOverageQtyLabel": "Extra usage (@ {rate}/unit)",
     "baseServiceTitle": "① Base Service (included in the base fee)",
-    "baseServiceDescription": "The base monthly fee includes remote monitoring/support, one monthly on-site inspection visit, maintenance of basic network equipment (router, AP, hub), maintenance of 4 CCTV units, router-to-AP cabling installation, and coverage for up to 20 employees/PCs. A separate contract-term surcharge may apply for contracts under 24 months.",
+    "baseServiceDescription": "The base monthly fee includes remote monitoring/support, one monthly on-site inspection visit, maintenance of basic network equipment (router, AP, hub), maintenance of 4 CCTV units (an extra per-unit fee applies beyond 4), router-to-AP cabling installation, and coverage for up to 20 employees/PCs. A separate contract-term surcharge may apply for contracts under 24 months.",
     "serviceSelectTitle": "② Additional Services",
     "serviceSelectEmpty": "No additional services registered yet. Add one in Rate Settings."
   },
@@ -308,7 +308,8 @@
     "selectCustomerError": "Please select a customer.",
     "calculateError": "Calculation failed.",
     "saveError": "Failed to save.",
-    "saveSuccess": "Quote saved."
+    "saveSuccess": "Quote saved.",
+    "cctvCount": "CCTV Count"
   },
   "activations": {
     "title": "Activations",
@@ -661,7 +662,8 @@
     "serviceCreateError": "Failed to create service",
     "serviceUpdateSuccess": "Service updated",
     "serviceUpdateError": "Failed to update service",
-    "noService": "No services registered yet"
+    "noService": "No services registered yet",
+    "cctvUnit": "CCTV Extra Per-Unit Rate (beyond 4 units)"
   },
   "documents": {
     "printSave": "Print / Save PDF"
