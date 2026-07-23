@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/utils/currency";
 import type { EquipmentCatalogItem } from "@/types/domain";
+import type { Locale } from "@/config/constants";
 
 export interface EquipmentSelectionState {
   qty: number;
@@ -18,10 +19,12 @@ export function EquipmentSelector({
   catalog,
   value,
   onChange,
+  locale,
 }: {
   catalog: EquipmentCatalogItem[];
   value: Record<string, EquipmentSelectionState>;
   onChange: (next: Record<string, EquipmentSelectionState>) => void;
+  locale: Locale;
 }) {
   const tCat = useTranslations("equipmentCategory");
   const tQuotes = useTranslations("quotes");
@@ -53,7 +56,7 @@ export function EquipmentSelector({
                 <span className="text-muted-foreground">[{tCat(item.category)}]</span> {item.model_name}
                 {item.spec_id && <span className="text-muted-foreground"> — {item.spec_id}</span>}
                 {item.monthly_rate != null && (
-                  <span className="text-muted-foreground"> ({formatRupiah(item.monthly_rate)}/월)</span>
+                  <span className="text-muted-foreground"> ({formatRupiah(item.monthly_rate, locale)}/월)</span>
                 )}
               </span>
               <Input
@@ -68,7 +71,7 @@ export function EquipmentSelector({
             {checked && item.overage_rate != null && (
               <div className="ml-7 flex items-center gap-2">
                 <span className="text-xs text-muted-foreground">
-                  {tQuotes("equipmentOverageQtyLabel", { rate: formatRupiah(item.overage_rate) })}
+                  {tQuotes("equipmentOverageQtyLabel", { rate: formatRupiah(item.overage_rate, locale) })}
                 </span>
                 <Input
                   type="number"

@@ -12,6 +12,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import type { Locale } from "@/config/constants";
 
 function currentMonthKey() {
   const now = new Date();
@@ -105,12 +106,12 @@ export default async function AgentCommissionPage({
                         </Link>
                       </TableCell>
                       <TableCell>{r.customerName}</TableCell>
-                      <TableCell className="text-right">{formatRupiah(r.amount)}</TableCell>
+                      <TableCell className="text-right">{formatRupiah(r.amount, locale as Locale)}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow className="bg-muted/40 font-semibold">
                     <TableCell colSpan={5}>{t("agentSubtotal", { name: g.agentName })}</TableCell>
-                    <TableCell className="text-right">{formatRupiah(g.subtotal)}</TableCell>
+                    <TableCell className="text-right">{formatRupiah(g.subtotal, locale as Locale)}</TableCell>
                   </TableRow>
                 </Fragment>
               ))}
@@ -126,7 +127,7 @@ export default async function AgentCommissionPage({
           {groups.length > 0 && (
             <div className="mt-3 flex justify-end gap-2 text-base font-semibold">
               <span>{t("grandTotal")}</span>
-              <span>{formatRupiah(grandTotal)}</span>
+              <span>{formatRupiah(grandTotal, locale as Locale)}</span>
             </div>
           )}
         </CardContent>

@@ -16,6 +16,7 @@ import { ToggleEquipmentActiveButton } from "@/components/admin/toggle-equipment
 import { ServiceDialog } from "@/components/admin/service-dialog";
 import { ToggleServiceActiveButton } from "@/components/admin/toggle-service-active-button";
 import { DeleteServiceButton } from "@/components/admin/delete-service-button";
+import type { Locale } from "@/config/constants";
 
 export default async function AdminRatesPage({
   params,
@@ -72,16 +73,16 @@ export default async function AdminRatesPage({
                   <TableCell>{item.spec_id ?? "-"}</TableCell>
                   <TableCell>{item.spec_ko ?? "-"}</TableCell>
                   <TableCell className="text-right">
-                    {item.purchase_price != null ? formatRupiah(item.purchase_price) : "-"}
+                    {item.purchase_price != null ? formatRupiah(item.purchase_price, locale as Locale) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {item.monthly_rate != null ? formatRupiah(item.monthly_rate) : "-"}
+                    {item.monthly_rate != null ? formatRupiah(item.monthly_rate, locale as Locale) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {item.monthly_cost != null ? formatRupiah(item.monthly_cost) : "-"}
+                    {item.monthly_cost != null ? formatRupiah(item.monthly_cost, locale as Locale) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {item.overage_rate != null ? formatRupiah(item.overage_rate) : "-"}
+                    {item.overage_rate != null ? formatRupiah(item.overage_rate, locale as Locale) : "-"}
                   </TableCell>
                   <TableCell>
                     <Badge variant={item.is_active ? "default" : "secondary"}>
@@ -131,10 +132,10 @@ export default async function AdminRatesPage({
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.description ?? "-"}</TableCell>
                   <TableCell className="text-right">
-                    {item.monthly_rate != null ? formatRupiah(item.monthly_rate) : "-"}
+                    {item.monthly_rate != null ? formatRupiah(item.monthly_rate, locale as Locale) : "-"}
                   </TableCell>
                   <TableCell className="text-right">
-                    {item.monthly_cost != null ? formatRupiah(item.monthly_cost) : "-"}
+                    {item.monthly_cost != null ? formatRupiah(item.monthly_cost, locale as Locale) : "-"}
                   </TableCell>
                   <TableCell>
                     <Badge variant={item.is_active ? "default" : "secondary"}>

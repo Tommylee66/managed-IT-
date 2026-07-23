@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { InvoiceLineItem } from "@/lib/calc/invoice-calc";
+import type { Locale } from "@/config/constants";
 
 export default async function InvoiceDetailPage({
   params,
@@ -94,7 +95,7 @@ export default async function InvoiceDetailPage({
               {items.map((item, i) => (
                 <TableRow key={i}>
                   <TableCell>{item.label}</TableCell>
-                  <TableCell className="text-right">{formatRupiah(item.amount)}</TableCell>
+                  <TableCell className="text-right">{formatRupiah(item.amount, locale as Locale)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -102,15 +103,15 @@ export default async function InvoiceDetailPage({
           <div className="mt-4 flex flex-col gap-1 text-sm">
             <div className="flex justify-between">
               <span>{t("subtotal")}</span>
-              <span>{formatRupiah(invoice.subtotal)}</span>
+              <span>{formatRupiah(invoice.subtotal, locale as Locale)}</span>
             </div>
             <div className="flex justify-between">
               <span>{t("ppn")}</span>
-              <span>{formatRupiah(invoice.ppn)}</span>
+              <span>{formatRupiah(invoice.ppn, locale as Locale)}</span>
             </div>
             <div className="flex justify-between font-semibold">
               <span>{t("total")}</span>
-              <span>{formatRupiah(invoice.total)}</span>
+              <span>{formatRupiah(invoice.total, locale as Locale)}</span>
             </div>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">{invoice.memo}</p>

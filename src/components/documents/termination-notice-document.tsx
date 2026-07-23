@@ -68,7 +68,7 @@ function AssetNoticeTable({
               {a.action === "leave_bill" || a.action === "partial"
                 ? Number.isNaN(a.unamortized)
                   ? "***"
-                  : formatRupiah(a.unamortized)
+                  : formatRupiah(a.unamortized, "id")
                 : "-"}
             </TableCell>
           </TableRow>
@@ -244,7 +244,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
                 />
               </TableCell>
               <TableCell className="text-right">
-                {plan.unamortizedTotal !== null ? formatRupiah(plan.unamortizedTotal) : plan.unamortizedTotalBucket}
+                {plan.unamortizedTotal !== null ? formatRupiah(plan.unamortizedTotal, "id") : plan.unamortizedTotalBucket}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -257,7 +257,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
                   ko={`고객 잔존 장비 미상각액 × ${plan.penalty_rate}%`}
                 />
               </TableCell>
-              <TableCell className="text-right">{penalty !== null ? formatRupiah(penalty) : "***"}</TableCell>
+              <TableCell className="text-right">{penalty !== null ? formatRupiah(penalty, "id") : "***"}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
@@ -269,7 +269,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
                   ko="현장방문, 장비회수, 설정백업, 계정권한 정리"
                 />
               </TableCell>
-              <TableCell className="text-right">{formatRupiah(plan.admin_fee)}</TableCell>
+              <TableCell className="text-right">{formatRupiah(plan.admin_fee, "id")}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>
@@ -278,7 +278,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
               <TableCell>
                 <Bilingual id="Jumlah yang diinput" ko="입력 금액" />
               </TableCell>
-              <TableCell className="text-right">{formatRupiah(plan.unpaid)}</TableCell>
+              <TableCell className="text-right">{formatRupiah(plan.unpaid, "id")}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-semibold">
@@ -291,7 +291,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
                 />
               </TableCell>
               <TableCell className="text-right font-semibold">
-                {total !== null ? formatRupiah(total) : plan.unamortizedTotalBucket}
+                {total !== null ? formatRupiah(total, "id") : plan.unamortizedTotalBucket}
               </TableCell>
             </TableRow>
           </TableBody>

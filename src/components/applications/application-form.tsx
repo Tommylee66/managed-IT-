@@ -296,10 +296,10 @@ export function ApplicationForm({
           ) : (
             <SummaryBox
               label={t("monthlyTotal")}
-              value={formatRupiah(preview.total)}
+              value={formatRupiah(preview.total, locale as Locale)}
               metrics={[
-                { label: tCalc("monthlySubtotal"), value: formatRupiah(preview.monthly) },
-                { label: tCalc("ppn"), value: formatRupiah(preview.ppn) },
+                { label: tCalc("monthlySubtotal"), value: formatRupiah(preview.monthly, locale as Locale) },
+                { label: tCalc("ppn"), value: formatRupiah(preview.ppn, locale as Locale) },
               ]}
             />
           )}
@@ -317,7 +317,7 @@ export function ApplicationForm({
                 {preview.rows.map((r, i) => (
                   <TableRow key={i}>
                     <TableCell>{renderQuoteRowLabel(r, locale as Locale)}</TableCell>
-                    <TableCell className="text-right">{formatRupiah(r.amount)}</TableCell>
+                    <TableCell className="text-right">{formatRupiah(r.amount, locale as Locale)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

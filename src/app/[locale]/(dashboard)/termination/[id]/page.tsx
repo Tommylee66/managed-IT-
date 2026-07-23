@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SummaryBox } from "@/components/ui/summary-box";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { Locale } from "@/config/constants";
 
 export default async function TerminationPlanDetailPage({
   params,
@@ -105,7 +106,7 @@ export default async function TerminationPlanDetailPage({
                   <TableCell>{d.collectQty}</TableCell>
                   <TableCell>{d.billQty}</TableCell>
                   <TableCell className="text-right">
-                    {Number.isNaN(d.unamortized) ? t("masked") : formatRupiah(d.unamortized)}
+                    {Number.isNaN(d.unamortized) ? t("masked") : formatRupiah(d.unamortized, locale as Locale)}
                   </TableCell>
                   <TableCell className="text-xs text-muted-foreground">{ACTION_LABEL[d.action]}</TableCell>
                 </TableRow>
@@ -122,18 +123,18 @@ export default async function TerminationPlanDetailPage({
         <CardContent>
           <SummaryBox
             label={t("estimatedTotal")}
-            value={totalExact !== null ? formatRupiah(totalExact) : plan.unamortizedTotalBucket}
+            value={totalExact !== null ? formatRupiah(totalExact, locale as Locale) : plan.unamortizedTotalBucket}
             metrics={[
               {
                 label: t("unamortizedSettlement"),
-                value: plan.unamortizedTotal !== null ? formatRupiah(plan.unamortizedTotal) : plan.unamortizedTotalBucket,
+                value: plan.unamortizedTotal !== null ? formatRupiah(plan.unamortizedTotal, locale as Locale) : plan.unamortizedTotalBucket,
               },
               {
                 label: t("earlyTerminationPenalty", { rate: plan.penalty_rate }),
-                value: plan.unamortizedTotal !== null ? formatRupiah(penalty) : t("masked"),
+                value: plan.unamortizedTotal !== null ? formatRupiah(penalty, locale as Locale) : t("masked"),
               },
-              { label: t("removalAdminFee"), value: formatRupiah(plan.admin_fee) },
-              { label: t("unpaidFeeLabel"), value: formatRupiah(plan.unpaid) },
+              { label: t("removalAdminFee"), value: formatRupiah(plan.admin_fee, locale as Locale) },
+              { label: t("unpaidFeeLabel"), value: formatRupiah(plan.unpaid, locale as Locale) },
             ]}
           />
         </CardContent>

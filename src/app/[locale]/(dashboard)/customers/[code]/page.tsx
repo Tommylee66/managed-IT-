@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EditCustomerForm } from "@/components/customers/edit-customer-form";
+import type { Locale } from "@/config/constants";
 
 export default async function CustomerDetailPage({
   params,
@@ -79,7 +80,7 @@ export default async function CustomerDetailPage({
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{t("monthlyAmount")}</p>
-                <p>{formatRupiah(currentContract.monthly_fee)}</p>
+                <p>{formatRupiah(currentContract.monthly_fee, locale as Locale)}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{t("contractStartDate")}</p>
@@ -167,7 +168,7 @@ export default async function CustomerDetailPage({
                       {c.no}
                     </Link>
                   </TableCell>
-                  <TableCell>{formatRupiah(c.monthly_fee)}</TableCell>
+                  <TableCell>{formatRupiah(c.monthly_fee, locale as Locale)}</TableCell>
                   <TableCell>
                     {c.start_date} ~ {c.end_date}
                   </TableCell>
@@ -207,9 +208,9 @@ export default async function CustomerDetailPage({
                 <TableRow key={cr.id}>
                   <TableCell>{cr.effective_date}</TableCell>
                   <TableCell>{cr.type || "-"}</TableCell>
-                  <TableCell>{cr.old_monthly != null ? formatRupiah(cr.old_monthly) : "-"}</TableCell>
-                  <TableCell>{cr.new_monthly != null ? formatRupiah(cr.new_monthly) : "-"}</TableCell>
-                  <TableCell>{cr.settlement_amount != null ? formatRupiah(cr.settlement_amount) : "-"}</TableCell>
+                  <TableCell>{cr.old_monthly != null ? formatRupiah(cr.old_monthly, locale as Locale) : "-"}</TableCell>
+                  <TableCell>{cr.new_monthly != null ? formatRupiah(cr.new_monthly, locale as Locale) : "-"}</TableCell>
+                  <TableCell>{cr.settlement_amount != null ? formatRupiah(cr.settlement_amount, locale as Locale) : "-"}</TableCell>
                 </TableRow>
               ))}
               {changeRequests.length === 0 && (
@@ -246,9 +247,9 @@ export default async function CustomerDetailPage({
                     <TableCell>{tp.term_date}</TableCell>
                     <TableCell>{tp.remaining ?? "-"}</TableCell>
                     <TableCell>{tp.penalty_rate}%</TableCell>
-                    <TableCell>{formatRupiah(tp.admin_fee)}</TableCell>
+                    <TableCell>{formatRupiah(tp.admin_fee, locale as Locale)}</TableCell>
                     <TableCell>
-                      {tp.unamortizedTotal != null ? formatRupiah(tp.unamortizedTotal) : tp.unamortizedTotalBucket}
+                      {tp.unamortizedTotal != null ? formatRupiah(tp.unamortizedTotal, locale as Locale) : tp.unamortizedTotalBucket}
                     </TableCell>
                   </TableRow>
                 ))}

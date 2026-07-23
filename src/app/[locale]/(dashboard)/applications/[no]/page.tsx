@@ -100,14 +100,14 @@ export default async function ApplicationDetailPage({
               {application.calc?.rows.map((r, i) => (
                 <TableRow key={i}>
                   <TableCell>{renderQuoteRowLabel(r, locale as Locale)}</TableCell>
-                  <TableCell className="text-right">{formatRupiah(r.amount)}</TableCell>
+                  <TableCell className="text-right">{formatRupiah(r.amount, locale as Locale)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
           <div className="mt-4 flex justify-between font-semibold text-sm">
             <span>{t("monthlyTotal")}</span>
-            <span>{formatRupiah(application.monthly ?? 0)}</span>
+            <span>{formatRupiah(application.monthly ?? 0, locale as Locale)}</span>
           </div>
         </CardContent>
       </Card>

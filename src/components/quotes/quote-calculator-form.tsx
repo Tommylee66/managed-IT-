@@ -318,7 +318,7 @@ export function QuoteCalculatorForm({
             {serviceCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("serviceSelectEmpty")}</p>
             ) : (
-              <ServiceSelector catalog={serviceCatalog} value={serviceQty} onChange={setServiceQty} />
+              <ServiceSelector catalog={serviceCatalog} value={serviceQty} onChange={setServiceQty} locale={locale as Locale} />
             )}
           </div>
 
@@ -327,7 +327,7 @@ export function QuoteCalculatorForm({
             {equipmentCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
             ) : (
-              <EquipmentSelector catalog={equipmentCatalog} value={equipmentQty} onChange={setEquipmentQty} />
+              <EquipmentSelector catalog={equipmentCatalog} value={equipmentQty} onChange={setEquipmentQty} locale={locale as Locale} />
             )}
           </div>
           <div className="flex flex-col gap-2">
@@ -359,18 +359,18 @@ export function QuoteCalculatorForm({
           ) : (
             <SummaryBox
               label={t("monthlyTotal")}
-              value={formatRupiah(preview.total)}
+              value={formatRupiah(preview.total, locale as Locale)}
               metrics={
                 preview.margin !== undefined
                   ? [
-                      { label: t("monthlyCost"), value: formatRupiah(preview.monthlyCost ?? 0) },
-                      { label: t("totalCostWithInit"), value: formatRupiah(preview.totalCost ?? 0) },
+                      { label: t("monthlyCost"), value: formatRupiah(preview.monthlyCost ?? 0, locale as Locale) },
+                      { label: t("totalCostWithInit"), value: formatRupiah(preview.totalCost ?? 0, locale as Locale) },
                       { label: t("marginRate"), value: `${preview.margin.toFixed(1)}%` },
-                      { label: t("ppn"), value: formatRupiah(preview.ppn) },
+                      { label: t("ppn"), value: formatRupiah(preview.ppn, locale as Locale) },
                     ]
                   : [
                       { label: t("marginRateBucketed"), value: preview.marginBucket ?? "-" },
-                      { label: t("ppn"), value: formatRupiah(preview.ppn) },
+                      { label: t("ppn"), value: formatRupiah(preview.ppn, locale as Locale) },
                     ]
               }
             />
@@ -389,7 +389,7 @@ export function QuoteCalculatorForm({
                 {preview.rows.map((r, i) => (
                   <TableRow key={i}>
                     <TableCell>{renderQuoteRowLabel(r, locale as Locale)}</TableCell>
-                    <TableCell className="text-right">{formatRupiah(r.amount)}</TableCell>
+                    <TableCell className="text-right">{formatRupiah(r.amount, locale as Locale)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

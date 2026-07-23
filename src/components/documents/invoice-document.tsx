@@ -43,20 +43,20 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
           {invoice.items.map((item, i) => (
             <TableRow key={i}>
               <TableCell>{item.label}</TableCell>
-              <TableCell className="text-right">{formatRupiah(item.amount)}</TableCell>
+              <TableCell className="text-right">{formatRupiah(item.amount, "ko")}</TableCell>
             </TableRow>
           ))}
           <TableRow>
             <TableCell className="font-semibold">소계</TableCell>
-            <TableCell className="text-right font-semibold">{formatRupiah(invoice.subtotal)}</TableCell>
+            <TableCell className="text-right font-semibold">{formatRupiah(invoice.subtotal, "ko")}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>PPN</TableCell>
-            <TableCell className="text-right">{formatRupiah(invoice.ppn)}</TableCell>
+            <TableCell className="text-right">{formatRupiah(invoice.ppn, "ko")}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell className="font-semibold">총 청구금액</TableCell>
-            <TableCell className="text-right font-semibold">{formatRupiah(invoice.total)}</TableCell>
+            <TableCell className="text-right font-semibold">{formatRupiah(invoice.total, "ko")}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

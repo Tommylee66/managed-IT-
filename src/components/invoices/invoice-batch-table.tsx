@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatRupiah } from "@/lib/utils/currency";
 import { saveInvoicesAction, markInvoicesSentAction } from "@/app/[locale]/(dashboard)/invoices/actions";
 import type { Contract, Customer, Invoice } from "@/types/domain";
+import type { Locale } from "@/config/constants";
 
 export interface BillableRowView {
   contract: Contract;
@@ -113,7 +114,7 @@ export function InvoiceBatchTable({
           </div>
           <div className="rounded-xl border border-border bg-[#fbfdff] p-3">
             <p className="text-xs text-muted-foreground">{t("totalAmount")}</p>
-            <p className="text-lg font-semibold">{formatRupiah(total)}</p>
+            <p className="text-lg font-semibold">{formatRupiah(total, locale as Locale)}</p>
           </div>
           <div className="rounded-xl border border-border bg-[#fbfdff] p-3">
             <p className="text-xs text-muted-foreground">{t("sentCount")}</p>
@@ -168,7 +169,7 @@ export function InvoiceBatchTable({
                   <TableCell>{row.customer.name}</TableCell>
                   <TableCell>{row.contract.no}</TableCell>
                   <TableCell>{row.recipientEmail || t("notRegisteredEmail")}</TableCell>
-                  <TableCell className="text-right">{formatRupiah(row.totals.total)}</TableCell>
+                  <TableCell className="text-right">{formatRupiah(row.totals.total, locale as Locale)}</TableCell>
                   <TableCell>
                     <Badge variant={status.variant}>{status.label}</Badge>
                   </TableCell>

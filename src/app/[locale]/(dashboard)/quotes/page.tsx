@@ -8,6 +8,7 @@ import { formatRupiah } from "@/lib/utils/currency";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Locale } from "@/config/constants";
 
 export default async function QuotesPage({
   params,
@@ -57,7 +58,7 @@ export default async function QuotesPage({
                 </TableCell>
                 <TableCell>{customerName(q.customer_code)}</TableCell>
                 <TableCell>{tCommon("months", { count: q.months })}</TableCell>
-                <TableCell>{formatRupiah(q.monthly)}</TableCell>
+                <TableCell>{formatRupiah(q.monthly, locale as Locale)}</TableCell>
                 <TableCell>{new Date(q.created_at).toLocaleDateString(locale)}</TableCell>
               </TableRow>
             ))}

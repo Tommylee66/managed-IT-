@@ -33,6 +33,7 @@ import { calcProratedSettlement } from "@/lib/calc/proration";
 import { calculateQuotePreviewAction, type QuotePreview } from "@/app/[locale]/(dashboard)/quotes/actions";
 import { createChangeRequestAction } from "@/app/[locale]/(dashboard)/change-requests/actions";
 import type { Contract, EquipmentCatalogItem, ServiceCatalogItem, QuoteInputs } from "@/types/domain";
+import type { Locale } from "@/config/constants";
 
 const TYPE_OPTIONS = [
   { value: "장비 추가", key: "typeEquipmentAdd" },
@@ -232,7 +233,7 @@ export function ChangeRequestForm({
             {serviceCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("serviceSelectEmpty")}</p>
             ) : (
-              <ServiceSelector catalog={serviceCatalog} value={serviceQty} onChange={setServiceQty} />
+              <ServiceSelector catalog={serviceCatalog} value={serviceQty} onChange={setServiceQty} locale={locale as Locale} />
             )}
           </div>
           <div className="flex flex-col gap-2">
@@ -240,7 +241,7 @@ export function ChangeRequestForm({
             {equipmentCatalog.length === 0 ? (
               <p className="text-sm text-muted-foreground">{tQuotes("equipmentSelectEmpty")}</p>
             ) : (
-              <EquipmentSelector catalog={equipmentCatalog} value={equipmentQty} onChange={setEquipmentQty} />
+              <EquipmentSelector catalog={equipmentCatalog} value={equipmentQty} onChange={setEquipmentQty} locale={locale as Locale} />
             )}
           </div>
           <div className="flex flex-col gap-2">
@@ -266,11 +267,11 @@ export function ChangeRequestForm({
           {preview ? (
             <SummaryBox
               label={t("afterMonthly")}
-              value={formatRupiah(preview.monthly)}
+              value={formatRupiah(preview.monthly, locale as Locale)}
               metrics={[
-                { label: t("currentMonthly"), value: formatRupiah(contract.monthly_fee) },
-                { label: t("monthlyDiff"), value: formatRupiah(diff ?? 0) },
-                { label: t("settlementAmount"), value: formatRupiah(settlement ?? 0) },
+                { label: t("currentMonthly"), value: formatRupiah(contract.monthly_fee, locale as Locale) },
+                { label: t("monthlyDiff"), value: formatRupiah(diff ?? 0, locale as Locale) },
+                { label: t("settlementAmount"), value: formatRupiah(settlement ?? 0, locale as Locale) },
               ]}
             />
           ) : null}

@@ -23,6 +23,7 @@ import {
 } from "@/lib/calc/termination-calc";
 import { createTerminationPlanAction } from "@/app/[locale]/(dashboard)/termination/actions";
 import type { Contract, Asset } from "@/types/domain";
+import type { Locale } from "@/config/constants";
 
 interface RowState extends AssetDecisionInput {
   assetType: Asset["type"];
@@ -218,7 +219,7 @@ export function TerminationForm({
                         onChange={(e) => updateRow(i, { originalCost: Number(e.target.value) })}
                       />
                     </TableCell>
-                    <TableCell className="text-right">{formatRupiah(decision.unamortized)}</TableCell>
+                    <TableCell className="text-right">{formatRupiah(decision.unamortized, locale as Locale)}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {ACTION_LABEL[decision.action]}
                     </TableCell>
@@ -244,14 +245,14 @@ export function TerminationForm({
         <CardContent>
           <SummaryBox
             label={t("estimatedTotal")}
-            value={formatRupiah(summary.total)}
+            value={formatRupiah(summary.total, locale as Locale)}
             metrics={[
               { label: t("collectedEquipment"), value: t("qtyUnit", { count: summary.collectQtyTotal }) },
               { label: t("remainingEquipment"), value: t("qtyUnit", { count: summary.leaveQtyTotal }) },
-              { label: t("unamortizedSettlement"), value: formatRupiah(summary.unamortizedTotal) },
-              { label: t("earlyTerminationPenalty", { rate: penaltyRate }), value: formatRupiah(summary.penalty) },
-              { label: t("removalAdminFee"), value: formatRupiah(adminFee) },
-              { label: t("unpaidFeeLabel"), value: formatRupiah(unpaid) },
+              { label: t("unamortizedSettlement"), value: formatRupiah(summary.unamortizedTotal, locale as Locale) },
+              { label: t("earlyTerminationPenalty", { rate: penaltyRate }), value: formatRupiah(summary.penalty, locale as Locale) },
+              { label: t("removalAdminFee"), value: formatRupiah(adminFee, locale as Locale) },
+              { label: t("unpaidFeeLabel"), value: formatRupiah(unpaid, locale as Locale) },
             ]}
           />
         </CardContent>

@@ -10,6 +10,7 @@ import { MenuSection } from "@/components/home/menu-section";
 import { MiniBarChart } from "@/components/home/mini-bar-chart";
 import { DualBarChart } from "@/components/home/dual-bar-chart";
 import { KpiStrip } from "@/components/home/kpi-strip";
+import type { Locale } from "@/config/constants";
 
 function monthKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -110,18 +111,18 @@ export default async function DashboardPage({
           <p className="mb-2 text-[11px] text-muted-foreground">{tHome("chartMonthlyCaption")}</p>
           <KpiStrip
             items={[
-              { label: tHome("kpiMrr"), value: formatRupiah(thisMonthMrr) },
-              { label: tHome("kpiYearRevenue"), value: formatRupiah(yearRevenue) },
+              { label: tHome("kpiMrr"), value: formatRupiah(thisMonthMrr, locale as Locale) },
+              { label: tHome("kpiYearRevenue"), value: formatRupiah(yearRevenue, locale as Locale) },
               { label: tHome("kpiActiveContracts"), value: String(activeContracts.length) },
               { label: tHome("kpiTerminations"), value: String(terminations.length) },
             ]}
           />
-          <MiniBarChart data={revenueByMonth} color="green" formatValue={(v) => formatRupiah(v)} />
+          <MiniBarChart data={revenueByMonth} color="green" formatValue={(v) => formatRupiah(v, locale as Locale)} />
         </div>
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <h3 className="text-sm font-semibold">{tHome("chartAnnualTitle")}</h3>
           <p className="mb-1 text-[11px] text-muted-foreground">{tHome("chartAnnualCaption")}</p>
-          <MiniBarChart data={revenueByYear} formatValue={(v) => formatRupiah(v)} />
+          <MiniBarChart data={revenueByYear} formatValue={(v) => formatRupiah(v, locale as Locale)} />
         </div>
         <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
           <h3 className="text-sm font-semibold">{tHome("chartSignupCancelTitle")}</h3>

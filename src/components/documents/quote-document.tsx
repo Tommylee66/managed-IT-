@@ -59,7 +59,7 @@ export function QuoteDocument({
                   <TableCell>
                     <Bilingual id={label.id} ko={label.ko} />
                   </TableCell>
-                  <TableCell className="text-right">{formatRupiah(r.amount)}</TableCell>
+                  <TableCell className="text-right">{formatRupiah(r.amount, "id")}</TableCell>
                 </TableRow>
               );
             })}
@@ -67,17 +67,17 @@ export function QuoteDocument({
             <TableCell className="font-semibold">
               <Bilingual id="Subtotal Tagihan Bulanan" ko="월 청구액 소계" />
             </TableCell>
-            <TableCell className="text-right font-semibold">{formatRupiah(quote.monthly)}</TableCell>
+            <TableCell className="text-right font-semibold">{formatRupiah(quote.monthly, "id")}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>PPN {ppnRate}%</TableCell>
-            <TableCell className="text-right">{formatRupiah(ppn)}</TableCell>
+            <TableCell className="text-right">{formatRupiah(ppn, "id")}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell className="font-semibold">
               <Bilingual id="Total Tagihan Bulanan" ko="월 청구액 합계" />
             </TableCell>
-            <TableCell className="text-right font-semibold">{formatRupiah(total)}</TableCell>
+            <TableCell className="text-right font-semibold">{formatRupiah(total, "id")}</TableCell>
           </TableRow>
         </TableBody>
       </Table>

@@ -4,6 +4,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/utils/currency";
 import type { ServiceCatalogItem } from "@/types/domain";
+import type { Locale } from "@/config/constants";
 
 export interface ServiceSelectionState {
   qty: number;
@@ -16,10 +17,12 @@ export function ServiceSelector({
   catalog,
   value,
   onChange,
+  locale,
 }: {
   catalog: ServiceCatalogItem[];
   value: Record<string, ServiceSelectionState>;
   onChange: (next: Record<string, ServiceSelectionState>) => void;
+  locale: Locale;
 }) {
   function toggle(id: string, checked: boolean) {
     const next = { ...value };
@@ -43,7 +46,7 @@ export function ServiceSelector({
               {item.name}
               {item.description && <span className="text-muted-foreground"> — {item.description}</span>}
               {item.monthly_rate != null && (
-                <span className="text-muted-foreground"> ({formatRupiah(item.monthly_rate)}/월)</span>
+                <span className="text-muted-foreground"> ({formatRupiah(item.monthly_rate, locale)}/월)</span>
               )}
             </span>
             <Input

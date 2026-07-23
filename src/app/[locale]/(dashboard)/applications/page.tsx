@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Locale } from "@/config/constants";
 
 export default async function ApplicationsPage({
   params,
@@ -60,7 +61,7 @@ export default async function ApplicationsPage({
                 </TableCell>
                 <TableCell>{a.customer_name}</TableCell>
                 <TableCell>{a.source}</TableCell>
-                <TableCell>{formatRupiah(a.monthly ?? 0)}</TableCell>
+                <TableCell>{formatRupiah(a.monthly ?? 0, locale as Locale)}</TableCell>
                 <TableCell>
                   <Badge variant={a.status === "received" ? "secondary" : "default"}>
                     {STATUS_LABEL[a.status]}

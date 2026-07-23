@@ -95,7 +95,7 @@ export default async function QuoteDetailPage({
               {quote.rows.map((r, i) => (
                 <TableRow key={i}>
                   <TableCell>{renderQuoteRowLabel(r, locale as Locale)}</TableCell>
-                  <TableCell className="text-right">{formatRupiah(r.amount)}</TableCell>
+                  <TableCell className="text-right">{formatRupiah(r.amount, locale as Locale)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -103,7 +103,7 @@ export default async function QuoteDetailPage({
           <div className="mt-4 flex flex-col gap-1 text-sm">
             <div className="flex justify-between font-semibold">
               <span>{t("monthlyTotal")}</span>
-              <span>{formatRupiah(quote.monthly)}</span>
+              <span>{formatRupiah(quote.monthly, locale as Locale)}</span>
             </div>
             {!isMasked ? (
               <div className="flex justify-between text-muted-foreground">

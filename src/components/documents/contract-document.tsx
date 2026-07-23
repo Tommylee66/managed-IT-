@@ -42,7 +42,7 @@ export function ContractDocument({
             <TableCell className="font-medium">
               <Bilingual id="Biaya Layanan Bulanan" ko="월 서비스 요금" />
             </TableCell>
-            <TableCell>{formatRupiah(contract.monthly_fee)} + PPN</TableCell>
+            <TableCell>{formatRupiah(contract.monthly_fee, "id")} + PPN</TableCell>
           </TableRow>
           <TableRow>
             <TableCell className="font-medium">

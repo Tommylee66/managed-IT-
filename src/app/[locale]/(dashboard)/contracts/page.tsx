@@ -7,6 +7,7 @@ import { formatRupiah } from "@/lib/utils/currency";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Locale } from "@/config/constants";
 
 export default async function ContractsPage({
   params,
@@ -55,7 +56,7 @@ export default async function ContractsPage({
                 </TableCell>
                 <TableCell>{c.customer_name}</TableCell>
                 <TableCell>{c.agent_name ?? "-"}</TableCell>
-                <TableCell>{formatRupiah(c.monthly_fee)}</TableCell>
+                <TableCell>{formatRupiah(c.monthly_fee, locale as Locale)}</TableCell>
                 <TableCell>
                   {c.start_date} ~ {c.end_date}
                 </TableCell>

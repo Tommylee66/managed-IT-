@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { Locale } from "@/config/constants";
 
 export default async function ContractDetailPage({
   params,
@@ -68,7 +69,7 @@ export default async function ContractDetailPage({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t("monthlyBilling")}</p>
-            <p>{formatRupiah(contract.monthly_fee)}</p>
+            <p>{formatRupiah(contract.monthly_fee, locale as Locale)}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t("period")}</p>
@@ -102,15 +103,15 @@ export default async function ContractDetailPage({
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{t("monthlyCommissionFull")}</p>
-                <p>{formatRupiah(contract.monthly_commission)}</p>
+                <p>{formatRupiah(contract.monthly_commission, locale as Locale)}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{t("monthlyCommissionHalf")}</p>
-                <p>{formatRupiah(contract.half_monthly_commission)}</p>
+                <p>{formatRupiah(contract.half_monthly_commission, locale as Locale)}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">{t("totalCommission")}</p>
-                <p>{formatRupiah(contract.total_commission)}</p>
+                <p>{formatRupiah(contract.total_commission, locale as Locale)}</p>
               </div>
             </>
           )}
