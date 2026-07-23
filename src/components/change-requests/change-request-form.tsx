@@ -2,11 +2,12 @@
 
 import { useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -90,7 +91,7 @@ export function ChangeRequestForm({
     return initial;
   });
 
-  const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
+  const { register, control, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
       type: TYPE_OPTIONS[2].value,
       effective_date: new Date().toISOString().slice(0, 10),
@@ -219,7 +220,19 @@ export function ChangeRequestForm({
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="discount">{tCalc("discount")}</Label>
-              <Input id="discount" type="number" {...register("discount")} />
+              <Controller
+                control={control}
+                name="discount"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="discount"
+                    locale={locale as Locale}
+                    value={String(field.value ?? "")}
+                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
           </div>
           <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">

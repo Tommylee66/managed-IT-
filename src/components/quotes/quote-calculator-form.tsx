@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -113,7 +114,7 @@ export function QuoteCalculatorForm({
     return initial;
   });
 
-  const { register, handleSubmit, setValue, getValues } = useForm<FormValues>({
+  const { register, control, handleSubmit, setValue, getValues } = useForm<FormValues>({
     defaultValues: {
       customer_code: initialValues?.customer_code ?? "",
       agent_code: initialValues?.agent_code ?? "",
@@ -302,7 +303,19 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="discount">{t("discount")}</Label>
-              <Input id="discount" type="number" {...register("discount")} />
+              <Controller
+                control={control}
+                name="discount"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="discount"
+                    locale={locale as Locale}
+                    value={String(field.value ?? "")}
+                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
             </div>
           </div>
 

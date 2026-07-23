@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -144,11 +145,19 @@ export function TerminationForm({
           </div>
           <div className="flex flex-col gap-2">
             <Label>{t("adminFee")}</Label>
-            <Input type="number" value={adminFee} onChange={(e) => setAdminFee(Number(e.target.value))} />
+            <CurrencyInput
+              locale={locale as Locale}
+              value={String(adminFee)}
+              onChange={(digits) => setAdminFee(digits ? Number(digits) : 0)}
+            />
           </div>
           <div className="flex flex-col gap-2">
             <Label>{t("unpaidFee")}</Label>
-            <Input type="number" value={unpaid} onChange={(e) => setUnpaid(Number(e.target.value))} />
+            <CurrencyInput
+              locale={locale as Locale}
+              value={String(unpaid)}
+              onChange={(digits) => setUnpaid(digits ? Number(digits) : 0)}
+            />
           </div>
           <div className="col-span-2 md:col-span-4 flex flex-col gap-2">
             <Label>{t("notes")}</Label>
@@ -212,11 +221,11 @@ export function TerminationForm({
                       />
                     </TableCell>
                     <TableCell>
-                      <Input
-                        type="number"
+                      <CurrencyInput
                         className="w-32"
-                        value={row.originalCost}
-                        onChange={(e) => updateRow(i, { originalCost: Number(e.target.value) })}
+                        locale={locale as Locale}
+                        value={String(row.originalCost)}
+                        onChange={(digits) => updateRow(i, { originalCost: digits ? Number(digits) : 0 })}
                       />
                     </TableCell>
                     <TableCell className="text-right">{formatRupiah(decision.unamortized, locale as Locale)}</TableCell>
