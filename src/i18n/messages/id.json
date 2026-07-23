@@ -646,7 +646,7 @@
     "saving": "Menyimpan...",
     "saveAll": "Simpan Semua",
     "saveSuccess": "Pengaturan tarif berhasil disimpan.",
-    "saveError": "Gagal menyimpan. Periksa format JSON.",
+    "saveError": "Gagal menyimpan.",
     "auditLogTitle": "Log Audit",
     "timestamp": "Waktu",
     "action": "Tindakan",
@@ -705,7 +705,8 @@
     "cctvUnit": "Tarif Tambahan per Unit CCTV (di atas 4 unit)",
     "serviceDeleteConfirm": "Hapus layanan \"{name}\" secara permanen? Tindakan ini tidak memengaruhi penawaran/kontrak yang sudah diterbitkan, tetapi tidak dapat dibatalkan.",
     "serviceDeleteSuccess": "Layanan berhasil dihapus",
-    "serviceDeleteError": "Gagal menghapus layanan"
+    "serviceDeleteError": "Gagal menghapus layanan",
+    "saveErrorJson": "Format JSON tidak valid."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

@@ -53,18 +53,26 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
   const { fields, append, remove } = useFieldArray({ control, name: "locations" });
 
   async function onSubmit(values: FormValues) {
+    let cost_fields, init_fields, commission_items;
     try {
-      const cost_fields = JSON.parse(values.cost_fields_json);
-      const init_fields = JSON.parse(values.init_fields_json);
-      const commission_items = JSON.parse(values.commission_items_json);
+      cost_fields = JSON.parse(values.cost_fields_json);
+      init_fields = JSON.parse(values.init_fields_json);
+      commission_items = JSON.parse(values.commission_items_json);
+    } catch (e) {
+      toast.error(`${t("saveErrorJson")} (${e instanceof Error ? e.message : String(e)})`);
+      return;
+    }
+    try {
       const { cost_fields_json, init_fields_json, commission_items_json, ...rest } = values;
       void cost_fields_json;
       void init_fields_json;
       void commission_items_json;
       await updateRatesAction({ ...rest, cost_fields, init_fields, commission_items });
       toast.success(t("saveSuccess"));
-    } catch {
-      toast.error(t("saveError"));
+    } catch (e) {
+      // Surface the real reason (auth/RLS/network/etc.) instead of always
+      // blaming the JSON textareas — those are now checked separately above.
+      toast.error(`${t("saveError")} (${e instanceof Error ? e.message : String(e)})`);
     }
   }
 

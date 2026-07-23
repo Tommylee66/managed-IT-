@@ -133,8 +133,9 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
         reset();
       }
       setOpen(false);
-    } catch {
-      toast.error(isEdit ? t("equipmentUpdateError") : t("equipmentCreateError"));
+    } catch (e) {
+      const reason = e instanceof Error ? e.message : String(e);
+      toast.error(`${isEdit ? t("equipmentUpdateError") : t("equipmentCreateError")} (${reason})`);
     }
   }
 

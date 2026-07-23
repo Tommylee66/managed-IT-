@@ -646,7 +646,7 @@
     "saving": "저장 중...",
     "saveAll": "전체 저장",
     "saveSuccess": "요율 설정을 저장했습니다.",
-    "saveError": "저장에 실패했습니다. JSON 형식을 확인하세요.",
+    "saveError": "저장에 실패했습니다.",
     "auditLogTitle": "감사 로그",
     "timestamp": "일시",
     "action": "동작",
@@ -705,7 +705,8 @@
     "cctvUnit": "CCTV 추가 대당 요금 (4대 초과분)",
     "serviceDeleteConfirm": "\"{name}\" 서비스를 완전히 삭제하시겠습니까? 이미 발행된 견적/계약에는 영향을 주지 않지만, 이 작업은 되돌릴 수 없습니다.",
     "serviceDeleteSuccess": "서비스가 삭제되었습니다",
-    "serviceDeleteError": "서비스 삭제에 실패했습니다"
+    "serviceDeleteError": "서비스 삭제에 실패했습니다",
+    "saveErrorJson": "JSON 형식이 올바르지 않습니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"

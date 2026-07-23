@@ -646,7 +646,7 @@
     "saving": "Saving...",
     "saveAll": "Save All",
     "saveSuccess": "Rate settings saved.",
-    "saveError": "Failed to save. Please check the JSON format.",
+    "saveError": "Save failed.",
     "auditLogTitle": "Audit Log",
     "timestamp": "Timestamp",
     "action": "Action",
@@ -705,7 +705,8 @@
     "cctvUnit": "CCTV Extra Per-Unit Rate (beyond 4 units)",
     "serviceDeleteConfirm": "Permanently delete the service \"{name}\"? This won't affect already-issued quotes/contracts, but it can't be undone.",
     "serviceDeleteSuccess": "Service deleted",
-    "serviceDeleteError": "Failed to delete service"
+    "serviceDeleteError": "Failed to delete service",
+    "saveErrorJson": "Invalid JSON format."
   },
   "documents": {
     "printSave": "Print / Save PDF"

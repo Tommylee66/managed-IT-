@@ -76,8 +76,9 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
         reset();
       }
       setOpen(false);
-    } catch {
-      toast.error(isEdit ? t("serviceUpdateError") : t("serviceCreateError"));
+    } catch (e) {
+      const reason = e instanceof Error ? e.message : String(e);
+      toast.error(`${isEdit ? t("serviceUpdateError") : t("serviceCreateError")} (${reason})`);
     }
   }
 
