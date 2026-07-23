@@ -198,7 +198,19 @@
     "rateChangeSuccess": "Tarif komisi berhasil diubah.",
     "deactivateSuccess": "Berhasil dinonaktifkan.",
     "activateSuccess": "Berhasil diaktifkan.",
-    "changeError": "Gagal melakukan perubahan."
+    "changeError": "Gagal melakukan perubahan.",
+    "commissionReportTitle": "Komisi Penjualan Bulanan",
+    "commissionReportSubtitle": "Rincian Komisi Bulan {month}",
+    "backToAgents": "Kembali ke Agen Penjualan",
+    "selectMonth": "Pilih Bulan",
+    "apply": "Terapkan",
+    "downloadCsv": "Unduh CSV",
+    "commissionContractNo": "No. Kontrak",
+    "commissionCustomerName": "Nama Pelanggan",
+    "commissionAmount": "Komisi",
+    "agentSubtotal": "Subtotal {name}",
+    "grandTotal": "Total Keseluruhan",
+    "noCommission": "Tidak ada komisi penjualan untuk bulan ini"
   },
   "quotes": {
     "title": "Penawaran",

@@ -5,6 +5,7 @@ import { getSessionContext } from "@/lib/auth/session";
 import { listAgents } from "@/lib/data-access/agents";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CreateAgentDialog } from "@/components/agents/create-agent-dialog";
 
@@ -27,7 +28,12 @@ export default async function AgentsPage({
     <Card>
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
-        <CardAction>
+        <CardAction className="flex gap-2">
+          {session!.role === "master" && (
+            <Link href={`/${locale}/agents/commission`}>
+              <Button variant="outline">{t("commissionReportTitle")}</Button>
+            </Link>
+          )}
           <CreateAgentDialog />
         </CardAction>
       </CardHeader>

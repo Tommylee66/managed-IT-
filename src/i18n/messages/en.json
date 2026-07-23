@@ -198,7 +198,19 @@
     "rateChangeSuccess": "Commission rate updated.",
     "deactivateSuccess": "Deactivated.",
     "activateSuccess": "Activated.",
-    "changeError": "Failed to make change."
+    "changeError": "Failed to make change.",
+    "commissionReportTitle": "Monthly Sales Commission",
+    "commissionReportSubtitle": "Commission Details for {month}",
+    "backToAgents": "Back to Agents",
+    "selectMonth": "Select Month",
+    "apply": "Apply",
+    "downloadCsv": "Download CSV",
+    "commissionContractNo": "Contract No.",
+    "commissionCustomerName": "Customer",
+    "commissionAmount": "Commission",
+    "agentSubtotal": "{name} Subtotal",
+    "grandTotal": "Grand Total",
+    "noCommission": "No sales commission for this month"
   },
   "quotes": {
     "title": "Quotes",

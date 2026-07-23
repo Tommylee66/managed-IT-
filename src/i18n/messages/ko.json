@@ -198,7 +198,19 @@
     "rateChangeSuccess": "수수료율을 변경했습니다.",
     "deactivateSuccess": "비활성화했습니다.",
     "activateSuccess": "활성화했습니다.",
-    "changeError": "변경에 실패했습니다."
+    "changeError": "변경에 실패했습니다.",
+    "commissionReportTitle": "월별 영업수수료",
+    "commissionReportSubtitle": "{month} 영업수수료 내역",
+    "backToAgents": "영업 대리점으로 돌아가기",
+    "selectMonth": "조회 월 선택",
+    "apply": "조회",
+    "downloadCsv": "CSV 다운로드",
+    "commissionContractNo": "계약번호",
+    "commissionCustomerName": "고객명",
+    "commissionAmount": "수수료",
+    "agentSubtotal": "{name} 소계",
+    "grandTotal": "총 합계",
+    "noCommission": "해당 월에 지급할 영업수수료가 없습니다"
   },
   "quotes": {
     "title": "견적",

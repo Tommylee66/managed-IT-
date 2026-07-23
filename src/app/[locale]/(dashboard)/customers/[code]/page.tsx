@@ -4,7 +4,6 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getCustomer } from "@/lib/data-access/customers";
-import { listQuotesByCustomer } from "@/lib/data-access/quotes";
 import { listContractsByCustomer } from "@/lib/data-access/contracts";
 import { listAssetsByCustomer } from "@/lib/data-access/assets";
 import { listServiceLogsByCustomer } from "@/lib/data-access/service-logs";
@@ -29,9 +28,8 @@ export default async function CustomerDetailPage({
   const customer = await getCustomer(supabase, code, session!.role);
   if (!customer) notFound();
 
-  const [quotes, contracts, assets, serviceLogs, changeRequests, terminationPlans, t, tContracts, tCommon, tAssets] =
+  const [contracts, assets, serviceLogs, changeRequests, terminationPlans, t, tContracts, tCommon, tAssets] =
     await Promise.all([
-      listQuotesByCustomer(supabase, code, session!.role),
       listContractsByCustomer(supabase, code, session!.role),
       listAssetsByCustomer(supabase, code, session!.role),
       listServiceLogsByCustomer(supabase, code),
@@ -143,45 +141,6 @@ export default async function CustomerDetailPage({
             <p className="text-xs text-muted-foreground">{t("memo")}</p>
             <p className="whitespace-pre-wrap">{customer.memo || "-"}</p>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t("quoteHistory")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("quoteNo")}</TableHead>
-                <TableHead>{t("contractPeriod")}</TableHead>
-                <TableHead>{t("monthlyAmount")}</TableHead>
-                <TableHead>{t("createdDate")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {quotes.map((q) => (
-                <TableRow key={q.no}>
-                  <TableCell>
-                    <Link href={`/${locale}/quotes/${q.no}`} className="font-medium hover:underline">
-                      {q.no}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{tCommon("months", { count: q.months })}</TableCell>
-                  <TableCell>{formatRupiah(q.monthly)}</TableCell>
-                  <TableCell>{new Date(q.created_at).toLocaleDateString(locale)}</TableCell>
-                </TableRow>
-              ))}
-              {quotes.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
-                    {t("noQuotes")}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
         </CardContent>
       </Card>
 
