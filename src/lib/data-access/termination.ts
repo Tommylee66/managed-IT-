@@ -44,6 +44,20 @@ export async function listTerminationPlansByContract(
   return (data as TerminationPlan[]).map((p) => toView(p, role));
 }
 
+export async function listTerminationPlansByCustomer(
+  supabase: SupabaseClient,
+  customerCode: string,
+  role: StaffRole
+): Promise<TerminationPlanView[]> {
+  const { data, error } = await supabase
+    .from('termination_plans')
+    .select('*')
+    .eq('customer_code', customerCode)
+    .order('saved_at', { ascending: false });
+  if (error) throw error;
+  return (data as TerminationPlan[]).map((p) => toView(p, role));
+}
+
 export async function getTerminationPlan(
   supabase: SupabaseClient,
   id: string,

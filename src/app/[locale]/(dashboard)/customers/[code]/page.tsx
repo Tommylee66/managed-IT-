@@ -8,6 +8,9 @@ import { listQuotesByCustomer } from "@/lib/data-access/quotes";
 import { listContractsByCustomer } from "@/lib/data-access/contracts";
 import { listAssetsByCustomer } from "@/lib/data-access/assets";
 import { listServiceLogsByCustomer } from "@/lib/data-access/service-logs";
+import { listChangeRequestsByCustomer } from "@/lib/data-access/change-requests";
+import { listTerminationPlansByCustomer } from "@/lib/data-access/termination";
+import { getAgent } from "@/lib/data-access/agents";
 import { formatRupiah } from "@/lib/utils/currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,16 +29,20 @@ export default async function CustomerDetailPage({
   const customer = await getCustomer(supabase, code, session!.role);
   if (!customer) notFound();
 
-  const [quotes, contracts, assets, serviceLogs, t, tContracts, tCommon, tAssets] = await Promise.all([
-    listQuotesByCustomer(supabase, code, session!.role),
-    listContractsByCustomer(supabase, code, session!.role),
-    listAssetsByCustomer(supabase, code, session!.role),
-    listServiceLogsByCustomer(supabase, code),
-    getTranslations("customers"),
-    getTranslations("contracts"),
-    getTranslations("common"),
-    getTranslations("assets"),
-  ]);
+  const [quotes, contracts, assets, serviceLogs, changeRequests, terminationPlans, t, tContracts, tCommon, tAssets] =
+    await Promise.all([
+      listQuotesByCustomer(supabase, code, session!.role),
+      listContractsByCustomer(supabase, code, session!.role),
+      listAssetsByCustomer(supabase, code, session!.role),
+      listServiceLogsByCustomer(supabase, code),
+      listChangeRequestsByCustomer(supabase, code),
+      listTerminationPlansByCustomer(supabase, code, session!.role),
+      getTranslations("customers"),
+      getTranslations("contracts"),
+      getTranslations("common"),
+      getTranslations("assets"),
+    ]);
+  const customerAgent = customer.agent_code ? await getAgent(supabase, customer.agent_code, session!.role) : null;
 
   const STATUS_LABEL: Record<string, string> = {
     draft: t("statusDraft"),
@@ -48,6 +55,8 @@ export default async function CustomerDetailPage({
     terminated: tContracts("statusTerminated"),
   };
 
+  const currentContract = contracts.find((c) => c.status !== "terminated") ?? contracts[0] ?? null;
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
@@ -56,6 +65,42 @@ export default async function CustomerDetailPage({
           {STATUS_LABEL[customer.status]}
         </Badge>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("currentStatusTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-5">
+          {currentContract ? (
+            <>
+              <div>
+                <p className="text-xs text-muted-foreground">{tContracts("status")}</p>
+                <Badge variant={currentContract.status === "terminated" ? "secondary" : "default"}>
+                  {CONTRACT_STATUS_LABEL[currentContract.status]}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t("monthlyAmount")}</p>
+                <p>{formatRupiah(currentContract.monthly_fee)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t("contractStartDate")}</p>
+                <p>{currentContract.start_date}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t("salesAgent")}</p>
+                <p>{currentContract.agent_name || t("noAgent")}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{t("equipmentCount")}</p>
+                <p>{assets.length}</p>
+              </div>
+            </>
+          ) : (
+            <p className="col-span-2 text-muted-foreground md:col-span-5">{t("noActiveContract")}</p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -85,6 +130,10 @@ export default async function CustomerDetailPage({
           <div>
             <p className="text-xs text-muted-foreground">{t("invoiceEmail")}</p>
             <p>{customer.invoice_email || "-"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("salesAgent")}</p>
+            <p>{customerAgent?.name || t("noAgent")}</p>
           </div>
           <div className="col-span-2 md:col-span-3">
             <p className="text-xs text-muted-foreground">{t("address")}</p>
@@ -147,6 +196,7 @@ export default async function CustomerDetailPage({
                 <TableHead>{t("contractNo")}</TableHead>
                 <TableHead>{t("monthlyAmount")}</TableHead>
                 <TableHead>{t("period")}</TableHead>
+                <TableHead>{t("salesAgent")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
               </TableRow>
             </TableHeader>
@@ -162,12 +212,13 @@ export default async function CustomerDetailPage({
                   <TableCell>
                     {c.start_date} ~ {c.end_date}
                   </TableCell>
+                  <TableCell>{c.agent_name || t("noAgent")}</TableCell>
                   <TableCell>{CONTRACT_STATUS_LABEL[c.status]}</TableCell>
                 </TableRow>
               ))}
               {contracts.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
                     {t("noContracts")}
                   </TableCell>
                 </TableRow>
@@ -176,6 +227,77 @@ export default async function CustomerDetailPage({
           </Table>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("changeHistory")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("changeDate")}</TableHead>
+                <TableHead>{t("changeType")}</TableHead>
+                <TableHead>{t("monthlyBefore")}</TableHead>
+                <TableHead>{t("monthlyAfter")}</TableHead>
+                <TableHead>{t("settlementAmount")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {changeRequests.map((cr) => (
+                <TableRow key={cr.id}>
+                  <TableCell>{cr.effective_date}</TableCell>
+                  <TableCell>{cr.type || "-"}</TableCell>
+                  <TableCell>{cr.old_monthly != null ? formatRupiah(cr.old_monthly) : "-"}</TableCell>
+                  <TableCell>{cr.new_monthly != null ? formatRupiah(cr.new_monthly) : "-"}</TableCell>
+                  <TableCell>{cr.settlement_amount != null ? formatRupiah(cr.settlement_amount) : "-"}</TableCell>
+                </TableRow>
+              ))}
+              {changeRequests.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    {t("noChangeRequests")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {terminationPlans.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t("terminationInfo")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t("terminationDate")}</TableHead>
+                  <TableHead>{t("remainingMonths")}</TableHead>
+                  <TableHead>{t("penaltyRate")}</TableHead>
+                  <TableHead>{t("adminFeeLabel")}</TableHead>
+                  <TableHead>{t("unamortizedAmount")}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {terminationPlans.map((tp) => (
+                  <TableRow key={tp.id}>
+                    <TableCell>{tp.term_date}</TableCell>
+                    <TableCell>{tp.remaining ?? "-"}</TableCell>
+                    <TableCell>{tp.penalty_rate}%</TableCell>
+                    <TableCell>{formatRupiah(tp.admin_fee)}</TableCell>
+                    <TableCell>
+                      {tp.unamortizedTotal != null ? formatRupiah(tp.unamortizedTotal) : tp.unamortizedTotalBucket}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

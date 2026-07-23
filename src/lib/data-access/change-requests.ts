@@ -28,6 +28,19 @@ export async function listChangeRequestsByContract(
   return data as ChangeRequest[];
 }
 
+export async function listChangeRequestsByCustomer(
+  supabase: SupabaseClient,
+  customerCode: string
+): Promise<ChangeRequest[]> {
+  const { data, error } = await supabase
+    .from('change_requests')
+    .select('*')
+    .eq('customer_code', customerCode)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data as ChangeRequest[];
+}
+
 export interface CreateChangeRequestInput {
   type: string;
   effective_date: string;

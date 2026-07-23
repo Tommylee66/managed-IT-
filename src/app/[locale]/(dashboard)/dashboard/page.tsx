@@ -140,7 +140,7 @@ export default async function DashboardPage({
         </MenuSection>
 
         <MenuSection title={tHome("sectionApplicationContract")}>
-          <MenuCard href={p("/applications")} icon="🔎" color="purple" title={tNav("applications")} description={tHome("cardApplicationsDesc")} />
+          <MenuCard href={p("/customers")} icon="🔎" color="purple" title={tNav("applications")} description={tHome("cardApplicationsDesc")} />
           <MenuCard href={p("/quotes")} icon="🧾" color="purple" title={tNav("quotes")} description={tHome("cardQuotesDesc")} />
           <MenuCard href={p("/contracts")} icon="📄" color="purple" title={tNav("contracts")} description={tHome("cardContractsDesc")} />
           <MenuCard href={p("/change-requests")} icon="🔁" color="purple" title={tNav("changeRequests")} description={tHome("cardChangeRequestsDesc")} />
