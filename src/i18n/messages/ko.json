@@ -85,7 +85,10 @@
     "updatingPassword": "변경 중...",
     "resetSuccessTitle": "비밀번호가 변경되었습니다",
     "resetSuccessMessage": "새 비밀번호로 로그인해주세요.",
-    "resetError": "링크가 만료되었거나 유효하지 않습니다. 다시 시도해주세요."
+    "resetError": "링크가 만료되었거나 유효하지 않습니다. 다시 시도해주세요.",
+    "checkingLink": "링크를 확인하는 중입니다...",
+    "invalidLinkTitle": "링크가 유효하지 않습니다",
+    "invalidLinkMessage": "비밀번호 재설정 링크가 만료되었거나 이미 사용되었습니다. 재설정 링크를 다시 요청해주세요."
   },
   "roles": {
     "master": "마스터 관리자",

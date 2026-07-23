@@ -85,7 +85,10 @@
     "updatingPassword": "Mengubah...",
     "resetSuccessTitle": "Kata Sandi Berhasil Diubah",
     "resetSuccessMessage": "Silakan masuk dengan kata sandi baru Anda.",
-    "resetError": "Tautan telah kedaluwarsa atau tidak valid. Silakan coba lagi."
+    "resetError": "Tautan telah kedaluwarsa atau tidak valid. Silakan coba lagi.",
+    "checkingLink": "Memeriksa tautan...",
+    "invalidLinkTitle": "Tautan Tidak Valid",
+    "invalidLinkMessage": "Tautan atur ulang kata sandi telah kedaluwarsa atau sudah digunakan. Silakan minta tautan baru."
   },
   "roles": {
     "master": "Admin Utama",

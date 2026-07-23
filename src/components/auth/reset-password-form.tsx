@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +20,24 @@ export function ResetPasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  // The recovery link's session exchange happens asynchronously as soon as
+  // the Supabase client is created — start it on mount (not lazily inside
+  // onSubmit) so it has the whole time the user spends typing to finish,
+  // and surface clearly if no session ever shows up (expired/invalid link).
+  const [sessionReady, setSessionReady] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data }) => {
+      setSessionReady(!!data.session);
+      setCheckingSession(false);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) setSessionReady(true);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
 
   const schema = z
     .object({
@@ -38,9 +56,6 @@ export function ResetPasswordForm() {
     formState: { errors },
   } = useForm<Values>({ resolver: zodResolver(schema) });
 
-  // The password-reset email link establishes a temporary recovery session
-  // for this browser via the redirect URL — createClient() picks it up
-  // automatically, so updateUser() just needs that session to exist.
   async function onSubmit(values: Values) {
     setServerError(null);
     setIsSubmitting(true);
@@ -48,10 +63,39 @@ export function ResetPasswordForm() {
     const { error } = await supabase.auth.updateUser({ password: values.password });
     setIsSubmitting(false);
     if (error) {
-      setServerError(t("resetError"));
+      // Surface Supabase's actual message (e.g. "should be different from
+      // the old password", "link expired") rather than one generic string —
+      // the real reason matters for the user to know what to do next.
+      setServerError(error.message);
       return;
     }
     setDone(true);
+  }
+
+  if (checkingSession) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardContent className="pt-6 text-center text-sm text-muted-foreground">
+          {t("checkingLink")}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!sessionReady) {
+    return (
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>{t("invalidLinkTitle")}</CardTitle>
+          <CardDescription>{t("invalidLinkMessage")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Link href={`/${locale}/forgot-password`} className="block text-center text-sm underline">
+            {t("forgotPasswordLink")}
+          </Link>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (done) {
