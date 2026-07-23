@@ -83,3 +83,11 @@ export async function setServiceCatalogActive(
   if (error) throw error;
   return data as ServiceCatalogItem;
 }
+
+/** Hard delete — safe because quotes/change-requests snapshot the selected
+ * service's name/rate/cost at selection time (see ServiceSelection), so
+ * nothing references service_catalog rows by foreign key. */
+export async function deleteServiceCatalogItem(supabase: SupabaseClient, id: string): Promise<void> {
+  const { error } = await supabase.from('service_catalog').delete().eq('id', id);
+  if (error) throw error;
+}

@@ -15,6 +15,7 @@ import {
   createServiceCatalogItem,
   updateServiceCatalogItem,
   setServiceCatalogActive,
+  deleteServiceCatalogItem,
   type CreateServiceInput,
   type UpdateServiceInput,
 } from '@/lib/data-access/services';
@@ -76,4 +77,11 @@ export async function setServiceCatalogActiveAction(id: string, isActive: boolea
   const item = await setServiceCatalogActive(supabase, id, isActive);
   revalidatePath('/admin/rates');
   return item;
+}
+
+export async function deleteServiceCatalogItemAction(id: string) {
+  await requireMaster();
+  const supabase = await createClient();
+  await deleteServiceCatalogItem(supabase, id);
+  revalidatePath('/admin/rates');
 }

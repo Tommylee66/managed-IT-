@@ -15,6 +15,7 @@ import { EquipmentDialog } from "@/components/admin/equipment-dialog";
 import { ToggleEquipmentActiveButton } from "@/components/admin/toggle-equipment-active-button";
 import { ServiceDialog } from "@/components/admin/service-dialog";
 import { ToggleServiceActiveButton } from "@/components/admin/toggle-service-active-button";
+import { DeleteServiceButton } from "@/components/admin/delete-service-button";
 
 export default async function AdminRatesPage({
   params,
@@ -143,6 +144,7 @@ export default async function AdminRatesPage({
                   <TableCell className="flex gap-2">
                     <ServiceDialog item={item} />
                     <ToggleServiceActiveButton id={item.id} active={item.is_active} />
+                    <DeleteServiceButton id={item.id} name={item.name} />
                   </TableCell>
                 </TableRow>
               ))}

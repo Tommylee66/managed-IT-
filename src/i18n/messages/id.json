@@ -666,7 +666,10 @@
     "serviceUpdateSuccess": "Layanan berhasil diperbarui",
     "serviceUpdateError": "Gagal memperbarui layanan",
     "noService": "Belum ada layanan terdaftar",
-    "cctvUnit": "Tarif Tambahan per Unit CCTV (di atas 4 unit)"
+    "cctvUnit": "Tarif Tambahan per Unit CCTV (di atas 4 unit)",
+    "serviceDeleteConfirm": "Hapus layanan \"{name}\" secara permanen? Tindakan ini tidak memengaruhi penawaran/kontrak yang sudah diterbitkan, tetapi tidak dapat dibatalkan.",
+    "serviceDeleteSuccess": "Layanan berhasil dihapus",
+    "serviceDeleteError": "Gagal menghapus layanan"
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF"

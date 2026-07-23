@@ -666,7 +666,10 @@
     "serviceUpdateSuccess": "서비스가 수정되었습니다",
     "serviceUpdateError": "서비스 수정에 실패했습니다",
     "noService": "등록된 서비스가 없습니다",
-    "cctvUnit": "CCTV 추가 대당 요금 (4대 초과분)"
+    "cctvUnit": "CCTV 추가 대당 요금 (4대 초과분)",
+    "serviceDeleteConfirm": "\"{name}\" 서비스를 완전히 삭제하시겠습니까? 이미 발행된 견적/계약에는 영향을 주지 않지만, 이 작업은 되돌릴 수 없습니다.",
+    "serviceDeleteSuccess": "서비스가 삭제되었습니다",
+    "serviceDeleteError": "서비스 삭제에 실패했습니다"
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"
