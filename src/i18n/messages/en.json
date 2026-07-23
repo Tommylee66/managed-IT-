@@ -710,7 +710,9 @@
     "serviceDeleteConfirm": "Permanently delete the service \"{name}\"? This won't affect already-issued quotes/contracts, but it can't be undone.",
     "serviceDeleteSuccess": "Service deleted",
     "serviceDeleteError": "Failed to delete service",
-    "saveErrorJson": "Invalid JSON format."
+    "saveErrorJson": "Invalid JSON format.",
+    "roleChangeSuccess": "Role updated",
+    "roleChangeError": "Failed to update role"
   },
   "documents": {
     "printSave": "Print / Save PDF"

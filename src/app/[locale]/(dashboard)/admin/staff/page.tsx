@@ -10,6 +10,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { CreateStaffDialog } from "@/components/admin/create-staff-dialog";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { ToggleActiveButton } from "@/components/admin/toggle-active-button";
+import { RoleSelect } from "@/components/admin/role-select";
 
 export default async function AdminStaffPage({
   params,
@@ -22,11 +23,7 @@ export default async function AdminStaffPage({
   if (!session || session.role !== "master") redirect("/dashboard");
 
   const supabase = await createClient();
-  const [profiles, t, tRoles] = await Promise.all([
-    listProfiles(supabase),
-    getTranslations("admin"),
-    getTranslations("roles"),
-  ]);
+  const [profiles, t] = await Promise.all([listProfiles(supabase), getTranslations("admin")]);
   const approvedProfiles = profiles.filter((p) => p.is_approved);
 
   const admin = createAdminClient();
@@ -58,7 +55,7 @@ export default async function AdminStaffPage({
                 <TableCell>{p.full_name}</TableCell>
                 <TableCell>{emailById.get(p.id) ?? "-"}</TableCell>
                 <TableCell>
-                  <Badge variant={p.role === "master" ? "default" : "secondary"}>{tRoles(p.role)}</Badge>
+                  <RoleSelect userId={p.id} role={p.role} disabled={p.id === session.userId} />
                 </TableCell>
                 <TableCell>
                   <Badge variant={p.is_active ? "default" : "secondary"}>

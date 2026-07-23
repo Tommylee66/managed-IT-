@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Profile } from '@/types/domain';
+import type { Profile, StaffRole } from '@/types/domain';
 
 export async function listProfiles(supabase: SupabaseClient): Promise<Profile[]> {
   const { data, error } = await supabase.from('profiles').select('*').order('created_at');
@@ -15,6 +15,21 @@ export async function setProfileActive(
   const { data, error } = await supabase
     .from('profiles')
     .update({ is_active: isActive })
+    .eq('id', userId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Profile;
+}
+
+export async function setProfileRole(
+  supabase: SupabaseClient,
+  userId: string,
+  role: StaffRole
+): Promise<Profile> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ role })
     .eq('id', userId)
     .select('*')
     .single();

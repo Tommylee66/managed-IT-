@@ -710,7 +710,9 @@
     "serviceDeleteConfirm": "\"{name}\" 서비스를 완전히 삭제하시겠습니까? 이미 발행된 견적/계약에는 영향을 주지 않지만, 이 작업은 되돌릴 수 없습니다.",
     "serviceDeleteSuccess": "서비스가 삭제되었습니다",
     "serviceDeleteError": "서비스 삭제에 실패했습니다",
-    "saveErrorJson": "JSON 형식이 올바르지 않습니다."
+    "saveErrorJson": "JSON 형식이 올바르지 않습니다.",
+    "roleChangeSuccess": "권한이 변경되었습니다",
+    "roleChangeError": "권한 변경에 실패했습니다"
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장"
