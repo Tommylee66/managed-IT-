@@ -36,8 +36,10 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
   const isEdit = !!item;
 
   const schema = z.object({
-    name: z.string().min(1, t("serviceNameRequired")),
-    description: z.string().optional(),
+    name_id: z.string().min(1, t("serviceNameRequired")),
+    name_ko: z.string().min(1, t("serviceNameRequired")),
+    description_id: z.string().optional(),
+    description_ko: z.string().optional(),
     monthly_rate: z.string().optional(),
     monthly_cost: z.string().optional(),
   });
@@ -52,8 +54,10 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: item?.name ?? "",
-      description: item?.description ?? "",
+      name_id: item?.name_id ?? "",
+      name_ko: item?.name_ko ?? "",
+      description_id: item?.description_id ?? "",
+      description_ko: item?.description_ko ?? "",
       monthly_rate: item?.monthly_rate?.toString() ?? "",
       monthly_cost: item?.monthly_cost?.toString() ?? "",
     },
@@ -61,8 +65,10 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
 
   async function onSubmit(values: FormValues) {
     const payload = {
-      name: values.name,
-      description: values.description,
+      name_id: values.name_id,
+      name_ko: values.name_ko,
+      description_id: values.description_id,
+      description_ko: values.description_ko,
       monthly_rate: values.monthly_rate ? Number(values.monthly_rate) : null,
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
     };
@@ -99,13 +105,22 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="name">{t("serviceName")}</Label>
-            <Input id="name" {...register("name")} />
-            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+            <Label htmlFor="name_id">{t("serviceNameId")}</Label>
+            <Input id="name_id" {...register("name_id")} />
+            {errors.name_id && <p className="text-sm text-destructive">{errors.name_id.message}</p>}
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="description">{t("serviceDescription")}</Label>
-            <Textarea id="description" rows={2} {...register("description")} />
+            <Label htmlFor="name_ko">{t("serviceNameKo")}</Label>
+            <Input id="name_ko" {...register("name_ko")} />
+            {errors.name_ko && <p className="text-sm text-destructive">{errors.name_ko.message}</p>}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="description_id">{t("serviceDescriptionId")}</Label>
+            <Textarea id="description_id" rows={2} {...register("description_id")} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="description_ko">{t("serviceDescriptionKo")}</Label>
+            <Textarea id="description_ko" rows={2} {...register("description_ko")} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">

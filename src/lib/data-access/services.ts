@@ -8,7 +8,7 @@ export async function listServiceCatalog(
   supabase: SupabaseClient,
   { activeOnly = false, role = 'master' }: { activeOnly?: boolean; role?: StaffRole } = {}
 ): Promise<ServiceCatalogItem[]> {
-  let query = supabase.from('service_catalog').select('*').order('name');
+  let query = supabase.from('service_catalog').select('*').order('name_id');
   if (activeOnly) query = query.eq('is_active', true);
   const { data, error } = await query;
   if (error) throw error;
@@ -18,8 +18,10 @@ export async function listServiceCatalog(
 }
 
 interface ServiceFields {
-  name: string;
-  description?: string | null;
+  name_id: string;
+  name_ko: string;
+  description_id?: string | null;
+  description_ko?: string | null;
   monthly_rate?: number | null;
   monthly_cost?: number | null;
 }
@@ -34,8 +36,10 @@ export async function createServiceCatalogItem(
   const { data, error } = await supabase
     .from('service_catalog')
     .insert({
-      name: input.name,
-      description: input.description ?? null,
+      name_id: input.name_id,
+      name_ko: input.name_ko,
+      description_id: input.description_id ?? null,
+      description_ko: input.description_ko ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
       created_by: input.created_by,
@@ -57,8 +61,10 @@ export async function updateServiceCatalogItem(
   const { data, error } = await supabase
     .from('service_catalog')
     .update({
-      name: input.name,
-      description: input.description ?? null,
+      name_id: input.name_id,
+      name_ko: input.name_ko,
+      description_id: input.description_id ?? null,
+      description_ko: input.description_ko ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
     })

@@ -22,7 +22,8 @@
     "print": "View printable version",
     "ownerBctShort": "BCT",
     "ownerCustomerShort": "Customer",
-    "appSubtitle": "Customer Registration · Quotes/Contracts · Activation · Assets · Billing"
+    "appSubtitle": "Customer Registration · Quotes/Contracts · Activation · Assets · Billing",
+    "perMonth": "month"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -697,9 +698,11 @@
     "newService": "Add Service",
     "serviceCreateDialogTitle": "Register Service",
     "serviceEditDialogTitle": "Edit Service",
-    "serviceName": "Service Name",
+    "serviceNameId": "Service Name (Indonesian)",
+    "serviceNameKo": "Service Name (Korean)",
     "serviceNameRequired": "Service name is required",
-    "serviceDescription": "Description",
+    "serviceDescriptionId": "Description (Indonesian)",
+    "serviceDescriptionKo": "Description (Korean)",
     "serviceMonthlyRate": "Monthly Rate (Customer)",
     "serviceMonthlyCost": "Monthly Internal Cost",
     "serviceRateHint": "The monthly rate is what's billed to the customer; the internal cost is used only for margin calculation and isn't shown to staff.",

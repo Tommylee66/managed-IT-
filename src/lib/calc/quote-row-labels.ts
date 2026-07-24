@@ -84,11 +84,15 @@ function interpolate(template: string, params?: Record<string, string | number>)
   return template.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? ''));
 }
 
-type LabelSource = Pick<QuoteRowRecord, 'label' | 'labelKey' | 'params'>;
+type LabelSource = Pick<QuoteRowRecord, 'label' | 'labelKey' | 'params' | 'labelId' | 'labelKo'>;
 
-/** Renders a quote row's label in the given locale, falling back to the
- * stored (Korean) `label` for rows saved before `labelKey` existed. */
+/** Renders a quote row's label in the given locale. Catalog-sourced rows
+ * (labelId/labelKo) win over a fixed QUOTE_ROW_LABELS entry, which in turn
+ * wins over the stored (Korean) `label` for rows saved before either existed.
+ * English has no separate catalog variant, so it falls back to the
+ * Indonesian text — same convention as equipment_catalog's spec_id/spec_ko. */
 export function renderQuoteRowLabel(row: LabelSource, locale: Locale): string {
+  if (row.labelId || row.labelKo) return (locale === 'ko' ? row.labelKo : row.labelId) ?? row.label;
   const entry = row.labelKey ? QUOTE_ROW_LABELS[row.labelKey] : undefined;
   if (!entry) return row.label;
   return interpolate(entry[locale], row.params);
@@ -97,6 +101,9 @@ export function renderQuoteRowLabel(row: LabelSource, locale: Locale): string {
 /** Renders a quote row's label in both Indonesian and Korean, for the
  * permanent bilingual customer-facing quote document. */
 export function renderBilingualQuoteRowLabel(row: LabelSource): { id: string; ko: string } {
+  if (row.labelId || row.labelKo) {
+    return { id: row.labelId ?? row.label, ko: row.labelKo ?? row.label };
+  }
   const entry = row.labelKey ? QUOTE_ROW_LABELS[row.labelKey] : undefined;
   if (!entry) return { id: row.label, ko: row.label };
   return { id: interpolate(entry.id, row.params), ko: interpolate(entry.ko, row.params) };

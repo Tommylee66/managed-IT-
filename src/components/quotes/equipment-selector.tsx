@@ -28,6 +28,7 @@ export function EquipmentSelector({
 }) {
   const tCat = useTranslations("equipmentCategory");
   const tQuotes = useTranslations("quotes");
+  const tCommon = useTranslations("common");
 
   function toggle(id: string, checked: boolean) {
     const next = { ...value };
@@ -54,9 +55,17 @@ export function EquipmentSelector({
               <Checkbox checked={checked} onCheckedChange={(v) => toggle(item.id, v === true)} />
               <span className="flex-1 text-sm">
                 <span className="text-muted-foreground">[{tCat(item.category)}]</span> {item.model_name}
-                {item.spec_id && <span className="text-muted-foreground"> — {item.spec_id}</span>}
+                {(locale === "ko" ? item.spec_ko : item.spec_id) && (
+                  <span className="text-muted-foreground">
+                    {" "}
+                    — {locale === "ko" ? item.spec_ko : item.spec_id}
+                  </span>
+                )}
                 {item.monthly_rate != null && (
-                  <span className="text-muted-foreground"> ({formatRupiah(item.monthly_rate, locale)}/월)</span>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    ({formatRupiah(item.monthly_rate, locale)}/{tCommon("perMonth")})
+                  </span>
                 )}
               </span>
               <Input

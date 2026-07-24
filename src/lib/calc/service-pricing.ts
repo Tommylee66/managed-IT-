@@ -20,8 +20,10 @@ export function resolveServiceSelections(
       if (!item) return null;
       return {
         catalogId: item.id,
-        name: item.name,
-        description: item.description,
+        nameId: item.name_id,
+        nameKo: item.name_ko,
+        descriptionId: item.description_id,
+        descriptionKo: item.description_ko,
         qty: r.qty,
         monthlyRate: item.monthly_rate,
         monthlyCost: item.monthly_cost,
@@ -38,7 +40,9 @@ export function servicePricedRows(selections: ServiceSelection[]): QuoteRowRecor
     if (s.monthlyRate != null) {
       rows.push({
         key: `service:${s.catalogId}`,
-        label: s.qty > 1 ? `${s.name} × ${s.qty}` : s.name,
+        label: s.qty > 1 ? `${s.nameId} × ${s.qty}` : s.nameId,
+        labelId: s.qty > 1 ? `${s.nameId} × ${s.qty}` : s.nameId,
+        labelKo: s.qty > 1 ? `${s.nameKo} × ${s.qty}` : s.nameKo,
         amount: s.monthlyRate * s.qty,
         cost: (s.monthlyCost ?? 0) * s.qty,
         init: 0,

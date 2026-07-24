@@ -22,7 +22,8 @@
     "print": "인쇄용 보기",
     "ownerBctShort": "BCT",
     "ownerCustomerShort": "고객",
-    "appSubtitle": "고객등록 · 견적/계약 · 개통 · 자산 · 청구 관리"
+    "appSubtitle": "고객등록 · 견적/계약 · 개통 · 자산 · 청구 관리",
+    "perMonth": "월"
   },
   "nav": {
     "dashboard": "대시보드",
@@ -697,9 +698,11 @@
     "newService": "서비스 추가",
     "serviceCreateDialogTitle": "서비스 등록",
     "serviceEditDialogTitle": "서비스 수정",
-    "serviceName": "서비스명",
+    "serviceNameId": "서비스명 (인도네시아어)",
+    "serviceNameKo": "서비스명 (한국어)",
     "serviceNameRequired": "서비스명을 입력하세요",
-    "serviceDescription": "설명",
+    "serviceDescriptionId": "설명 (인도네시아어)",
+    "serviceDescriptionKo": "설명 (한국어)",
     "serviceMonthlyRate": "월 청구요율",
     "serviceMonthlyCost": "월 내부원가",
     "serviceRateHint": "청구요율은 고객에게 청구되는 금액이며, 내부원가는 마진 계산에만 사용되고 직원에게는 노출되지 않습니다.",

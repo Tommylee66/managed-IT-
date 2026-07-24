@@ -118,8 +118,10 @@ export default async function AdminRatesPage({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t("serviceName")}</TableHead>
-                <TableHead>{t("serviceDescription")}</TableHead>
+                <TableHead>{t("serviceNameId")}</TableHead>
+                <TableHead>{t("serviceNameKo")}</TableHead>
+                <TableHead>{t("serviceDescriptionId")}</TableHead>
+                <TableHead>{t("serviceDescriptionKo")}</TableHead>
                 <TableHead className="text-right">{t("serviceMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("serviceMonthlyCost")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
@@ -129,8 +131,10 @@ export default async function AdminRatesPage({
             <TableBody>
               {serviceItems.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.description ?? "-"}</TableCell>
+                  <TableCell>{item.name_id}</TableCell>
+                  <TableCell>{item.name_ko}</TableCell>
+                  <TableCell>{item.description_id ?? "-"}</TableCell>
+                  <TableCell>{item.description_ko ?? "-"}</TableCell>
                   <TableCell className="text-right">
                     {item.monthly_rate != null ? formatRupiah(item.monthly_rate, locale as Locale) : "-"}
                   </TableCell>
@@ -145,13 +149,13 @@ export default async function AdminRatesPage({
                   <TableCell className="flex gap-2">
                     <ServiceDialog item={item} />
                     <ToggleServiceActiveButton id={item.id} active={item.is_active} />
-                    <DeleteServiceButton id={item.id} name={item.name} />
+                    <DeleteServiceButton id={item.id} name={item.name_id} />
                   </TableCell>
                 </TableRow>
               ))}
               {serviceItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground">
                     {t("noService")}
                   </TableCell>
                 </TableRow>

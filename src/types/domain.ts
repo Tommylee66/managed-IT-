@@ -233,8 +233,10 @@ export interface EquipmentSelection {
 
 export interface ServiceCatalogItem {
   id: string;
-  name: string;
-  description: string | null;
+  name_id: string;
+  name_ko: string;
+  description_id: string | null;
+  description_ko: string | null;
   /** Monthly rate charged to the customer. Null = not yet priced. */
   monthly_rate: number | null;
   /** Internal monthly cost, master-only — null if not tracked. */
@@ -249,8 +251,10 @@ export interface ServiceCatalogItem {
  * request itself — see supabase/migrations/20260713000001_service_catalog.sql. */
 export interface ServiceSelection {
   catalogId: string;
-  name: string;
-  description: string | null;
+  nameId: string;
+  nameKo: string;
+  descriptionId: string | null;
+  descriptionKo: string | null;
   qty: number;
   /** Rate/cost snapshotted at selection time — see ServiceCatalogItem. */
   monthlyRate: number | null;
@@ -264,6 +268,11 @@ export interface QuoteRowRecord {
    * Optional so older stored rows without it still fall back to `label` (Korean). */
   labelKey?: string;
   params?: Record<string, string | number>;
+  /** Inline bilingual override for rows sourced from free-text catalog data
+   * (e.g. a service catalog item's name) rather than a fixed QUOTE_ROW_LABELS
+   * entry — takes precedence over labelKey when present. */
+  labelId?: string;
+  labelKo?: string;
   amount: number;
   cost: number;
   init: number;

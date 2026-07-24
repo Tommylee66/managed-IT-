@@ -22,7 +22,8 @@
     "print": "Lihat versi cetak",
     "ownerBctShort": "BCT",
     "ownerCustomerShort": "Pelanggan",
-    "appSubtitle": "Registrasi Pelanggan · Penawaran/Kontrak · Aktivasi · Aset · Penagihan"
+    "appSubtitle": "Registrasi Pelanggan · Penawaran/Kontrak · Aktivasi · Aset · Penagihan",
+    "perMonth": "bulan"
   },
   "nav": {
     "dashboard": "Dasbor",
@@ -697,9 +698,11 @@
     "newService": "Tambah Layanan",
     "serviceCreateDialogTitle": "Daftarkan Layanan",
     "serviceEditDialogTitle": "Edit Layanan",
-    "serviceName": "Nama Layanan",
+    "serviceNameId": "Nama Layanan (Indonesia)",
+    "serviceNameKo": "Nama Layanan (Korea)",
     "serviceNameRequired": "Nama layanan wajib diisi",
-    "serviceDescription": "Deskripsi",
+    "serviceDescriptionId": "Deskripsi (Indonesia)",
+    "serviceDescriptionKo": "Deskripsi (Korea)",
     "serviceMonthlyRate": "Tarif Bulanan (Pelanggan)",
     "serviceMonthlyCost": "Biaya Internal Bulanan",
     "serviceRateHint": "Tarif bulanan adalah jumlah yang ditagihkan ke pelanggan; biaya internal hanya digunakan untuk perhitungan margin dan tidak ditampilkan ke staf.",

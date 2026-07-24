@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { formatRupiah } from "@/lib/utils/currency";
@@ -24,6 +25,8 @@ export function ServiceSelector({
   onChange: (next: Record<string, ServiceSelectionState>) => void;
   locale: Locale;
 }) {
+  const t = useTranslations("common");
+
   function toggle(id: string, checked: boolean) {
     const next = { ...value };
     if (checked) next[id] = next[id] ?? { qty: 1 };
@@ -43,10 +46,18 @@ export function ServiceSelector({
           <div key={item.id} className="flex items-center gap-3">
             <Checkbox checked={checked} onCheckedChange={(v) => toggle(item.id, v === true)} />
             <span className="flex-1 text-sm">
-              {item.name}
-              {item.description && <span className="text-muted-foreground"> — {item.description}</span>}
+              {locale === "ko" ? item.name_ko : item.name_id}
+              {(locale === "ko" ? item.description_ko : item.description_id) && (
+                <span className="text-muted-foreground">
+                  {" "}
+                  — {locale === "ko" ? item.description_ko : item.description_id}
+                </span>
+              )}
               {item.monthly_rate != null && (
-                <span className="text-muted-foreground"> ({formatRupiah(item.monthly_rate, locale)}/월)</span>
+                <span className="text-muted-foreground">
+                  {" "}
+                  ({formatRupiah(item.monthly_rate, locale)}/{t("perMonth")})
+                </span>
               )}
             </span>
             <Input
