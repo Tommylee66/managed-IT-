@@ -71,6 +71,7 @@ interface FormValues {
   cctv: number;
   locationIndex: number;
   discount: number;
+  discountPercent: number;
   memo: string;
 }
 
@@ -99,6 +100,11 @@ export function QuoteCalculatorForm({
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
+  const [discountMode, setDiscountMode] = useState<"amount" | "percent">("amount");
+  // The stored quote input is always a plain amount — percent mode resolves
+  // to one before every calculate/save (see recalculate()), and this holds
+  // the last-resolved value so onSave doesn't need to redo the round trip.
+  const [resolvedDiscount, setResolvedDiscount] = useState(initialValues?.inputs.discount ?? 0);
   const [equipmentQty, setEquipmentQty] = useState<Record<string, EquipmentSelectionState>>(() => {
     const initial: Record<string, EquipmentSelectionState> = {};
     initialValues?.equipment_selections.forEach((s) => {
@@ -125,11 +131,12 @@ export function QuoteCalculatorForm({
       cctv: initialValues?.inputs.cctv ?? 4,
       locationIndex: initialValues?.inputs.locationIndex ?? 0,
       discount: initialValues?.inputs.discount ?? 0,
+      discountPercent: 0,
       memo: initialValues?.inputs.memo ?? "",
     },
   });
 
-  function toInputs(v: FormValues): QuoteInputs {
+  function toInputs(v: FormValues, discountOverride?: number): QuoteInputs {
     return {
       emp: Number(v.emp),
       // AP/Hub no longer price as generic per-unit add-ons (equipment
@@ -149,7 +156,7 @@ export function QuoteCalculatorForm({
       vpnBranches: 0,
       security: "none",
       priority: "no",
-      discount: Number(v.discount),
+      discount: discountOverride ?? Number(v.discount),
       memo: v.memo,
     };
   }
@@ -158,8 +165,23 @@ export function QuoteCalculatorForm({
     const v = getValues();
     startCalculating(async () => {
       try {
+        let discountAmount = Number(v.discount);
+        if (discountMode === "percent") {
+          // Resolve the percentage against the pre-discount subtotal first
+          // (a plain calc with discount forced to 0), then use that amount
+          // for the real preview below — the stored/submitted value is
+          // always a plain amount either way.
+          const baseline = await calculateQuotePreviewAction(
+            toInputs(v, 0),
+            Number(v.months),
+            equipmentQtyToRequest(equipmentQty),
+            serviceQtyToRequest(serviceQty)
+          );
+          discountAmount = Math.round((baseline.monthly * Number(v.discountPercent || 0)) / 100);
+        }
+        setResolvedDiscount(discountAmount);
         const result = await calculateQuotePreviewAction(
-          toInputs(v),
+          toInputs(v, discountAmount),
           Number(v.months),
           equipmentQtyToRequest(equipmentQty),
           serviceQtyToRequest(serviceQty)
@@ -192,7 +214,7 @@ export function QuoteCalculatorForm({
           start_date: v.start_date,
           billing_date: v.billing_date,
           months: Number(v.months),
-          inputs: toInputs(v),
+          inputs: toInputs(v, resolvedDiscount),
           equipment_selections: equipmentQtyToRequest(equipmentQty),
           service_selections: serviceQtyToRequest(serviceQty),
         });
@@ -205,7 +227,7 @@ export function QuoteCalculatorForm({
           start_date: v.start_date,
           billing_date: v.billing_date,
           months: Number(v.months),
-          inputs: toInputs(v),
+          inputs: toInputs(v, resolvedDiscount),
           equipment_selections: equipmentQtyToRequest(equipmentQty),
           service_selections: serviceQtyToRequest(serviceQty),
         });
@@ -301,21 +323,44 @@ export function QuoteCalculatorForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="discount">{t("discount")}</Label>
-              <Controller
-                control={control}
-                name="discount"
-                render={({ field }) => (
-                  <CurrencyInput
-                    id="discount"
-                    locale={locale as Locale}
-                    value={String(field.value ?? "")}
-                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
-                    onBlur={field.onBlur}
+            <div className="flex flex-col gap-2 col-span-2">
+              <Label>{t("discount")}</Label>
+              <div className="flex gap-2">
+                <Select value={discountMode} onValueChange={(v) => setDiscountMode(v as "amount" | "percent")}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="amount">{t("discountModeAmount")}</SelectItem>
+                    <SelectItem value="percent">{t("discountModePercent")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                {discountMode === "amount" ? (
+                  <Controller
+                    control={control}
+                    name="discount"
+                    render={({ field }) => (
+                      <CurrencyInput
+                        id="discount"
+                        locale={locale as Locale}
+                        value={String(field.value ?? "")}
+                        onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                        onBlur={field.onBlur}
+                      />
+                    )}
+                  />
+                ) : (
+                  <Input
+                    id="discountPercent"
+                    type="number"
+                    step="0.1"
+                    min={0}
+                    max={100}
+                    placeholder="%"
+                    {...register("discountPercent", { valueAsNumber: true })}
                   />
                 )}
-              />
+              </div>
             </div>
           </div>
 

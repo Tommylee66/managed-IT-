@@ -30,6 +30,8 @@ export default async function QuotePrintPage({
       quote={quote}
       customerName={customer?.name ?? quote.customer_code}
       agentName={agent?.name ?? "-"}
+      agentPhone={agent?.phone}
+      agentEmail={agent?.email}
       ppnRate={rates.ppn}
     />
   );

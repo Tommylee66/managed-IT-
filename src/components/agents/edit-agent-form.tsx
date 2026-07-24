@@ -15,6 +15,7 @@ import type { Agent } from "@/types/domain";
 
 const schema = z.object({
   phone: z.string().optional(),
+  email: z.string().optional(),
   bankName: z.string().optional(),
   accountNumber: z.string().optional(),
   holderName: z.string().optional(),
@@ -40,6 +41,7 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
     resolver: zodResolver(schema),
     defaultValues: {
       phone: agent.phone ?? "",
+      email: agent.email ?? "",
       bankName: agent.bank?.bankName ?? "",
       accountNumber: agent.bank?.accountNumber ?? "",
       holderName: agent.bank?.holderName ?? "",
@@ -54,6 +56,7 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
     try {
       await updateAgentInfoAction(agent.code, {
         phone: values.phone,
+        email: values.email,
         bank: {
           bankName: values.bankName,
           accountNumber: values.accountNumber,
@@ -81,6 +84,10 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
             <div className="flex flex-col gap-2">
               <Label htmlFor="phone">{t("phone")}</Label>
               <Input id="phone" {...register("phone")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="email">{t("email")}</Label>
+              <Input id="email" type="email" {...register("email")} />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="bankName">{t("bankName")}</Label>

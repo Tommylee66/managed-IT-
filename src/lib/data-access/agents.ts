@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Agent, AgentBank, AgentRateHistoryEntry } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
-import { maskBankAccount, maskPhoneNumber, maskTaxId } from '@/lib/masking/staff-masking';
+import { maskBankAccount, maskPhoneNumber, maskEmail, maskTaxId } from '@/lib/masking/staff-masking';
 import { nextAgentCode } from '@/lib/numbering';
 
 function applyAgentMasking(agent: Agent, role: StaffRole): Agent {
@@ -9,6 +9,7 @@ function applyAgentMasking(agent: Agent, role: StaffRole): Agent {
   return {
     ...agent,
     phone: maskPhoneNumber(agent.phone),
+    email: maskEmail(agent.email),
     bank: maskBankAccount(agent.bank) as AgentBank | null,
     npwp: agent.npwp ? maskTaxId(agent.npwp) : agent.npwp,
     ktp: agent.ktp ? maskTaxId(agent.ktp) : agent.ktp,
@@ -37,6 +38,7 @@ export interface CreateAgentInput {
   rate: number;
   first_date?: string;
   phone?: string;
+  email?: string;
   bank?: AgentBank;
   npwp?: string;
   ktp?: string;
@@ -90,6 +92,7 @@ export async function changeAgentRate(
 
 export interface UpdateAgentInfoInput {
   phone?: string;
+  email?: string;
   bank?: AgentBank;
   npwp?: string;
   ktp?: string;

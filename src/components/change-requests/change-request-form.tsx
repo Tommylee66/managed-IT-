@@ -52,6 +52,7 @@ interface FormValues {
   cctv: number;
   locationIndex: number;
   discount: number;
+  discountPercent: number;
   memo: string;
 }
 
@@ -76,6 +77,8 @@ export function ChangeRequestForm({
   const [preview, setPreview] = useState<QuotePreview | null>(null);
   const [isCalculating, startCalculating] = useTransition();
   const [isSaving, setIsSaving] = useState(false);
+  const [discountMode, setDiscountMode] = useState<"amount" | "percent">("amount");
+  const [resolvedDiscount, setResolvedDiscount] = useState(currentInputs?.discount ?? 0);
   const [equipmentQty, setEquipmentQty] = useState<Record<string, EquipmentSelectionState>>(() => {
     const initial: Record<string, EquipmentSelectionState> = {};
     (contract.quote_snapshot?.equipment_selections ?? []).forEach((s) => {
@@ -99,11 +102,12 @@ export function ChangeRequestForm({
       cctv: currentInputs?.cctv ?? 4,
       locationIndex: currentInputs?.locationIndex ?? 0,
       discount: currentInputs?.discount ?? 0,
+      discountPercent: 0,
       memo: "",
     },
   });
 
-  function toInputs(v: FormValues): QuoteInputs {
+  function toInputs(v: FormValues, discountOverride?: number): QuoteInputs {
     return {
       emp: Number(v.emp),
       // See quote-calculator-form.tsx — AP/Hub price only via equipment
@@ -119,7 +123,7 @@ export function ChangeRequestForm({
       vpnBranches: 0,
       security: "none",
       priority: "no",
-      discount: Number(v.discount),
+      discount: discountOverride ?? Number(v.discount),
       memo: v.memo,
     };
   }
@@ -128,8 +132,19 @@ export function ChangeRequestForm({
     const v = getValues();
     startCalculating(async () => {
       try {
+        let discountAmount = Number(v.discount);
+        if (discountMode === "percent") {
+          const baseline = await calculateQuotePreviewAction(
+            toInputs(v, 0),
+            contract.months,
+            equipmentQtyToRequest(equipmentQty),
+            serviceQtyToRequest(serviceQty)
+          );
+          discountAmount = Math.round((baseline.monthly * Number(v.discountPercent || 0)) / 100);
+        }
+        setResolvedDiscount(discountAmount);
         const result = await calculateQuotePreviewAction(
-          toInputs(v),
+          toInputs(v, discountAmount),
           contract.months,
           equipmentQtyToRequest(equipmentQty),
           serviceQtyToRequest(serviceQty)
@@ -147,7 +162,7 @@ export function ChangeRequestForm({
       await createChangeRequestAction(contract.no, {
         type: v.type,
         effective_date: v.effective_date,
-        new_inputs: toInputs(v),
+        new_inputs: toInputs(v, resolvedDiscount),
         new_equipment_selections: equipmentQtyToRequest(equipmentQty),
         new_service_selections: serviceQtyToRequest(serviceQty),
         memo: v.memo,
@@ -218,21 +233,44 @@ export function ChangeRequestForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="discount">{tCalc("discount")}</Label>
-              <Controller
-                control={control}
-                name="discount"
-                render={({ field }) => (
-                  <CurrencyInput
-                    id="discount"
-                    locale={locale as Locale}
-                    value={String(field.value ?? "")}
-                    onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
-                    onBlur={field.onBlur}
+            <div className="flex flex-col gap-2 col-span-2">
+              <Label>{tCalc("discount")}</Label>
+              <div className="flex gap-2">
+                <Select value={discountMode} onValueChange={(v) => setDiscountMode(v as "amount" | "percent")}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="amount">{tCalc("discountModeAmount")}</SelectItem>
+                    <SelectItem value="percent">{tCalc("discountModePercent")}</SelectItem>
+                  </SelectContent>
+                </Select>
+                {discountMode === "amount" ? (
+                  <Controller
+                    control={control}
+                    name="discount"
+                    render={({ field }) => (
+                      <CurrencyInput
+                        id="discount"
+                        locale={locale as Locale}
+                        value={String(field.value ?? "")}
+                        onChange={(digits) => field.onChange(digits ? Number(digits) : 0)}
+                        onBlur={field.onBlur}
+                      />
+                    )}
+                  />
+                ) : (
+                  <Input
+                    id="discountPercent"
+                    type="number"
+                    step="0.1"
+                    min={0}
+                    max={100}
+                    placeholder="%"
+                    {...register("discountPercent", { valueAsNumber: true })}
                   />
                 )}
-              />
+              </div>
             </div>
           </div>
           <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">

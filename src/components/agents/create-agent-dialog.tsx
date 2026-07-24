@@ -28,6 +28,7 @@ export function CreateAgentDialog() {
     name: z.string().min(1, t("nameRequired")),
     rate: z.number().min(0).max(100),
     phone: z.string().optional(),
+    email: z.string().optional(),
     bankName: z.string().optional(),
     accountNumber: z.string().optional(),
     holderName: z.string().optional(),
@@ -51,6 +52,7 @@ export function CreateAgentDialog() {
         name: values.name,
         rate: values.rate,
         phone: values.phone,
+        email: values.email,
         npwp: values.npwp,
         ktp: values.ktp,
         address: values.address,
@@ -90,9 +92,15 @@ export function CreateAgentDialog() {
             <Input id="rate" type="number" step="0.1" {...register("rate", { valueAsNumber: true })} />
             {errors.rate && <p className="text-sm text-destructive">{errors.rate.message}</p>}
           </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="phone">{t("phone")}</Label>
-            <Input id="phone" {...register("phone")} />
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="phone">{t("phone")}</Label>
+              <Input id="phone" {...register("phone")} />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="email">{t("email")}</Label>
+              <Input id="email" type="email" {...register("email")} />
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div className="flex flex-col gap-2">

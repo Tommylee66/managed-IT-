@@ -10,11 +10,15 @@ export function QuoteDocument({
   quote,
   customerName,
   agentName,
+  agentPhone,
+  agentEmail,
   ppnRate,
 }: {
   quote: Quote;
   customerName: string;
   agentName: string;
+  agentPhone?: string | null;
+  agentEmail?: string | null;
   ppnRate: number;
 }) {
   const ppn = Math.round((quote.monthly * ppnRate) / 100);
@@ -34,7 +38,17 @@ export function QuoteDocument({
             <b>PT. Bumi Cerdas Teknology</b>
           </p>
           <p>Customer: {customerName}</p>
-          <p>Sales: {agentName}</p>
+          <p>
+            Sales: {agentName}
+            {agentPhone && ` · ${agentPhone}`}
+            {agentEmail && ` · ${agentEmail}`}
+          </p>
+          <p>
+            <Bilingual
+              id={`Masa Kontrak: ${quote.months} bulan (${quote.start_date} s/d penagihan ${quote.billing_date})`}
+              ko={`계약기간: ${quote.months}개월 (${quote.start_date} ~ 과금 ${quote.billing_date})`}
+            />
+          </p>
         </div>
       }
     >

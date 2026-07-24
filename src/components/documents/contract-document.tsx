@@ -9,11 +9,15 @@ export function ContractDocument({
   contract,
   customerName,
   agentName,
+  agentPhone,
+  agentEmail,
   ppnRate,
 }: {
   contract: Contract;
   customerName: string;
   agentName: string;
+  agentPhone?: string | null;
+  agentEmail?: string | null;
   ppnRate: number;
 }) {
   const sections = contractClauses(contract);
@@ -36,6 +40,8 @@ export function ContractDocument({
           </p>
           <p>
             <b>Sales:</b> {agentName}
+            {agentPhone && ` · ${agentPhone}`}
+            {agentEmail && ` · ${agentEmail}`}
           </p>
         </div>
       }

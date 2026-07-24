@@ -332,6 +332,8 @@
     "priorityNo": "No",
     "priorityYes": "Yes",
     "discount": "Discount/Adjustment (Rp)",
+    "discountModeAmount": "Amount",
+    "discountModePercent": "Percent(%)",
     "memo": "Notes",
     "calculating": "Calculating...",
     "calculate": "Calculate",

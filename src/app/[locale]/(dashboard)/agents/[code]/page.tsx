@@ -53,6 +53,10 @@ export default async function AgentDetailPage({
             <p>{agent.phone || "-"}</p>
           </div>
           <div>
+            <p className="text-xs text-muted-foreground">{t("email")}</p>
+            <p>{agent.email || "-"}</p>
+          </div>
+          <div>
             <p className="text-xs text-muted-foreground">{t("bankAccount")}</p>
             <p>
               {agent.bank?.bankName

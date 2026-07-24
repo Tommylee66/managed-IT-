@@ -332,6 +332,8 @@
     "priorityNo": "아니오",
     "priorityYes": "예",
     "discount": "할인/조정액 (Rp)",
+    "discountModeAmount": "금액",
+    "discountModePercent": "비율(%)",
     "memo": "메모",
     "calculating": "계산 중...",
     "calculate": "계산하기",

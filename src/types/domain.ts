@@ -69,6 +69,7 @@ export interface Agent {
   first_date: string | null;
   change_date: string | null;
   phone: string | null;
+  email: string | null;
   bank: AgentBank | null;
   /** Tax ID (Nomor Pokok Wajib Pajak) — needed to withhold and remit PPh on
    * commission payouts. Null for agents not yet registered for tax. */

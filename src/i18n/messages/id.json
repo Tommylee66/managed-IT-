@@ -332,6 +332,8 @@
     "priorityNo": "Tidak",
     "priorityYes": "Ya",
     "discount": "Diskon/Penyesuaian (Rp)",
+    "discountModeAmount": "Jumlah",
+    "discountModePercent": "Persentase(%)",
     "memo": "Catatan",
     "calculating": "Menghitung...",
     "calculate": "Hitung",

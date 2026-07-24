@@ -152,3 +152,12 @@
     background: linear-gradient(135deg, #eef5fb, #f8fbff 40%, #f4f6fa);
   }
 }
+
+/* Printed documents (quote/contract/invoice/termination) rely on the
+ * browser's own page margin for whitespace — most browsers default that to
+ * "None" for app-triggered prints, which puts content flush against the
+ * paper edge. This forces a consistent margin regardless of the browser's
+ * print dialog setting. */
+@page {
+  margin: 18mm 15mm;
+}
