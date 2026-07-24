@@ -9,12 +9,16 @@ export function ContractDocument({
   contract,
   customerName,
   agentName,
+  ppnRate,
 }: {
   contract: Contract;
   customerName: string;
   agentName: string;
+  ppnRate: number;
 }) {
   const sections = contractClauses(contract);
+  const ppn = Math.round((contract.monthly_fee * ppnRate) / 100);
+  const total = contract.monthly_fee + ppn;
 
   return (
     <DocumentShell
@@ -40,9 +44,19 @@ export function ContractDocument({
         <TableBody>
           <TableRow>
             <TableCell className="font-medium">
-              <Bilingual id="Biaya Layanan Bulanan" ko="월 서비스 요금" />
+              <Bilingual id="Biaya Layanan Bulanan (sebelum PPN)" ko="월 서비스 요금 (PPN 별도)" />
             </TableCell>
-            <TableCell>{formatRupiah(contract.monthly_fee, "id")} + PPN</TableCell>
+            <TableCell>{formatRupiah(contract.monthly_fee, "id")}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell className="font-medium">PPN {ppnRate}%</TableCell>
+            <TableCell>{formatRupiah(ppn, "id")}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell className="font-semibold">
+              <Bilingual id="Total Biaya Bulanan" ko="월 청구액 합계" />
+            </TableCell>
+            <TableCell className="font-semibold">{formatRupiah(total, "id")}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell className="font-medium">

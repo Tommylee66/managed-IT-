@@ -5,6 +5,7 @@ import { getSessionContext } from '@/lib/auth/session';
 import { listIncidentLogsByCustomerAndMonth } from '@/lib/data-access/incident-logs';
 import { getCustomer } from '@/lib/data-access/customers';
 import { generateReportDraft } from '@/lib/ai/report-draft';
+import { buildReportEmailHtml } from '@/lib/email/report-email-template';
 import type { IncidentLog } from '@/types/domain';
 
 function monthLabel(monthKey: string): string {
@@ -69,6 +70,7 @@ export async function sendReportEmailAction(
     throw new Error('RESEND_API_KEY가 설정되지 않았습니다. 관리자에게 이메일 발송 기능 설정을 요청해주세요.');
   }
   const fromAddress = process.env.REPORT_EMAIL_FROM || 'onboarding@resend.dev';
+  const html = buildReportEmailHtml({ customerName: customer.name, monthLabel: monthLabel(monthKey), bodyText: body });
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -81,6 +83,7 @@ export async function sendReportEmailAction(
       to: [to],
       subject,
       text: body,
+      html,
     }),
   });
   if (!res.ok) {
