@@ -14,5 +14,6 @@ export const EQUIPMENT_CATEGORY_LABEL: Record<AssetType, { id: string; ko: strin
   starlink: { id: 'Starlink', ko: 'Starlink' },
   pc_server: { id: 'PC/Server', ko: 'PC/서버' },
   printer: { id: 'Printer', ko: '프린터' },
+  ip_pbx: { id: 'IP PBX', ko: 'IP PBX' },
   other: { id: 'Lainnya', ko: '기타' },
 };

@@ -119,6 +119,7 @@ const TYPE_LABEL: Record<Asset['type'], string> = {
   starlink: 'Starlink',
   pc_server: 'PC/Server',
   printer: 'Printer',
+  ip_pbx: 'IP PBX',
   other: 'Other',
 };
 

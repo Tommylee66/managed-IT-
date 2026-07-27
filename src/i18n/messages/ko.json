@@ -780,6 +780,7 @@
     "starlink": "Starlink",
     "pc_server": "PC/서버",
     "printer": "프린터",
+    "ip_pbx": "IP PBX",
     "other": "기타"
   },
   "incidentLogs": {

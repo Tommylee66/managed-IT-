@@ -43,6 +43,7 @@ const CATEGORIES: AssetType[] = [
   "starlink",
   "pc_server",
   "printer",
+  "ip_pbx",
   "other",
 ];
 

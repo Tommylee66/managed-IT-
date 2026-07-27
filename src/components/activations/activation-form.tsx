@@ -30,6 +30,7 @@ const TYPE_OPTIONS: { value: AssetType; label: string }[] = [
   { value: "starlink", label: "Starlink" },
   { value: "pc_server", label: "PC/Server" },
   { value: "printer", label: "Printer" },
+  { value: "ip_pbx", label: "IP PBX" },
   { value: "other", label: "Other" },
 ];
 

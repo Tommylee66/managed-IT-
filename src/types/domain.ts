@@ -27,6 +27,7 @@ export type AssetType =
   | 'starlink'
   | 'pc_server'
   | 'printer'
+  | 'ip_pbx'
   | 'other';
 export type AssetOwner = 'bct' | 'customer';
 export type AssetCondition =
