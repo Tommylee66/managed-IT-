@@ -8,7 +8,7 @@ const EQUIPMENT_ROW_PREFIX = 'equipment';
 // Equipment left with the customer after the contract's own term ends (no
 // new contract signed yet) bills at a reduced month-to-month rate instead
 // of an abrupt cutoff or full-price continuation.
-const POST_TERM_EQUIPMENT_RATE = 0.2;
+const POST_TERM_EQUIPMENT_RATE = 0.3;
 
 function getContractEndDate(contract: Contract): string {
   return (
@@ -73,7 +73,7 @@ export interface InvoiceLineItem {
 export function invoiceLineItems(contract: Contract, month: string): InvoiceLineItem[] {
   if (!isContractActiveInMonth(contract, month)) {
     return postTermEquipmentRows(contract).map((r) => ({
-      label: `${r.label} (계약만료 후 20%)`,
+      label: `${r.label} (계약만료 후 ${Math.round(POST_TERM_EQUIPMENT_RATE * 100)}%)`,
       amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
     }));
   }

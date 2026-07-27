@@ -208,8 +208,8 @@ export function QuoteDocument({
           {hasRentedEquipment && (
             <li>
               <Bilingual
-                id="Jika Pelanggan tetap menggunakan perangkat sewa yang disediakan BCT setelah masa kontrak berakhir tanpa perjanjian baru, biaya sewa bulanan perangkat tersebut ditagihkan sebesar 20% dari tarif sewa normal, sampai perangkat dikembalikan atau kontrak baru disepakati."
-                ko="계약기간이 종료된 이후에도 신규 계약 체결 없이 고객이 BCT 제공 임대 장비를 계속 사용하는 경우, 해당 장비의 월 임대료는 장비가 반환되거나 신규 계약이 체결될 때까지 정상 임대료의 20%로 청구됩니다."
+                id="Jika Pelanggan tetap menggunakan perangkat sewa yang disediakan BCT setelah masa kontrak berakhir tanpa perjanjian baru, biaya sewa bulanan perangkat tersebut ditagihkan sebesar 30% dari tarif sewa normal, sampai perangkat dikembalikan atau kontrak baru disepakati."
+                ko="계약기간이 종료된 이후에도 신규 계약 체결 없이 고객이 BCT 제공 임대 장비를 계속 사용하는 경우, 해당 장비의 월 임대료는 장비가 반환되거나 신규 계약이 체결될 때까지 정상 임대료의 30%로 청구됩니다."
               />
             </li>
           )}
