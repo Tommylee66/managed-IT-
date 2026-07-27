@@ -77,6 +77,11 @@ export const QUOTE_ROW_LABELS: Record<string, Record<Locale, string>> = {
     id: 'Diskon/penyesuaian',
     en: 'Discount/adjustment',
   },
+  discountLimited: {
+    ko: '할인/조정액 (최초 {months}개월 적용)',
+    id: 'Diskon/penyesuaian (berlaku {months} bulan pertama)',
+    en: 'Discount/adjustment (applies for the first {months} months)',
+  },
 };
 
 function interpolate(template: string, params?: Record<string, string | number>): string {

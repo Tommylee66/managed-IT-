@@ -105,6 +105,7 @@ export function ApplicationForm({
       security: "none",
       priority: "no",
       discount: Number(v.discount),
+      discountMonths: 0,
       memo: v.memo,
     };
   }

@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
+import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
 import { EQUIPMENT_CATEGORY_LABEL } from "@/lib/calc/equipment-category-labels";
@@ -52,6 +53,7 @@ export function QuoteDocument({
         </div>
       }
     >
+      <DocTable>
       <Table>
         <TableHeader>
           <TableRow>
@@ -95,6 +97,7 @@ export function QuoteDocument({
           </TableRow>
         </TableBody>
       </Table>
+      </DocTable>
 
       <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
         <Bilingual
@@ -108,6 +111,7 @@ export function QuoteDocument({
           <h3 className="mb-1 font-semibold">
             <Bilingual id="Spesifikasi Perangkat yang Disediakan" ko="제공 장비 사양" />
           </h3>
+          <DocTable>
           <Table>
             <TableHeader>
               <TableRow>
@@ -147,6 +151,7 @@ export function QuoteDocument({
               })}
             </TableBody>
           </Table>
+          </DocTable>
         </div>
       )}
 
@@ -196,10 +201,18 @@ export function QuoteDocument({
           </li>
           <li>
             <Bilingual
-              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, biaya penalti dihitung dari: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT, dihitung proporsional terhadap sisa bulan kontrak; (b) denda sebesar persentase tertentu dari nilai tersebut (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi. Rincian penuh tercantum dalam Perjanjian Kerja Sama."
-              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 패널티는 (a) BCT가 제공한 장비/설치비의 미상각 잔액을 계약 잔여기간에 비례하여 산정하고, (b) 해당 잔액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 벌금을 더하고, (c) 철거·회수비 및 행정비를 합산하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다."
+              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar persentase tertentu dari nilai pada (a) (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi; ditambah (d) tagihan yang belum lunas. Rincian penuh tercantum dalam Perjanjian Kerja Sama."
+              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 정산금액은 (a) BCT가 제공한 장비/설치비의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 위약금을 더하고, (c) 철거·회수비 및 행정비를 더하고, (d) 미납요금을 더하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다."
             />
           </li>
+          {hasRentedEquipment && (
+            <li>
+              <Bilingual
+                id="Jika Pelanggan tetap menggunakan perangkat sewa yang disediakan BCT setelah masa kontrak berakhir tanpa perjanjian baru, biaya sewa bulanan perangkat tersebut ditagihkan sebesar 20% dari tarif sewa normal, sampai perangkat dikembalikan atau kontrak baru disepakati."
+                ko="계약기간이 종료된 이후에도 신규 계약 체결 없이 고객이 BCT 제공 임대 장비를 계속 사용하는 경우, 해당 장비의 월 임대료는 장비가 반환되거나 신규 계약이 체결될 때까지 정상 임대료의 20%로 청구됩니다."
+              />
+            </li>
+          )}
           <li>
             <Bilingual
               id="Penggantian komponen, lisensi, consumable, pekerjaan pengkabelan skala besar, pemulihan data, dan penanganan insiden keamanan serius memerlukan penawaran terpisah."

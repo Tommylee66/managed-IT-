@@ -18,6 +18,9 @@ export interface ClauseSection {
 }
 
 export function contractClauses(contract: Contract): ClauseSection[] {
+  const hasRentedEquipment = (contract.quote_snapshot?.equipment_selections ?? []).some(
+    (e) => e.monthlyRate != null
+  );
   return [
     {
       heading: { id: '1. Tujuan Perjanjian dan Sifat Layanan', ko: '1. 계약 목적 및 서비스 성격' },
@@ -173,13 +176,21 @@ export function contractClauses(contract: Contract): ClauseSection[] {
           ko: `계약기간은 ${contract.months}개월이며, 서비스 시작일은 ${contract.start_date}, 계약종료일은 ${contract.end_date}이다.`,
         },
         {
-          id: 'Jika kontrak diakhiri lebih awal karena kesalahan atau kepentingan Pelanggan, Pelanggan wajib membayar biaya yang belum lunas, sisa nilai belum diamortisasi dari biaya perangkat/instalasi/setting yang disediakan BCT, denda sebesar 50% dari sisa nilai tersebut, serta biaya pembongkaran, penarikan, dan administrasi.',
-          ko: '고객의 귀책 또는 편의에 의한 조기해지 시 고객은 미납요금, BCT 제공 장비/설치/세팅 원가의 미상각 잔액, 해당 잔액의 50% 상당 패널티, 철거·회수·행정비를 지급한다.',
+          id: 'Jika kontrak diakhiri lebih awal karena kesalahan atau kepentingan Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi/setting yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar 50% dari nilai pada (a); ditambah (c) biaya pembongkaran, penarikan, dan administrasi; ditambah (d) biaya yang belum lunas. Rincian dan jumlah akhir ditetapkan pada saat proses pengakhiran kontrak.',
+          ko: '고객의 귀책 또는 편의에 의한 조기해지 시 정산금액은 다음과 같이 산정한다: (a) BCT 제공 장비/설치/세팅 원가의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 50%에 해당하는 위약금을 더하고; (c) 철거·회수·행정비를 더하고; (d) 미납요금을 더하여 산정한다. 세부 산정 및 최종금액은 해지 처리 시점에 확정된다.',
         },
         {
           id: 'Pada saat pengakhiran kontrak, BCT akan menarik kembali perangkat yang disediakan BCT, dan Pelanggan wajib memberikan akses lokasi yang diperlukan untuk proses penarikan tersebut.',
           ko: '해지 시 BCT는 BCT 제공 장비를 회수하고, 고객은 회수에 필요한 현장접근을 제공해야 한다.',
         },
+        ...(hasRentedEquipment
+          ? [
+              {
+                id: 'Jika Pelanggan tetap menggunakan perangkat sewa yang disediakan BCT setelah masa kontrak berakhir tanpa perjanjian baru, biaya sewa bulanan perangkat tersebut ditagihkan sebesar 20% dari tarif sewa normal, sampai perangkat dikembalikan atau kontrak baru disepakati.',
+                ko: '계약기간이 종료된 이후에도 신규 계약 체결 없이 고객이 BCT 제공 임대 장비를 계속 사용하는 경우, 해당 장비의 월 임대료는 장비가 반환되거나 신규 계약이 체결될 때까지 정상 임대료의 20%로 청구된다.',
+              },
+            ]
+          : []),
       ],
     },
     {

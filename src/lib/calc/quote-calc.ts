@@ -101,7 +101,23 @@ export function calcQuoteForInputs(
   }
 
   const discount = Number(inputs.discount || 0);
-  if (discount) add('discount', '할인/조정액', -Math.abs(discount), 0, 0, true, 'discount');
+  const discountMonths = Number(inputs.discountMonths || 0);
+  if (discount) {
+    if (discountMonths > 0) {
+      add(
+        'discount',
+        `할인/조정액 (최초 ${discountMonths}개월 적용)`,
+        -Math.abs(discount),
+        0,
+        0,
+        true,
+        'discountLimited',
+        { months: discountMonths }
+      );
+    } else {
+      add('discount', '할인/조정액', -Math.abs(discount), 0, 0, true, 'discount');
+    }
+  }
 
   const monthly = rows.reduce((s, x) => s + x.amount, 0);
   const monthlyCost = rows.reduce((s, x) => s + x.cost, 0);

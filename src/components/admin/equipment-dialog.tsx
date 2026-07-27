@@ -48,12 +48,20 @@ const CATEGORIES: AssetType[] = [
 
 // Purchase price is a one-time cost; suggesting a monthly figure amortizes
 // it over a fixed period rather than the contract term (which varies per
-// customer) — 24 months is a plain, easy-to-explain default. Master can
-// always type over the suggestion before saving.
-const SUGGESTION_MONTHS = 24;
+// customer). Printers turn over/wear out faster than networking gear, so
+// they amortize over a shorter period. Master can always type over the
+// suggestion before saving.
+const SUGGESTION_MONTHS_DEFAULT = 18;
+const SUGGESTION_MONTHS_BY_CATEGORY: Partial<Record<AssetType, number>> = {
+  printer: 13,
+};
+// Internal cost is suggested as half the customer-facing rate — a plain
+// default margin, not derived from anything else. Master can override it.
+const SUGGESTION_COST_RATIO = 0.5;
 
-function suggestMonthly(purchasePrice: number): number {
-  return Math.round(purchasePrice / SUGGESTION_MONTHS / 1000) * 1000;
+function suggestMonthly(purchasePrice: number, category: AssetType): number {
+  const months = SUGGESTION_MONTHS_BY_CATEGORY[category] ?? SUGGESTION_MONTHS_DEFAULT;
+  return Math.round(purchasePrice / months / 1000) * 1000;
 }
 
 export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
@@ -85,6 +93,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     control,
     handleSubmit,
     setValue,
+    getValues,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
@@ -102,13 +111,23 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     },
   });
 
+  function applySuggestion(price: number, category: AssetType) {
+    if (!price) return;
+    const suggested = suggestMonthly(price, category);
+    if (!rateTouched) setValue("monthly_rate", String(suggested));
+    if (!costTouched) {
+      setValue("monthly_cost", String(Math.round((suggested * SUGGESTION_COST_RATIO) / 1000) * 1000));
+    }
+  }
+
   function onPurchasePriceChange(value: string) {
     setValue("purchase_price", value);
-    const price = Number(value);
-    if (!price) return;
-    const suggested = suggestMonthly(price);
-    if (!rateTouched) setValue("monthly_rate", String(suggested));
-    if (!costTouched) setValue("monthly_cost", String(suggested));
+    applySuggestion(Number(value), getValues("category"));
+  }
+
+  function onCategoryChange(category: AssetType) {
+    setValue("category", category);
+    applySuggestion(Number(getValues("purchase_price")), category);
   }
 
   async function onSubmit(values: FormValues) {
@@ -159,7 +178,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
             <Label>{t("equipmentCategory")}</Label>
             <Select
               defaultValue={item?.category ?? "ap"}
-              onValueChange={(v) => setValue("category", v as AssetType)}
+              onValueChange={(v) => onCategoryChange(v as AssetType)}
             >
               <SelectTrigger>
                 <SelectValue />

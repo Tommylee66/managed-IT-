@@ -335,6 +335,7 @@
     "discount": "할인/조정액 (Rp)",
     "discountModeAmount": "금액",
     "discountModePercent": "비율(%)",
+    "discountMonths": "적용기간(개월, 0=무제한)",
     "memo": "메모",
     "calculating": "계산 중...",
     "calculate": "계산하기",

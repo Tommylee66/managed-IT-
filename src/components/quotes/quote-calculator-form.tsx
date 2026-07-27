@@ -72,6 +72,7 @@ interface FormValues {
   locationIndex: number;
   discount: number;
   discountPercent: number;
+  discountMonths: number;
   memo: string;
 }
 
@@ -132,6 +133,7 @@ export function QuoteCalculatorForm({
       locationIndex: initialValues?.inputs.locationIndex ?? 0,
       discount: initialValues?.inputs.discount ?? 0,
       discountPercent: 0,
+      discountMonths: initialValues?.inputs.discountMonths ?? 0,
       memo: initialValues?.inputs.memo ?? "",
     },
   });
@@ -157,6 +159,7 @@ export function QuoteCalculatorForm({
       security: "none",
       priority: "no",
       discount: discountOverride ?? Number(v.discount),
+      discountMonths: Number(v.discountMonths || 0),
       memo: v.memo,
     };
   }
@@ -360,6 +363,19 @@ export function QuoteCalculatorForm({
                     {...register("discountPercent", { valueAsNumber: true })}
                   />
                 )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="discountMonths" className="text-xs text-muted-foreground shrink-0">
+                  {t("discountMonths")}
+                </Label>
+                <Input
+                  id="discountMonths"
+                  type="number"
+                  min={0}
+                  step="1"
+                  className="w-24"
+                  {...register("discountMonths", { valueAsNumber: true })}
+                />
               </div>
             </div>
           </div>

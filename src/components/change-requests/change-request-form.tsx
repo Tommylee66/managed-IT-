@@ -53,6 +53,7 @@ interface FormValues {
   locationIndex: number;
   discount: number;
   discountPercent: number;
+  discountMonths: number;
   memo: string;
 }
 
@@ -103,6 +104,7 @@ export function ChangeRequestForm({
       locationIndex: currentInputs?.locationIndex ?? 0,
       discount: currentInputs?.discount ?? 0,
       discountPercent: 0,
+      discountMonths: currentInputs?.discountMonths ?? 0,
       memo: "",
     },
   });
@@ -124,6 +126,7 @@ export function ChangeRequestForm({
       security: "none",
       priority: "no",
       discount: discountOverride ?? Number(v.discount),
+      discountMonths: Number(v.discountMonths || 0),
       memo: v.memo,
     };
   }
@@ -270,6 +273,19 @@ export function ChangeRequestForm({
                     {...register("discountPercent", { valueAsNumber: true })}
                   />
                 )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="discountMonths" className="text-xs text-muted-foreground shrink-0">
+                  {tCalc("discountMonths")}
+                </Label>
+                <Input
+                  id="discountMonths"
+                  type="number"
+                  min={0}
+                  step="1"
+                  className="w-24"
+                  {...register("discountMonths", { valueAsNumber: true })}
+                />
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import type { Invoice, Contract, Customer } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { maskEmail } from '@/lib/masking/staff-masking';
 import { nextInvoiceNo } from '@/lib/numbering';
-import { isContractActiveInMonth, invoiceLineItems, invoiceTotals } from '@/lib/calc/invoice-calc';
+import { isContractBillableInMonth, invoiceLineItems, invoiceTotals } from '@/lib/calc/invoice-calc';
 import { listContracts } from '@/lib/data-access/contracts';
 
 function applyInvoiceMasking(invoice: Invoice, role: StaffRole): Invoice {
@@ -60,17 +60,18 @@ export interface BillableRow {
 
 /** Ported 1:1 from the source app's renderInvoiceList()/billableContracts():
  * a contract is billable for `month` when not terminated and the month
- * falls within its billing window. Always computed against unmasked
- * customer/contract data — the caller decides what to mask for display. */
+ * falls within its billing window — extended to also include contracts past
+ * their own term that still have rented equipment worth billing at the
+ * reduced post-term rate (see isContractBillableInMonth). Always computed
+ * against unmasked customer/contract data — the caller decides what to mask
+ * for display. */
 export async function listBillableContracts(
   supabase: SupabaseClient,
   month: string,
   ppnRate: number
 ): Promise<BillableRow[]> {
   const contracts = await listContracts(supabase, 'master');
-  const billable = contracts.filter(
-    (c) => c.status !== 'terminated' && isContractActiveInMonth(c, month)
-  );
+  const billable = contracts.filter((c) => isContractBillableInMonth(c, month));
   if (!billable.length) return [];
 
   const { data: customersData, error: custError } = await supabase
@@ -100,7 +101,7 @@ export async function listBillableContracts(
     return {
       contract,
       customer,
-      totals: invoiceTotals(contract, ppnRate),
+      totals: invoiceTotals(contract, month, ppnRate),
       invoice,
       recipientEmail: (customer.invoice_email || customer.email || '').trim(),
     };
@@ -127,9 +128,9 @@ export async function upsertInvoice(
   options: UpsertInvoiceOptions = {}
 ): Promise<Invoice> {
   const existing = await getInvoiceByContractMonth(supabase, contract.no, month);
-  const totals = invoiceTotals(contract, ppnRate);
+  const totals = invoiceTotals(contract, month, ppnRate);
   const recipientEmail = (customer.invoice_email || customer.email || '').trim();
-  const items = invoiceLineItems(contract);
+  const items = invoiceLineItems(contract, month);
   const memo =
     'Managed IT Outsourcing 월 서비스 이용료입니다. Starlink 인터넷 서비스는 고객 명의 직접 가입/직접 납부 기준이며 BCT 청구 항목에 포함되지 않습니다.';
 

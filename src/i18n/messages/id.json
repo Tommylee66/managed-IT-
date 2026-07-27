@@ -335,6 +335,7 @@
     "discount": "Diskon/Penyesuaian (Rp)",
     "discountModeAmount": "Jumlah",
     "discountModePercent": "Persentase(%)",
+    "discountMonths": "Periode berlaku (bulan, 0=tanpa batas)",
     "memo": "Catatan",
     "calculating": "Menghitung...",
     "calculate": "Hitung",

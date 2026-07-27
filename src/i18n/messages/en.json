@@ -335,6 +335,7 @@
     "discount": "Discount/Adjustment (Rp)",
     "discountModeAmount": "Amount",
     "discountModePercent": "Percent(%)",
+    "discountMonths": "Applies for (months, 0=unlimited)",
     "memo": "Notes",
     "calculating": "Calculating...",
     "calculate": "Calculate",

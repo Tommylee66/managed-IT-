@@ -183,6 +183,11 @@ export interface QuoteInputs {
   security: 'none' | 'monitor' | 'device';
   priority: 'no' | 'yes';
   discount: number;
+  /** How many months from contract start the discount applies for — 0 means
+   * unlimited (applies for the life of the contract, the old behavior).
+   * After this many months, monthly invoicing drops the discount row and
+   * bills at full price. */
+  discountMonths: number;
   memo: string;
 }
 
