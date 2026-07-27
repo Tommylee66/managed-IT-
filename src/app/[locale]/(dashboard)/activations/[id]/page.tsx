@@ -4,9 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getActivation } from "@/lib/data-access/activations";
 import { listAssetsByContract } from "@/lib/data-access/assets";
+import { getContractRaw } from "@/lib/data-access/contracts";
+import { listIpPhoneExtensionsByCustomer } from "@/lib/data-access/ip-phone-extensions";
+import { listServiceCredentialsByCustomer } from "@/lib/data-access/service-credentials";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { IpPhoneSection } from "@/components/activations/ip-phone-section";
+import { ServiceCredentialSection } from "@/components/activations/service-credential-section";
 
 export default async function ActivationDetailPage({
   params,
@@ -20,8 +25,13 @@ export default async function ActivationDetailPage({
   const activation = await getActivation(supabase, id);
   if (!activation) notFound();
 
-  const [assets, t, tContracts, tCommon, tAssets] = await Promise.all([
+  const contract = await getContractRaw(supabase, activation.contract_no);
+  if (!contract) notFound();
+
+  const [assets, ipPhoneExtensions, serviceCredentials, t, tContracts, tCommon, tAssets] = await Promise.all([
     listAssetsByContract(supabase, activation.contract_no, session!.role),
+    listIpPhoneExtensionsByCustomer(supabase, contract.customer_code),
+    listServiceCredentialsByCustomer(supabase, contract.customer_code),
     getTranslations("activations"),
     getTranslations("contracts"),
     getTranslations("common"),
@@ -134,6 +144,9 @@ export default async function ActivationDetailPage({
           </Table>
         </CardContent>
       </Card>
+
+      <IpPhoneSection customerCode={contract.customer_code} extensions={ipPhoneExtensions} />
+      <ServiceCredentialSection customerCode={contract.customer_code} credentials={serviceCredentials} />
     </div>
   );
 }

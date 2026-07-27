@@ -378,6 +378,45 @@ export interface Asset {
   updated_at: string;
 }
 
+export type IpPhoneDeviceType = 'sip_app' | 'hardware_phone';
+
+/** Employee-to-extension assignment for a customer's IP phone system —
+ * separate from `assets` because a SIP softphone on someone's personal
+ * smartphone isn't a physical device BCT provisions or tracks. */
+export interface IpPhoneExtension {
+  id: string;
+  customer_code: string;
+  employee_name: string;
+  extension_number: string;
+  device_type: IpPhoneDeviceType;
+  memo: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ServiceCredentialCategory = 'cloud_storage' | 'web_hosting' | 'device_access' | 'other';
+
+/** Login credentials for a third-party service set up during activation
+ * (cloud storage, web hosting, device admin panels, etc.). The password is
+ * never included here — list views only ever get `has_password`; the
+ * plaintext is fetched on demand via a dedicated reveal action, gated to
+ * master/activation_dept, and decrypted server-side only (see
+ * src/lib/crypto/credential-encryption.ts). */
+export interface ServiceCredential {
+  id: string;
+  customer_code: string;
+  service_name: string;
+  category: ServiceCredentialCategory;
+  login_id: string | null;
+  has_password: boolean;
+  url: string | null;
+  memo: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AssetHistory {
   id: string;
   contract_no: string | null;
