@@ -174,6 +174,7 @@
     "name": "Nama",
     "commissionRate": "Tarif Komisi",
     "phone": "No. Telepon",
+    "email": "Email",
     "bankAccount": "Rekening Bank",
     "status": "Status",
     "empty": "Belum ada agen penjualan yang terdaftar.",
@@ -489,7 +490,11 @@
     "ppn": "PPN",
     "total": "Total Tagihan",
     "contractNotFoundError": "Kontrak tidak ditemukan: {no}",
-    "customerNotFoundError": "Pelanggan tidak ditemukan: {code}"
+    "customerNotFoundError": "Pelanggan tidak ditemukan: {code}",
+    "serviceLogTypeSent": "Email Invoice Terkirim",
+    "serviceLogTypeIssued": "Invoice Diterbitkan",
+    "serviceLogMemoSent": "Dikirim ke {email} / Total {total}",
+    "serviceLogMemoIssued": "Total tagihan {total}"
   },
   "applications": {
     "title": "Pengajuan",
@@ -539,7 +544,8 @@
     "sourceAgentIntake": "Diterima oleh Agen",
     "sourceExistingCustomerAddon": "Tambahan Pelanggan Lama",
     "selectOrNewCustomerError": "Pilih pelanggan atau masukkan nama pelanggan baru.",
-    "notFoundError": "Data pengajuan tidak ditemukan."
+    "notFoundError": "Data pengajuan tidak ditemukan.",
+    "autoRegisteredMemo": "Didaftarkan otomatis dari pengajuan baru"
   },
   "changeRequests": {
     "title": "Permintaan Perubahan",
@@ -816,6 +822,10 @@
     "sendConfirm": "Email ini akan benar-benar dikirim ke pelanggan. Lanjutkan?",
     "sendEmail": "Kirim Email",
     "sending": "Mengirim...",
-    "sendSuccess": "Berhasil dikirim ke {email}"
+    "sendSuccess": "Berhasil dikirim ke {email}",
+    "reportCustomerNotFoundError": "Pelanggan tidak ditemukan.",
+    "reportNoEmailError": "Pelanggan belum memiliki alamat email terdaftar. Silakan daftarkan email di data pelanggan terlebih dahulu.",
+    "reportResendKeyMissingError": "RESEND_API_KEY belum dikonfigurasi. Silakan minta admin untuk mengatur fitur pengiriman email.",
+    "reportEmailSendError": "Gagal mengirim email ({status}): {detail}"
   }
 }

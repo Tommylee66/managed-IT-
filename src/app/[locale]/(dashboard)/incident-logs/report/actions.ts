@@ -1,5 +1,6 @@
 'use server';
 
+import { getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSessionContext } from '@/lib/auth/session';
 import { listIncidentLogsByCustomerAndMonth } from '@/lib/data-access/incident-logs';
@@ -8,9 +9,15 @@ import { generateReportDraft } from '@/lib/ai/report-draft';
 import { buildReportEmailHtml } from '@/lib/email/report-email-template';
 import type { IncidentLog } from '@/types/domain';
 
+// The report body itself is always bilingual ID+KO (see report-draft.ts's
+// prompt), matching every other customer-facing document in the app — so
+// the month label feeding into it is bilingual too, not locale-switched.
 function monthLabel(monthKey: string): string {
   const [year, month] = monthKey.split('-');
-  return `${year}년 ${Number(month)}월`;
+  const date = new Date(Number(year), Number(month) - 1, 1);
+  const id = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(date);
+  const ko = `${year}년 ${Number(month)}월`;
+  return `${id} (${ko})`;
 }
 
 export interface ReportRecordsResult {
@@ -25,11 +32,12 @@ export async function loadReportRecordsAction(
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
+  const t = await getTranslations('incidentLogs');
   const [customer, records] = await Promise.all([
     getCustomer(supabase, customerCode, session.role),
     listIncidentLogsByCustomerAndMonth(supabase, customerCode, monthKey),
   ]);
-  if (!customer) throw new Error('고객을 찾을 수 없습니다.');
+  if (!customer) throw new Error(t('reportCustomerNotFoundError'));
   return { customerName: customer.name, records };
 }
 
@@ -37,11 +45,12 @@ export async function generateReportDraftAction(customerCode: string, monthKey: 
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
+  const t = await getTranslations('incidentLogs');
   const [customer, records] = await Promise.all([
     getCustomer(supabase, customerCode, session.role),
     listIncidentLogsByCustomerAndMonth(supabase, customerCode, monthKey),
   ]);
-  if (!customer) throw new Error('고객을 찾을 수 없습니다.');
+  if (!customer) throw new Error(t('reportCustomerNotFoundError'));
   const result = await generateReportDraft({
     customerName: customer.name,
     monthLabel: monthLabel(monthKey),
@@ -59,15 +68,16 @@ export async function sendReportEmailAction(
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
+  const t = await getTranslations('incidentLogs');
   const customer = await getCustomer(supabase, customerCode, session.role);
-  if (!customer) throw new Error('고객을 찾을 수 없습니다.');
+  if (!customer) throw new Error(t('reportCustomerNotFoundError'));
 
   const to = customer.invoice_email || customer.email;
-  if (!to) throw new Error('고객에게 등록된 이메일 주소가 없습니다. 고객 정보에 이메일을 먼저 등록해주세요.');
+  if (!to) throw new Error(t('reportNoEmailError'));
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    throw new Error('RESEND_API_KEY가 설정되지 않았습니다. 관리자에게 이메일 발송 기능 설정을 요청해주세요.');
+    throw new Error(t('reportResendKeyMissingError'));
   }
   const fromAddress = process.env.REPORT_EMAIL_FROM || 'onboarding@resend.dev';
   const html = buildReportEmailHtml({ customerName: customer.name, monthLabel: monthLabel(monthKey), bodyText: body });
@@ -87,7 +97,7 @@ export async function sendReportEmailAction(
     }),
   });
   if (!res.ok) {
-    throw new Error(`이메일 발송 실패 (${res.status}): ${await res.text()}`);
+    throw new Error(t('reportEmailSendError', { status: res.status, detail: await res.text() }));
   }
 
   await supabase.rpc('log_audit', {

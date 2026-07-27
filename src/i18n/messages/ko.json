@@ -174,6 +174,7 @@
     "name": "이름",
     "commissionRate": "수수료율",
     "phone": "연락처",
+    "email": "이메일",
     "bankAccount": "계좌",
     "status": "상태",
     "empty": "등록된 영업 대리점이 없습니다.",
@@ -489,7 +490,11 @@
     "ppn": "PPN",
     "total": "총 청구금액",
     "contractNotFoundError": "계약을 찾을 수 없습니다: {no}",
-    "customerNotFoundError": "고객을 찾을 수 없습니다: {code}"
+    "customerNotFoundError": "고객을 찾을 수 없습니다: {code}",
+    "serviceLogTypeSent": "청구서이메일발송",
+    "serviceLogTypeIssued": "청구서발행",
+    "serviceLogMemoSent": "수신 {email} / 총액 {total}",
+    "serviceLogMemoIssued": "총 청구금액 {total}"
   },
   "applications": {
     "title": "신청",
@@ -539,7 +544,8 @@
     "sourceAgentIntake": "영업사원 접수",
     "sourceExistingCustomerAddon": "기존 고객 추가신청",
     "selectOrNewCustomerError": "고객을 선택하거나 신규 고객명을 입력하세요.",
-    "notFoundError": "신청 내역을 찾을 수 없습니다."
+    "notFoundError": "신청 내역을 찾을 수 없습니다.",
+    "autoRegisteredMemo": "신규 신청 접수로 자동 등록"
   },
   "changeRequests": {
     "title": "변경 요청",
@@ -816,6 +822,10 @@
     "sendConfirm": "이 내용으로 고객에게 실제 이메일을 발송합니다. 계속하시겠습니까?",
     "sendEmail": "이메일 발송",
     "sending": "발송 중...",
-    "sendSuccess": "{email}로 발송되었습니다"
+    "sendSuccess": "{email}로 발송되었습니다",
+    "reportCustomerNotFoundError": "고객을 찾을 수 없습니다.",
+    "reportNoEmailError": "고객에게 등록된 이메일 주소가 없습니다. 고객 정보에 이메일을 먼저 등록해주세요.",
+    "reportResendKeyMissingError": "RESEND_API_KEY가 설정되지 않았습니다. 관리자에게 이메일 발송 기능 설정을 요청해주세요.",
+    "reportEmailSendError": "이메일 발송 실패 ({status}): {detail}"
   }
 }

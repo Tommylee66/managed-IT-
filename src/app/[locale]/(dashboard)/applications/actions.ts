@@ -33,13 +33,13 @@ export async function createApplicationAction(input: CreateApplicationFormInput)
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
+  const t = await getTranslations('applications');
 
   let customerCode = input.customer_code;
   let customerName = '';
 
   if (!customerCode) {
     if (!input.new_customer_name) {
-      const t = await getTranslations('applications');
       throw new Error(t('selectOrNewCustomerError'));
     }
     const customer = await createCustomer(supabase, {
@@ -47,7 +47,7 @@ export async function createApplicationAction(input: CreateApplicationFormInput)
       phone: input.new_customer_phone,
       email: input.new_customer_email,
       tax_id: input.new_customer_tax_id,
-      memo: '신규 신청 접수로 자동 등록',
+      memo: t('autoRegisteredMemo'),
       created_by: session.userId,
     });
     customerCode = customer.code;

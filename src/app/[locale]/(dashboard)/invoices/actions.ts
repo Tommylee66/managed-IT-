@@ -43,11 +43,11 @@ async function upsertOne(
     id: nextServiceLogId(),
     customer_code: customer.code,
     date,
-    type: markSent ? '청구서이메일발송' : '청구서발행',
+    type: markSent ? t('serviceLogTypeSent') : t('serviceLogTypeIssued'),
     title: `${invoice.no} / ${month}`,
     memo: markSent
-      ? `수신 ${invoice.recipient_email} / 총액 ${invoice.total}`
-      : `총 청구금액 ${invoice.total}`,
+      ? t('serviceLogMemoSent', { email: invoice.recipient_email ?? '', total: invoice.total })
+      : t('serviceLogMemoIssued', { total: invoice.total }),
     saved_by: userId,
   });
 

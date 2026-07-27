@@ -174,6 +174,7 @@
     "name": "Name",
     "commissionRate": "Commission Rate",
     "phone": "Phone",
+    "email": "Email",
     "bankAccount": "Bank Account",
     "status": "Status",
     "empty": "No sales agents registered yet.",
@@ -489,7 +490,11 @@
     "ppn": "VAT",
     "total": "Total Amount",
     "contractNotFoundError": "Contract not found: {no}",
-    "customerNotFoundError": "Customer not found: {code}"
+    "customerNotFoundError": "Customer not found: {code}",
+    "serviceLogTypeSent": "Invoice Email Sent",
+    "serviceLogTypeIssued": "Invoice Issued",
+    "serviceLogMemoSent": "Sent to {email} / Total {total}",
+    "serviceLogMemoIssued": "Total amount {total}"
   },
   "applications": {
     "title": "Applications",
@@ -539,7 +544,8 @@
     "sourceAgentIntake": "Received by Sales Agent",
     "sourceExistingCustomerAddon": "Existing Customer Add-on",
     "selectOrNewCustomerError": "Select a customer or enter a new customer name.",
-    "notFoundError": "Application not found."
+    "notFoundError": "Application not found.",
+    "autoRegisteredMemo": "Auto-registered from a new application"
   },
   "changeRequests": {
     "title": "Change Requests",
@@ -816,6 +822,10 @@
     "sendConfirm": "This will actually send an email to the customer. Continue?",
     "sendEmail": "Send Email",
     "sending": "Sending...",
-    "sendSuccess": "Sent to {email}"
+    "sendSuccess": "Sent to {email}",
+    "reportCustomerNotFoundError": "Customer not found.",
+    "reportNoEmailError": "This customer has no registered email address. Please add one to the customer's record first.",
+    "reportResendKeyMissingError": "RESEND_API_KEY is not configured. Please ask an admin to set up the email sending feature.",
+    "reportEmailSendError": "Failed to send email ({status}): {detail}"
   }
 }
