@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
+import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import type { TerminationPlanView } from "@/lib/data-access/termination";
 import type { AssetDecision } from "@/types/domain";
@@ -27,6 +28,7 @@ function AssetNoticeTable({
       </div>
     );
   return (
+    <DocTable>
     <Table>
       <TableHeader>
         <TableRow>
@@ -75,6 +77,7 @@ function AssetNoticeTable({
         ))}
       </TableBody>
     </Table>
+    </DocTable>
   );
 }
 
@@ -125,6 +128,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
         <h3 className="mb-1 font-semibold">
           <Bilingual id="1. Dasar Kontrak dan Pengakhiran" ko="1. 계약 및 해지 기준" />
         </h3>
+        <DocTable>
         <Table>
           <TableBody>
             <TableRow>
@@ -155,6 +159,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
             </TableRow>
           </TableBody>
         </Table>
+        </DocTable>
       </div>
 
       <div>
@@ -218,6 +223,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
         <h3 className="mb-1 font-semibold">
           <Bilingual id="5. Logika Perhitungan Denda" ko="5. 패널티 계산 로직" />
         </h3>
+        <DocTable>
         <Table>
           <TableHeader>
             <TableRow>
@@ -296,6 +302,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
             </TableRow>
           </TableBody>
         </Table>
+        </DocTable>
       </div>
 
       <div>

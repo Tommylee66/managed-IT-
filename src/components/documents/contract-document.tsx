@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
+import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { contractClauses } from "@/components/documents/contract-clauses";
 import type { Contract } from "@/types/domain";
@@ -46,6 +47,7 @@ export function ContractDocument({
         </div>
       }
     >
+      <DocTable>
       <Table>
         <TableBody>
           <TableRow>
@@ -80,6 +82,7 @@ export function ContractDocument({
           </TableRow>
         </TableBody>
       </Table>
+      </DocTable>
 
       <div className="flex flex-col gap-4">
         {sections.map((section) => (

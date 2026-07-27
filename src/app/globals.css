@@ -153,11 +153,14 @@
   }
 }
 
-/* Printed documents (quote/contract/invoice/termination) rely on the
- * browser's own page margin for whitespace — most browsers default that to
- * "None" for app-triggered prints, which puts content flush against the
- * paper edge. This forces a consistent margin regardless of the browser's
- * print dialog setting. */
+/* Printed documents (quote/contract/invoice/termination) used to rely on
+ * this @page rule for whitespace, but a browser's print dialog "Margins"
+ * setting (None/Default/Minimum/Custom) overrides @page whenever it isn't
+ * on "Default" — and that setting persists across print jobs from any site,
+ * not just this app, so @page alone was never reliable. The actual margin
+ * now lives in DocumentShell's own print padding (see document-shell.tsx),
+ * which always renders regardless of the dialog's margin setting. Keep
+ * @page at 0 so nothing doubles up on browsers/flows that DO honor it. */
 @page {
-  margin: 18mm 15mm;
+  margin: 0;
 }

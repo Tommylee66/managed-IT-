@@ -13,7 +13,7 @@ export function DocumentShell({
 }) {
   return (
     <div
-      className="mx-auto flex max-w-3xl flex-col gap-6 bg-white p-8 text-slate-900 print:p-0"
+      className="mx-auto flex max-w-3xl flex-col gap-6 bg-white p-8 text-slate-900 print:p-[18mm_15mm]"
       style={{ printColorAdjust: "exact", WebkitPrintColorAdjust: "exact" } as React.CSSProperties}
     >
       <div className="h-1.5 w-full rounded-full" style={{ background: "var(--brand-gradient)" }} />

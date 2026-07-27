@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
+import { DocTable } from "@/components/documents/doc-table";
 import type { Invoice } from "@/types/domain";
 
 export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
@@ -32,6 +33,7 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
         </div>
       }
     >
+      <DocTable>
       <Table>
         <TableHeader>
           <TableRow>
@@ -60,6 +62,7 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
           </TableRow>
         </TableBody>
       </Table>
+      </DocTable>
 
       <p className="text-muted-foreground">{invoice.memo}</p>
     </DocumentShell>
