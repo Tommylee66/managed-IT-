@@ -32,7 +32,7 @@
     "applications": "조회",
     "quotes": "신규신청(견적 작업)",
     "contracts": "계약",
-    "activations": "개통",
+    "activations": "개통/조회",
     "assets": "자산",
     "changeRequests": "변경 요청",
     "invoices": "청구서",
@@ -438,7 +438,9 @@
     "credentialDeleteError": "삭제에 실패했습니다.",
     "credentialReveal": "표시",
     "credentialHide": "숨기기",
-    "credentialRevealError": "비밀번호를 불러오지 못했습니다."
+    "credentialRevealError": "비밀번호를 불러오지 못했습니다.",
+    "lookupTitle": "고객별 조회",
+    "lookupSelectCustomer": "고객 선택"
   },
   "termination": {
     "title": "해지",

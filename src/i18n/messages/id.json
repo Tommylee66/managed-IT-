@@ -32,7 +32,7 @@
     "applications": "Pencarian",
     "quotes": "Pengajuan Baru (Buat Penawaran)",
     "contracts": "Kontrak",
-    "activations": "Aktivasi",
+    "activations": "Aktivasi/Pencarian",
     "assets": "Aset",
     "changeRequests": "Permintaan Perubahan",
     "invoices": "Faktur",
@@ -438,7 +438,9 @@
     "credentialDeleteError": "Gagal menghapus.",
     "credentialReveal": "Tampilkan",
     "credentialHide": "Sembunyikan",
-    "credentialRevealError": "Gagal memuat kata sandi."
+    "credentialRevealError": "Gagal memuat kata sandi.",
+    "lookupTitle": "Pencarian per Pelanggan",
+    "lookupSelectCustomer": "Pilih Pelanggan"
   },
   "termination": {
     "title": "Pengakhiran",

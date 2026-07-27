@@ -32,7 +32,7 @@
     "applications": "Lookup",
     "quotes": "New Application (Quote Work)",
     "contracts": "Contracts",
-    "activations": "Activations",
+    "activations": "Activation/Lookup",
     "assets": "Assets",
     "changeRequests": "Change Requests",
     "invoices": "Invoices",
@@ -438,7 +438,9 @@
     "credentialDeleteError": "Failed to delete.",
     "credentialReveal": "Show",
     "credentialHide": "Hide",
-    "credentialRevealError": "Failed to load password."
+    "credentialRevealError": "Failed to load password.",
+    "lookupTitle": "Lookup by Customer",
+    "lookupSelectCustomer": "Select Customer"
   },
   "termination": {
     "title": "Termination",
