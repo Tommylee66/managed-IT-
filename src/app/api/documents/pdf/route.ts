@@ -38,6 +38,10 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("PDF generation failed", error);
-    return NextResponse.json({ error: "PDF generation failed" }, { status: 500 });
+    // This route already requires an authenticated staff session (checked
+    // above), so surfacing the real error to the caller is safe here and
+    // saves a trip through Vercel's function logs while this is debugged.
+    const message = error instanceof Error ? `${error.message}\n${error.stack ?? ""}` : String(error);
+    return NextResponse.json({ error: "PDF generation failed", detail: message }, { status: 500 });
   }
 }
