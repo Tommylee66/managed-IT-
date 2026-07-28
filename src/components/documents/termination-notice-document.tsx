@@ -358,7 +358,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
         </div>
       )}
 
-      <div className="mt-10 grid grid-cols-2 gap-8">
+      <div className="mt-10 grid grid-cols-2 gap-8 print:break-inside-avoid">
         <div>
           <p className="font-semibold">PT. Bumi Cerdas Teknology</p>
           <div className="mt-12 border-t pt-1 text-xs text-muted-foreground">

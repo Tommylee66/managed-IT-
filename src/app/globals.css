@@ -164,3 +164,20 @@
 @page {
   margin: 0;
 }
+
+/* Page breaks in printed documents used to land wherever the content
+ * happened to overflow — splitting a table row, an ordered-list clause, or a
+ * signature block across two pages. These rules keep those units whole,
+ * pushing the entire unit to the next page instead of cutting it in half.
+ * True "page X of Y" numbering isn't achievable here at all — no CSS or JS
+ * API tells a web page how many pages the browser's print engine will
+ * produce, only the browser's own print-dialog "Headers and footers" option
+ * can show that (Chrome/Edge/Firefox all support it natively). */
+@media print {
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+  li, tr {
+    break-inside: avoid;
+  }
+}
