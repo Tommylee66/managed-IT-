@@ -169,10 +169,11 @@
  * happened to overflow — splitting a table row, an ordered-list clause, or a
  * signature block across two pages. These rules keep those units whole,
  * pushing the entire unit to the next page instead of cutting it in half.
- * True "page X of Y" numbering isn't achievable here at all — no CSS or JS
- * API tells a web page how many pages the browser's print engine will
- * produce, only the browser's own print-dialog "Headers and footers" option
- * can show that (Chrome/Edge/Firefox all support it natively). */
+ * These rules still matter for the browser's own print dialog (the fallback
+ * path in print-button.tsx), even though the primary path now generates the
+ * PDF server-side via Puppeteer (see src/lib/pdf/generate-document-pdf.ts),
+ * which gets exact "page X of Y" numbering and real margins directly from
+ * Chrome's PDF engine instead of relying on any web-page-visible API. */
 @media print {
   h1, h2, h3, h4 {
     break-after: avoid;

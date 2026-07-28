@@ -452,6 +452,7 @@
     "terminationDate": "Termination Date",
     "penaltyRate": "Penalty Rate (%)",
     "adminFee": "Removal/Admin Fee (Rp)",
+    "adminFeeHint": "Auto-suggested as 8% of total equipment cost — you can edit it directly.",
     "unpaidFee": "Unpaid Balance (Rp)",
     "notes": "Notes",
     "elapsedRemaining": "Elapsed {elapsed} months / Remaining {remaining} months (Total {months} months)",
@@ -770,7 +771,9 @@
     "roleChangeError": "Failed to update role"
   },
   "documents": {
-    "printSave": "Print / Save PDF"
+    "printSave": "Print / Save PDF",
+    "generatingPdf": "Generating PDF...",
+    "pdfGenerationError": "Failed to generate PDF. Falling back to browser print."
   },
   "home": {
     "heroTitle": "Task Menu",

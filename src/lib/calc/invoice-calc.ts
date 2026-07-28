@@ -36,23 +36,47 @@ export function isContractActiveInMonth(contract: Contract, month: string): bool
   return start <= monthEnd && end >= `${month}-01`;
 }
 
-function postTermEquipmentRows(contract: Contract): QuoteRowRecord[] {
-  const rows: QuoteRowRecord[] = contract.quote_snapshot?.rows ?? [];
-  return rows.filter(
-    (r) => r.key?.startsWith(EQUIPMENT_ROW_PREFIX) && Number(r.amount || 0) !== 0
+/** Printers are excluded from the post-term ownership transfer — they keep
+ * billing at their full, unchanged rental rate indefinitely, since BCT never
+ * hands over ownership of them the way it does for other rented equipment. */
+function isPrinterRow(contract: Contract, row: QuoteRowRecord): boolean {
+  const catalogId = row.key?.slice(EQUIPMENT_ROW_PREFIX.length + 1);
+  const selection = (contract.quote_snapshot?.equipment_selections ?? []).find(
+    (e) => e.catalogId === catalogId
   );
+  return selection?.category === 'printer';
+}
+
+function equipmentRows(contract: Contract): QuoteRowRecord[] {
+  const rows: QuoteRowRecord[] = contract.quote_snapshot?.rows ?? [];
+  return rows.filter((r) => r.key?.startsWith(EQUIPMENT_ROW_PREFIX) && Number(r.amount || 0) !== 0);
+}
+
+/** Non-printer equipment left with the customer after the contract's own
+ * term ends — ownership has transferred, billed at the reduced
+ * maintenance-fee rate (see POST_TERM_EQUIPMENT_RATE). */
+function postTermEquipmentRows(contract: Contract): QuoteRowRecord[] {
+  return equipmentRows(contract).filter((r) => !isPrinterRow(contract, r));
+}
+
+/** Printers left with the customer after the contract's own term ends —
+ * ownership never transfers, so these keep billing at their full, unchanged
+ * rental rate for as long as the customer keeps them. */
+function postTermPrinterRows(contract: Contract): QuoteRowRecord[] {
+  return equipmentRows(contract).filter((r) => isPrinterRow(contract, r));
 }
 
 /** A contract is still billable after its own term ends — at the reduced
- * equipment-only rate — as long as it hasn't been formally terminated and
- * still has rented equipment worth billing (once none is left, or once
- * terminated, it stops appearing here entirely). */
+ * maintenance-fee rate for transferred equipment, and at full rate for any
+ * printers — as long as it hasn't been formally terminated and still has
+ * rented equipment worth billing (once none is left, or once terminated, it
+ * stops appearing here entirely). */
 export function isContractBillableInMonth(contract: Contract, month: string): boolean {
   if (contract.status === 'terminated') return false;
   if (isContractActiveInMonth(contract, month)) return true;
   const end = getContractEndDate(contract);
   if (getMonthEnd(month) <= end) return false; // month is before the term, not after
-  return postTermEquipmentRows(contract).length > 0;
+  return postTermEquipmentRows(contract).length > 0 || postTermPrinterRows(contract).length > 0;
 }
 
 /** True once `discountMonths` (if set) has elapsed as of the target month —
@@ -78,10 +102,15 @@ export interface InvoiceLineItem {
 // row), and post-term equipment-only billing at a reduced rate.
 export function invoiceLineItems(contract: Contract, month: string): InvoiceLineItem[] {
   if (!isContractActiveInMonth(contract, month)) {
-    return postTermEquipmentRows(contract).map((r) => ({
+    const maintenanceItems = postTermEquipmentRows(contract).map((r) => ({
       label: `${r.label} 유지보수료`,
       amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
     }));
+    const printerItems = postTermPrinterRows(contract).map((r) => ({
+      label: r.label,
+      amount: r.amount,
+    }));
+    return [...maintenanceItems, ...printerItems];
   }
 
   const rows: QuoteRowRecord[] = contract.quote_snapshot?.rows ?? [];
@@ -102,10 +131,12 @@ export interface InvoiceTotals {
 export function invoiceTotals(contract: Contract, month: string, ppnRate: number): InvoiceTotals {
   let subtotal: number;
   if (!isContractActiveInMonth(contract, month)) {
-    subtotal = postTermEquipmentRows(contract).reduce(
+    const maintenanceSubtotal = postTermEquipmentRows(contract).reduce(
       (sum, r) => sum + Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
       0
     );
+    const printerSubtotal = postTermPrinterRows(contract).reduce((sum, r) => sum + r.amount, 0);
+    subtotal = maintenanceSubtotal + printerSubtotal;
   } else if (isDiscountExpired(contract, month)) {
     const discountRow = (contract.quote_snapshot?.rows ?? []).find((r) => r.key === 'discount');
     const discountAmount = discountRow ? Number(discountRow.amount || 0) : 0; // stored as a negative number

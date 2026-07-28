@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // These ship platform binaries (the headless Chromium build used for
+  // server-side PDF generation) that must be copied into the serverless
+  // function as-is, not bundled/tree-shaken by Next.js.
+  serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
 };
 
 export default withNextIntl(nextConfig);

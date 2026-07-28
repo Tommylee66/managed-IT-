@@ -139,10 +139,10 @@ export function QuoteDocument({
                     </TableCell>
                     <TableCell>{eq.modelName}</TableCell>
                     <TableCell>
-                      {eq.specId || eq.specKo ? (
-                        <Bilingual id={eq.specId || "-"} ko={eq.specKo || "-"} />
+                      {eq.specId && eq.specKo ? (
+                        <Bilingual id={eq.specId} ko={eq.specKo} />
                       ) : (
-                        "-"
+                        eq.specId || eq.specKo || "-"
                       )}
                     </TableCell>
                     <TableCell className="text-right">{eq.qty}</TableCell>
@@ -201,15 +201,15 @@ export function QuoteDocument({
           </li>
           <li>
             <Bilingual
-              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar persentase tertentu dari nilai pada (a) (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi; ditambah (d) tagihan yang belum lunas. Rincian penuh tercantum dalam Perjanjian Kerja Sama. Contoh: jika biaya perangkat Rp10.000.000 dengan sisa 12 dari 24 bulan kontrak, maka (a) = Rp10.000.000 × 12/24 = Rp5.000.000; (b) = 50% × Rp5.000.000 = Rp2.500.000; sehingga (a)+(b) = Rp7.500.000, ditambah (c) dan (d) sesuai kondisi aktual."
-              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 정산금액은 (a) BCT가 제공한 장비/설치비의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 위약금을 더하고, (c) 철거·회수비 및 행정비를 더하고, (d) 미납요금을 더하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다. 예시: 장비 원가가 Rp10,000,000이고 24개월 계약 중 12개월이 남은 경우, (a) = Rp10,000,000 × 12/24 = Rp5,000,000; (b) = Rp5,000,000의 50% = Rp2,500,000; 따라서 (a)+(b) = Rp7,500,000이며, 여기에 실제 상황에 따른 (c), (d)가 추가됩니다."
+              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar persentase tertentu dari nilai pada (a) (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi sebesar 8% dari harga awal perangkat; ditambah (d) tagihan yang belum lunas. Rincian penuh tercantum dalam Perjanjian Kerja Sama. Contoh: jika harga awal perangkat Rp10.000.000 dengan sisa 12 dari 24 bulan kontrak, maka (a) = Rp10.000.000 × 12/24 = Rp5.000.000; (b) = 50% × Rp5.000.000 = Rp2.500.000; (c) = 8% × Rp10.000.000 = Rp800.000; sehingga (a)+(b)+(c) = Rp8.300.000, ditambah (d) sesuai kondisi aktual."
+              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 정산금액은 (a) BCT가 제공한 장비/설치비의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 위약금을 더하고, (c) 장비 원가의 8%에 해당하는 철거·회수·행정비를 더하고, (d) 미납요금을 더하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다. 예시: 장비 원가가 Rp10,000,000이고 24개월 계약 중 12개월이 남은 경우, (a) = Rp10,000,000 × 12/24 = Rp5,000,000; (b) = Rp5,000,000의 50% = Rp2,500,000; (c) = Rp10,000,000의 8% = Rp800,000; 따라서 (a)+(b)+(c) = Rp8,300,000이며, 여기에 실제 상황에 따른 (d)가 추가됩니다."
             />
           </li>
           {hasRentedEquipment && (
             <li>
               <Bilingual
-                id="Jika kontrak berakhir sesuai masa kontrak tanpa perjanjian baru, kepemilikan perangkat sewa yang disediakan BCT (CCTV, printer, dll.) beralih kepada Pelanggan. Biaya bulanan sebesar 30% dari tarif sewa normal yang berlaku setelahnya merupakan biaya pemeliharaan (maintenance), bukan biaya sewa, dan berlaku sampai ada perjanjian baru."
-                ko="계약기간이 정상적으로 종료되고 신규 계약이 체결되지 않는 경우, BCT가 제공한 임대 장비(CCTV, 프린터 등)의 소유권은 고객에게 이전됩니다. 이후 청구되는 정상 임대료의 30% 금액은 임대료가 아닌 유지보수료이며, 신규 계약이 체결될 때까지 적용됩니다."
+                id="Jika kontrak berakhir sesuai masa kontrak, kepemilikan perangkat sewa yang disediakan BCT beralih kepada Pelanggan. (Kecuali printer — biaya sewanya tetap sama meskipun masa kontrak telah berakhir.) Setelah kepemilikan beralih, biaya yang ditagihkan bukan lagi biaya sewa, melainkan biaya pemeliharaan sebesar 30% dari tarif sewa semula."
+                ko="계약기간이 정상적으로 종료되는 경우 BCT가 제공한 임대장비의 소유권은 고객에게 이전됩니다. (단, 프린터는 제외되며 계약기간이 지나도 임대비용은 동일합니다.) 소유권이 이전된 이후에는 임대료가 아닌 유지보수료가 기존 임대료의 30% 금액으로 청구됩니다."
               />
             </li>
           )}

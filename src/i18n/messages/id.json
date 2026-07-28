@@ -452,6 +452,7 @@
     "terminationDate": "Tanggal Pengakhiran",
     "penaltyRate": "Tarif Penalti (%)",
     "adminFee": "Biaya Pembongkaran/Admin (Rp)",
+    "adminFeeHint": "Disarankan otomatis sebesar 8% dari total biaya perangkat, dapat diubah secara manual.",
     "unpaidFee": "Tagihan Belum Dibayar (Rp)",
     "notes": "Catatan",
     "elapsedRemaining": "Berjalan {elapsed} bulan / Sisa {remaining} bulan (Total {months} bulan)",
@@ -770,7 +771,9 @@
     "roleChangeError": "Gagal mengubah peran"
   },
   "documents": {
-    "printSave": "Cetak / Simpan PDF"
+    "printSave": "Cetak / Simpan PDF",
+    "generatingPdf": "Membuat PDF...",
+    "pdfGenerationError": "Gagal membuat PDF. Menggunakan cetak browser sebagai gantinya."
   },
   "home": {
     "heroTitle": "Menu Kerja",

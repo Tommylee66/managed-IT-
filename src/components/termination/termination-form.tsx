@@ -47,7 +47,7 @@ export function TerminationForm({
   const locale = params.locale as string;
   const [termDate, setTermDate] = useState(new Date().toISOString().slice(0, 10));
   const [penaltyRate, setPenaltyRate] = useState(50);
-  const [adminFee, setAdminFee] = useState(1_500_000);
+  const [adminFeeOverride, setAdminFeeOverride] = useState<number | null>(null);
   const [unpaid, setUnpaid] = useState(0);
   const [memo, setMemo] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,6 +86,15 @@ export function TerminationForm({
     })
   );
 
+  // Removal/teardown fee suggests itself as 8% of the equipment's total
+  // original cost — same "suggestion, not a hard rule" pattern as the
+  // equipment-catalog rate suggestions, so master can still type over it.
+  const suggestedAdminFee = useMemo(
+    () => Math.round(rows.reduce((sum, r) => sum + r.originalCost, 0) * 0.08),
+    [rows]
+  );
+  const adminFee = adminFeeOverride ?? suggestedAdminFee;
+
   const elapsed = contractElapsedMonths(contract.start_date, termDate, contract.months);
   const remaining = contractRemainingMonths(contract.start_date, termDate, contract.months);
   // Once the contract's own term has already ended (this termination is
@@ -98,7 +107,11 @@ export function TerminationForm({
   const decisions = useMemo(
     () =>
       rows.map((r) => {
-        if (contractTermEnded) {
+        // Printers never transfer ownership post-term (they keep billing at
+        // full rate indefinitely instead) — so this override skips them,
+        // leaving their action/amortization to the normal per-asset logic
+        // below exactly as if the contract hadn't ended.
+        if (contractTermEnded && r.type !== "printer") {
           return calcAssetDecision({ ...r, owner: "customer" }, 0, contract.months);
         }
         // An asset can't have been in service before the contract existed —
@@ -172,8 +185,9 @@ export function TerminationForm({
             <CurrencyInput
               locale={locale as Locale}
               value={String(adminFee)}
-              onChange={(digits) => setAdminFee(digits ? Number(digits) : 0)}
+              onChange={(digits) => setAdminFeeOverride(digits ? Number(digits) : 0)}
             />
+            <p className="text-xs text-muted-foreground">{t("adminFeeHint")}</p>
           </div>
           <div className="flex flex-col gap-2">
             <Label>{t("unpaidFee")}</Label>
