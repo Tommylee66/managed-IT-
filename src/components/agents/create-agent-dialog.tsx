@@ -29,6 +29,7 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
   const locale = params.locale as string;
   const [open, setOpen] = useState(false);
   const [createdAgentName, setCreatedAgentName] = useState<string | null>(null);
+  const [createdAgentEmail, setCreatedAgentEmail] = useState<string | undefined>(undefined);
 
   const schema = z.object({
     name: z.string().min(1, t("nameRequired")),
@@ -72,6 +73,7 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
       });
       toast.success(t("createSuccess"));
       setCreatedAgentName(values.name);
+      setCreatedAgentEmail(values.email);
       reset();
     } catch {
       toast.error(t("createError"));
@@ -80,12 +82,19 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
 
   function handleOpenChange(next: boolean) {
     setOpen(next);
-    if (!next) setCreatedAgentName(null);
+    if (!next) {
+      setCreatedAgentName(null);
+      setCreatedAgentEmail(undefined);
+    }
   }
 
   function goToStaffRegistration() {
+    const name = createdAgentName ?? "";
+    const email = createdAgentEmail ?? "";
     handleOpenChange(false);
-    router.push(`/${locale}/admin/staff`);
+    router.push(
+      `/${locale}/admin/staff?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`
+    );
   }
 
   return (

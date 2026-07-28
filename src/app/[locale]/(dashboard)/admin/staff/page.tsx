@@ -14,10 +14,13 @@ import { RoleSelect } from "@/components/admin/role-select";
 
 export default async function AdminStaffPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ name?: string; email?: string }>;
 }) {
   const { locale } = await params;
+  const { name, email } = await searchParams;
   setRequestLocale(locale);
   const session = await getSessionContext();
   if (!session || session.role !== "master") redirect("/dashboard");
@@ -35,7 +38,7 @@ export default async function AdminStaffPage({
       <CardHeader>
         <CardTitle>{t("staffTitle")}</CardTitle>
         <CardAction>
-          <CreateStaffDialog />
+          <CreateStaffDialog defaultName={name} defaultEmail={email} />
         </CardAction>
       </CardHeader>
       <CardContent>

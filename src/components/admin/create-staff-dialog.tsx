@@ -35,11 +35,17 @@ type FormValues = {
   role: (typeof ROLES)[number];
 };
 
-export function CreateStaffDialog() {
+export function CreateStaffDialog({
+  defaultName,
+  defaultEmail,
+}: {
+  defaultName?: string;
+  defaultEmail?: string;
+} = {}) {
   const t = useTranslations("admin");
   const tRoles = useTranslations("roles");
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(Boolean(defaultName || defaultEmail));
 
   const schema = z.object({
     full_name: z.string().min(1, t("nameRequired")),
@@ -54,7 +60,10 @@ export function CreateStaffDialog() {
     reset,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: { role: "admin_dept" } });
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { role: "admin_dept", full_name: defaultName ?? "", email: defaultEmail ?? "" },
+  });
 
   async function onSubmit(values: FormValues) {
     const res = await fetch("/api/admin/staff", {
