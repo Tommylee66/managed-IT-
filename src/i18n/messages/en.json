@@ -854,6 +854,7 @@
     "loading": "Loading...",
     "loadRecords": "Load Records",
     "recordsFound": "{count} records this month",
+    "printReport": "Print",
     "draftTitle": "Report Draft",
     "generateDraft": "Generate AI Draft",
     "generating": "Generating...",

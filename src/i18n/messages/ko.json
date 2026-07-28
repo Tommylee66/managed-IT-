@@ -854,6 +854,7 @@
     "loading": "불러오는 중...",
     "loadRecords": "기록 불러오기",
     "recordsFound": "이번 달 기록 {count}건",
+    "printReport": "인쇄",
     "draftTitle": "리포트 초안",
     "generateDraft": "AI 초안 생성",
     "generating": "생성 중...",

@@ -7,18 +7,8 @@ import { listIncidentLogsByCustomerAndMonth } from '@/lib/data-access/incident-l
 import { getCustomer } from '@/lib/data-access/customers';
 import { generateReportDraft } from '@/lib/ai/report-draft';
 import { buildReportEmailHtml } from '@/lib/email/report-email-template';
+import { bilingualMonthLabel } from '@/lib/utils/date';
 import type { IncidentLog } from '@/types/domain';
-
-// The report body itself is always bilingual ID+KO (see report-draft.ts's
-// prompt), matching every other customer-facing document in the app — so
-// the month label feeding into it is bilingual too, not locale-switched.
-function monthLabel(monthKey: string): string {
-  const [year, month] = monthKey.split('-');
-  const date = new Date(Number(year), Number(month) - 1, 1);
-  const id = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' }).format(date);
-  const ko = `${year}년 ${Number(month)}월`;
-  return `${id} (${ko})`;
-}
 
 export interface ReportRecordsResult {
   customerName: string;
@@ -53,7 +43,7 @@ export async function generateReportDraftAction(customerCode: string, monthKey: 
   if (!customer) throw new Error(t('reportCustomerNotFoundError'));
   const result = await generateReportDraft({
     customerName: customer.name,
-    monthLabel: monthLabel(monthKey),
+    monthLabel: bilingualMonthLabel(monthKey),
     records,
   });
   return { ...result, recordCount: records.length };
@@ -80,7 +70,7 @@ export async function sendReportEmailAction(
     throw new Error(t('reportResendKeyMissingError'));
   }
   const fromAddress = process.env.REPORT_EMAIL_FROM || 'onboarding@resend.dev';
-  const html = buildReportEmailHtml({ customerName: customer.name, monthLabel: monthLabel(monthKey), bodyText: body });
+  const html = buildReportEmailHtml({ customerName: customer.name, monthLabel: bilingualMonthLabel(monthKey), bodyText: body });
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

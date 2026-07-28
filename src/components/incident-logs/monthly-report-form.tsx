@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -15,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   loadReportRecordsAction,
@@ -32,6 +34,8 @@ function currentMonthKey() {
 
 export function MonthlyReportForm({ customers }: { customers: Customer[] }) {
   const t = useTranslations("incidentLogs");
+  const params = useParams();
+  const locale = params.locale as string;
   const [customerCode, setCustomerCode] = useState("");
   const [month, setMonth] = useState(currentMonthKey());
   const [isLoading, setIsLoading] = useState(false);
@@ -133,6 +137,16 @@ export function MonthlyReportForm({ customers }: { customers: Customer[] }) {
             <CardTitle className="text-base">
               {t("recordsFound", { count: records.records.length })}
             </CardTitle>
+            <CardAction>
+              <Button asChild variant="outline" size="sm">
+                <Link
+                  href={`/${locale}/incident-logs/report/print?customer=${customerCode}&month=${month}`}
+                  target="_blank"
+                >
+                  {t("printReport")}
+                </Link>
+              </Button>
+            </CardAction>
           </CardHeader>
           <CardContent>
             <Table>

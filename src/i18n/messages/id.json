@@ -854,6 +854,7 @@
     "loading": "Memuat...",
     "loadRecords": "Muat Catatan",
     "recordsFound": "{count} catatan bulan ini",
+    "printReport": "Cetak",
     "draftTitle": "Draf Laporan",
     "generateDraft": "Buat Draf dengan AI",
     "generating": "Membuat...",
