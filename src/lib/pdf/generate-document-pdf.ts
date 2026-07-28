@@ -7,8 +7,14 @@ async function launchBrowser(): Promise<Browser> {
 
   if (isServerless) {
     const chromium = (await import("@sparticuz/chromium")).default;
+    // @sparticuz/chromium's default args include --single-process, which
+    // breaks Chromium's print compositor: page.pdf() silently renders the
+    // whole document as one continuous page instead of paginating it. Local
+    // Chrome doesn't use this flag, which is why this only showed up in
+    // production.
+    const args = chromium.args.filter((arg) => arg !== "--single-process");
     return puppeteer.launch({
-      args: chromium.args,
+      args,
       executablePath: await chromium.executablePath(),
       headless: true,
     }) as unknown as Promise<Browser>;
