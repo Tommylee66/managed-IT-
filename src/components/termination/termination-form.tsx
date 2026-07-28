@@ -80,6 +80,7 @@ export function TerminationForm({
         originalCost: defaultCosts[a.id] ?? 0,
         collectQty: nonRecoverable || configAsset ? 0 : total,
         billQty: 0,
+        registeredAt: a.registered_at,
       };
     })
   );
@@ -88,8 +89,21 @@ export function TerminationForm({
   const remaining = contractRemainingMonths(contract.start_date, termDate, contract.months);
 
   const decisions = useMemo(
-    () => rows.map((r) => calcAssetDecision(r, remaining, contract.months)),
-    [rows, remaining, contract.months]
+    () =>
+      rows.map((r) => {
+        // An asset can't have been in service before the contract existed —
+        // clamp defensively, then measure THIS asset's own elapsed/remaining
+        // time from when it was actually installed (see AssetDecisionInput.
+        // registeredAt), not the contract's start date. Equipment installed
+        // at contract start naturally lines up with the contract-wide figure;
+        // equipment added later via a change request gets its own, shorter
+        // elapsed time and correspondingly larger unamortized remainder.
+        const effectiveStart =
+          r.registeredAt > contract.start_date ? r.registeredAt : contract.start_date;
+        const rowRemaining = contractRemainingMonths(effectiveStart, termDate, contract.months);
+        return calcAssetDecision(r, rowRemaining, contract.months);
+      }),
+    [rows, termDate, contract.start_date, contract.months]
   );
   const summary = useMemo(
     () => summarizeTerminationPlan(decisions, penaltyRate, adminFee, unpaid),

@@ -62,6 +62,11 @@ export interface AssetDecisionInput {
   originalCost: number;
   collectQty: number;
   billQty: number;
+  /** When this specific asset was actually installed (`assets.registered_at`)
+   * — equipment added mid-contract via a change request has less service
+   * time than the contract's own start date would imply, so its unamortized
+   * value must be computed from its own install date, not the contract's. */
+  registeredAt: string;
 }
 
 export interface AssetDecisionResult extends AssetDecisionInput {
