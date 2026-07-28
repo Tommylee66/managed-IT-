@@ -153,16 +153,22 @@
   }
 }
 
-/* Printed documents (quote/contract/invoice/termination) used to rely on
- * this @page rule for whitespace, but a browser's print dialog "Margins"
- * setting (None/Default/Minimum/Custom) overrides @page whenever it isn't
- * on "Default" — and that setting persists across print jobs from any site,
- * not just this app, so @page alone was never reliable. The actual margin
- * now lives in DocumentShell's own print padding (see document-shell.tsx),
- * which always renders regardless of the dialog's margin setting. Keep
- * @page at 0 so nothing doubles up on browsers/flows that DO honor it. */
+/* This must match the `margin` passed to Puppeteer's page.pdf() in
+ * generate-document-pdf.ts. Discovered the hard way: when this was `0`,
+ * any page that starts via a FORCED break (an `li`/`tr` with
+ * break-inside:avoid that doesn't fit and gets pushed whole onto the next
+ * page — see the @media print rules below) had its content reflow using
+ * this CSS margin instead of Puppeteer's own margin option, so it started
+ * flush at the physical page edge and collided with the repeating
+ * header/footer template. Normal (non-forced) page breaks were unaffected,
+ * which is why this only showed up on some pages of some documents.
+ * Tradeoff: a real browser's print-dialog "Margins" setting set to
+ * anything but "Default" still overrides this, and on "Default" it now
+ * stacks with DocumentShell's own print padding (document-shell.tsx) for
+ * the window.print() fallback path — acceptable since that path only
+ * runs if server-side PDF generation itself fails. */
 @page {
-  margin: 0;
+  margin: 20mm 15mm 18mm 15mm;
 }
 
 /* Page breaks in printed documents used to land wherever the content
