@@ -26,6 +26,7 @@ export function ServiceSelector({
   locale: Locale;
 }) {
   const t = useTranslations("common");
+  const tQuotes = useTranslations("quotes");
 
   function toggle(id: string, checked: boolean) {
     const next = { ...value };
@@ -40,13 +41,18 @@ export function ServiceSelector({
 
   return (
     <div className="flex flex-col gap-2 rounded-md border p-3">
-      {catalog.map((item) => {
+      {catalog
+        .filter((item) => item.is_active || item.id in value)
+        .map((item) => {
         const checked = item.id in value;
         return (
           <div key={item.id} className="flex items-center gap-3">
             <Checkbox checked={checked} onCheckedChange={(v) => toggle(item.id, v === true)} />
             <span className="flex-1 text-sm">
               {locale === "ko" ? item.name_ko : item.name_id}
+              {!item.is_active && (
+                <span className="text-destructive"> ({tQuotes("catalogItemInactive")})</span>
+              )}
               {(locale === "ko" ? item.description_ko : item.description_id) && (
                 <span className="text-muted-foreground">
                   {" "}

@@ -252,6 +252,7 @@
     "updateSuccess": "Quote updated successfully",
     "updateError": "Failed to update quote",
     "equipmentOverageQtyLabel": "Extra usage (@ {rate}/unit)",
+    "catalogItemInactive": "Inactive — can only be unselected",
     "baseServiceTitle": "① Base Service (included in the base fee)",
     "baseServiceDescription": "The base monthly fee includes remote monitoring/support, one monthly on-site inspection visit, maintenance of basic network equipment (router, AP, hub), maintenance of 4 CCTV units (an extra per-unit fee applies beyond 4), router-to-AP cabling installation, and coverage for up to 20 employees/PCs. A separate contract-term surcharge may apply for contracts under 24 months.",
     "serviceSelectTitle": "② Additional Services",

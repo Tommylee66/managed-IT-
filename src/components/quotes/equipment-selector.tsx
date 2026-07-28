@@ -47,7 +47,9 @@ export function EquipmentSelector({
 
   return (
     <div className="flex flex-col gap-2 rounded-md border p-3">
-      {catalog.map((item) => {
+      {catalog
+        .filter((item) => item.is_active || item.id in value)
+        .map((item) => {
         const checked = item.id in value;
         return (
           <div key={item.id} className="flex flex-col gap-2">
@@ -55,6 +57,9 @@ export function EquipmentSelector({
               <Checkbox checked={checked} onCheckedChange={(v) => toggle(item.id, v === true)} />
               <span className="flex-1 text-sm">
                 <span className="text-muted-foreground">[{tCat(item.category)}]</span> {item.model_name}
+                {!item.is_active && (
+                  <span className="text-destructive"> ({tQuotes("catalogItemInactive")})</span>
+                )}
                 {(locale === "ko" ? item.spec_ko : item.spec_id) && (
                   <span className="text-muted-foreground">
                     {" "}

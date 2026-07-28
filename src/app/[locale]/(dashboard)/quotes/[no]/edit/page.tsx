@@ -26,8 +26,12 @@ export default async function EditQuotePage({
     listCustomers(supabase, session!.role),
     listAgents(supabase, session!.role),
     getRates(supabase, session!.role),
-    listEquipmentCatalog(supabase, { activeOnly: true }),
-    listServiceCatalog(supabase, { activeOnly: true }),
+    // Not activeOnly — this quote may already have selections pointing at
+    // equipment/services that were deactivated since it was created. The
+    // selector components hide inactive items UNLESS they're already
+    // selected, so staff can still see and remove them here.
+    listEquipmentCatalog(supabase, {}),
+    listServiceCatalog(supabase, {}),
     getTranslations("quotes"),
   ]);
   const locationNames = rates.locations.map((l) => l.name);

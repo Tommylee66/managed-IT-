@@ -26,8 +26,12 @@ export default async function NewChangeRequestPage({
 
   const [rates, equipmentCatalog, serviceCatalog, t] = await Promise.all([
     getRates(supabase, "master") as Promise<Rates>,
-    listEquipmentCatalog(supabase, { activeOnly: true }),
-    listServiceCatalog(supabase, { activeOnly: true }),
+    // Not activeOnly — the contract's current selections may point at
+    // equipment/services deactivated since the contract was created. The
+    // selector components hide inactive items UNLESS already selected, so
+    // staff can still see and remove them here.
+    listEquipmentCatalog(supabase, {}),
+    listServiceCatalog(supabase, {}),
     getTranslations("changeRequests"),
   ]);
   const locationNames = rates.locations.map((l) => l.name);
