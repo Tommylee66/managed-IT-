@@ -201,6 +201,8 @@
     "register": "Daftarkan",
     "createSuccess": "Agen penjualan berhasil didaftarkan.",
     "createError": "Gagal mendaftarkan agen.",
+    "createSuccessDetail": "Agen {name} berhasil didaftarkan. Lanjutkan mendaftarkan akun staf?",
+    "goToStaffRegistration": "Lanjut ke Pendaftaran Staf",
     "rateChangeSuccess": "Tarif komisi berhasil diubah.",
     "deactivateSuccess": "Berhasil dinonaktifkan.",
     "activateSuccess": "Berhasil diaktifkan.",

@@ -201,6 +201,8 @@
     "register": "Register",
     "createSuccess": "Sales agent registered.",
     "createError": "Failed to register agent.",
+    "createSuccessDetail": "Agent {name} has been registered. Continue to register a staff account?",
+    "goToStaffRegistration": "Go to Staff Registration",
     "rateChangeSuccess": "Commission rate updated.",
     "deactivateSuccess": "Deactivated.",
     "activateSuccess": "Activated.",

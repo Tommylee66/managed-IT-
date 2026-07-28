@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,9 +21,14 @@ import {
 } from "@/components/ui/dialog";
 import { createAgentAction } from "@/app/[locale]/(dashboard)/agents/actions";
 
-export function CreateAgentDialog() {
+export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
   const t = useTranslations("agents");
+  const tCommon = useTranslations("common");
+  const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
   const [open, setOpen] = useState(false);
+  const [createdAgentName, setCreatedAgentName] = useState<string | null>(null);
 
   const schema = z.object({
     name: z.string().min(1, t("nameRequired")),
@@ -65,15 +71,25 @@ export function CreateAgentDialog() {
         },
       });
       toast.success(t("createSuccess"));
+      setCreatedAgentName(values.name);
       reset();
-      setOpen(false);
     } catch {
       toast.error(t("createError"));
     }
   }
 
+  function handleOpenChange(next: boolean) {
+    setOpen(next);
+    if (!next) setCreatedAgentName(null);
+  }
+
+  function goToStaffRegistration() {
+    handleOpenChange(false);
+    router.push(`/${locale}/admin/staff`);
+  }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button>{t("newAgent")}</Button>
       </DialogTrigger>
@@ -81,6 +97,19 @@ export function CreateAgentDialog() {
         <DialogHeader>
           <DialogTitle>{t("createDialogTitle")}</DialogTitle>
         </DialogHeader>
+        {createdAgentName ? (
+          <div className="flex flex-col gap-4">
+            <p className="text-sm">{t("createSuccessDetail", { name: createdAgentName })}</p>
+            <DialogFooter className="gap-2 sm:justify-between">
+              <Button variant="outline" onClick={() => handleOpenChange(false)}>
+                {tCommon("close")}
+              </Button>
+              {isMaster && (
+                <Button onClick={goToStaffRegistration}>{t("goToStaffRegistration")}</Button>
+              )}
+            </DialogFooter>
+          </div>
+        ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">{t("name")}</Label>
@@ -140,6 +169,7 @@ export function CreateAgentDialog() {
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

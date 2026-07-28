@@ -201,6 +201,8 @@
     "register": "등록",
     "createSuccess": "영업 대리점을 등록했습니다.",
     "createError": "등록에 실패했습니다.",
+    "createSuccessDetail": "{name} 대리점이 등록되었습니다. 이어서 직원 계정을 등록하시겠습니까?",
+    "goToStaffRegistration": "직원 등록으로 이동",
     "rateChangeSuccess": "수수료율을 변경했습니다.",
     "deactivateSuccess": "비활성화했습니다.",
     "activateSuccess": "활성화했습니다.",

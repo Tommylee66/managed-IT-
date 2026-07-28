@@ -34,7 +34,7 @@ export default async function AgentsPage({
               <Button variant="outline">{t("commissionReportTitle")}</Button>
             </Link>
           )}
-          <CreateAgentDialog />
+          <CreateAgentDialog isMaster={session!.role === "master"} />
         </CardAction>
       </CardHeader>
       <CardContent>
