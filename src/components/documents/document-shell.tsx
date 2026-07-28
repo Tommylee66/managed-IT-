@@ -1,5 +1,5 @@
 import { PrintButton } from "@/components/documents/print-button";
-import { BctLogoMark } from "@/components/brand/bct-logo-mark";
+import { BctWordmark } from "@/components/brand/bct-wordmark";
 
 export function DocumentShell({
   title,
@@ -21,7 +21,7 @@ export function DocumentShell({
 
       <header className="flex items-start justify-between gap-4 pb-3">
         <div className="flex items-center gap-4">
-          <BctLogoMark size={64} />
+          <BctWordmark size="lg" />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
               PT. Bumi Cerdas Teknology &middot; Managed IT Services

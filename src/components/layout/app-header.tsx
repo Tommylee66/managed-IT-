@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { LogoutButton } from "@/components/layout/logout-button";
 import { Badge } from "@/components/ui/badge";
-import { BctLogoMark } from "@/components/brand/bct-logo-mark";
+import { BctWordmark } from "@/components/brand/bct-wordmark";
 import type { StaffRole } from "@/lib/masking/staff-masking";
 
 export async function AppHeader({
@@ -23,11 +23,8 @@ export async function AppHeader({
     <header className="sticky top-0 z-10 border-b border-border bg-card/95 px-5 py-3 backdrop-blur print:hidden">
       <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-4">
         <Link href={`/${locale}/dashboard`} className="flex items-center gap-3">
-          <BctLogoMark size={44} />
-          <div>
-            <h1 className="text-lg font-semibold leading-tight tracking-tight">{t("appName")}</h1>
-            <p className="text-xs text-muted-foreground">{t("appSubtitle")}</p>
-          </div>
+          <BctWordmark size="sm" />
+          <p className="border-l border-border pl-3 text-xs text-muted-foreground">{t("appSubtitle")}</p>
         </Link>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={role === "master" ? "default" : "secondary"}>
