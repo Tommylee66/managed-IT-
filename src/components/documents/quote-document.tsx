@@ -189,8 +189,8 @@ export function QuoteDocument({
           )}
           <li>
             <Bilingual
-              id="Layanan bulanan mencakup pemeliharaan rutin serta dukungan jarak jauh/lapangan untuk seluruh PC karyawan dan perangkat jaringan yang tercakup dalam kontrak. Biaya suku cadang dan perbaikan akibat kerusakan (di luar pemeliharaan rutin) ditagihkan terpisah sesuai biaya riil (at-cost), tanpa markup."
-              ko="월 서비스 요금에는 계약에 포함된 전 직원 PC 및 네트워크 장비의 정기 유지보수와 원격/방문 지원이 포함됩니다. 고장으로 인한 부품 교체·수리 비용은 정기 유지보수와 별도로, 실제 소요 비용(실비) 기준으로 마진 없이 청구됩니다."
+              id="Layanan bulanan mencakup pemeliharaan rutin serta dukungan jarak jauh/lapangan untuk seluruh PC karyawan dan perangkat jaringan yang tercakup dalam kontrak. Biaya suku cadang dan perbaikan akibat kerusakan (di luar pemeliharaan rutin) ditagihkan terpisah berdasarkan biaya riil ditambah biaya penanganan (handling charge)."
+              ko="월 서비스 요금에는 계약에 포함된 전 직원 PC 및 네트워크 장비의 정기 유지보수와 원격/방문 지원이 포함됩니다. 고장으로 인한 부품 교체·수리 비용은 정기 유지보수와 별도로, 실제 소요비용 기준 핸들링 챠지만 추가하여 청구됩니다."
             />
           </li>
           <li>
