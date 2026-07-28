@@ -142,11 +142,13 @@ export function QuoteCalculatorForm({
     return {
       emp: Number(v.emp),
       // AP/Hub no longer price as generic per-unit add-ons (equipment
-      // catalog selections instead), and visit frequency/VPN/security/
-      // priority-response no longer price as hardcoded rate fields (service
-      // catalog selections instead, see ServiceSelector below). These stay
-      // at their baseline (no-extra-charge) values only because QuoteInputs
-      // still carries the fields for old stored quotes. CCTV, however, is a
+      // catalog selections instead), and visit frequency/VPN/security no
+      // longer price as hardcoded rate fields (service catalog selections
+      // instead, see ServiceSelector below). These stay at their baseline
+      // (no-extra-charge) values only because QuoteInputs still carries the
+      // fields for old stored quotes (priority response was removed from
+      // QuoteInputs entirely — it was never actually re-priced through the
+      // service catalog and had no live UI control). CCTV, however, is a
       // real input again — base service includes 4 units, extra billed per
       // unit (see quote-calc.ts).
       ap: 1,
@@ -157,7 +159,6 @@ export function QuoteCalculatorForm({
       vpn: "none",
       vpnBranches: 0,
       security: "none",
-      priority: "no",
       discount: discountOverride ?? Number(v.discount),
       discountMonths: Number(v.discountMonths || 0),
       memo: v.memo,

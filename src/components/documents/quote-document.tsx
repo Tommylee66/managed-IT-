@@ -195,21 +195,21 @@ export function QuoteDocument({
           </li>
           <li>
             <Bilingual
-              id="VPN dasar menyediakan akses jarak jauh yang aman ke jaringan kantor pusat; VPN cabang (jika dipilih) memperluas akses ini ke lokasi cabang tambahan. Layanan keamanan mencakup pemantauan aktivitas jaringan, atau penyediaan dan pengelolaan perangkat keamanan setingkat FortiGate. Respons prioritas (jika dipilih) memberikan target waktu tanggap insiden yang lebih cepat dari layanan standar."
-              ko="기본 VPN은 본사 네트워크에 대한 안전한 원격 접속을 제공하며, 지사 VPN(선택 시)은 이 접속 범위를 추가 지사까지 확장합니다. 보안 서비스는 네트워크 활동 모니터링, 또는 FortiGate급 보안장비의 제공 및 운영관리 중 선택할 수 있습니다. 우선 장애대응(선택 시)은 일반 서비스보다 더 빠른 목표 대응 시간을 제공합니다."
+              id="VPN, layanan keamanan tambahan, atau layanan lain di luar paket dasar (jika dipilih) tercantum sebagai baris tersendiri pada tabel di atas, lengkap dengan nama, deskripsi, dan harganya masing-masing."
+              ko="VPN, 추가 보안 서비스 등 기본 패키지 이외의 서비스가 포함된 경우, 위 표에 별도 항목으로 명칭·설명·요금이 함께 명시됩니다."
             />
           </li>
           <li>
             <Bilingual
-              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar persentase tertentu dari nilai pada (a) (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi; ditambah (d) tagihan yang belum lunas. Rincian penuh tercantum dalam Perjanjian Kerja Sama."
-              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 정산금액은 (a) BCT가 제공한 장비/설치비의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 위약금을 더하고, (c) 철거·회수비 및 행정비를 더하고, (d) 미납요금을 더하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다."
+              id="Jika kontrak diakhiri lebih awal atas permintaan atau kelalaian Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar persentase tertentu dari nilai pada (a) (standar 50%, dapat berbeda sesuai perjanjian); ditambah (c) biaya pembongkaran/penarikan dan administrasi; ditambah (d) tagihan yang belum lunas. Rincian penuh tercantum dalam Perjanjian Kerja Sama. Contoh: jika biaya perangkat Rp10.000.000 dengan sisa 12 dari 24 bulan kontrak, maka (a) = Rp10.000.000 × 12/24 = Rp5.000.000; (b) = 50% × Rp5.000.000 = Rp2.500.000; sehingga (a)+(b) = Rp7.500.000, ditambah (c) dan (d) sesuai kondisi aktual."
+              ko="고객 사정 또는 귀책으로 계약을 중도 해지하는 경우, 정산금액은 (a) BCT가 제공한 장비/설치비의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 일정 비율(기본 50%, 계약에 따라 다를 수 있음)에 해당하는 위약금을 더하고, (c) 철거·회수비 및 행정비를 더하고, (d) 미납요금을 더하여 산정합니다. 상세 내용은 서비스 계약서에 명시됩니다. 예시: 장비 원가가 Rp10,000,000이고 24개월 계약 중 12개월이 남은 경우, (a) = Rp10,000,000 × 12/24 = Rp5,000,000; (b) = Rp5,000,000의 50% = Rp2,500,000; 따라서 (a)+(b) = Rp7,500,000이며, 여기에 실제 상황에 따른 (c), (d)가 추가됩니다."
             />
           </li>
           {hasRentedEquipment && (
             <li>
               <Bilingual
-                id="Jika Pelanggan tetap menggunakan perangkat sewa yang disediakan BCT setelah masa kontrak berakhir tanpa perjanjian baru, biaya sewa bulanan perangkat tersebut ditagihkan sebesar 30% dari tarif sewa normal, sampai perangkat dikembalikan atau kontrak baru disepakati."
-                ko="계약기간이 종료된 이후에도 신규 계약 체결 없이 고객이 BCT 제공 임대 장비를 계속 사용하는 경우, 해당 장비의 월 임대료는 장비가 반환되거나 신규 계약이 체결될 때까지 정상 임대료의 30%로 청구됩니다."
+                id="Jika kontrak berakhir sesuai masa kontrak tanpa perjanjian baru, kepemilikan perangkat sewa yang disediakan BCT (CCTV, printer, dll.) beralih kepada Pelanggan. Biaya bulanan sebesar 30% dari tarif sewa normal yang berlaku setelahnya merupakan biaya pemeliharaan (maintenance), bukan biaya sewa, dan berlaku sampai ada perjanjian baru."
+                ko="계약기간이 정상적으로 종료되고 신규 계약이 체결되지 않는 경우, BCT가 제공한 임대 장비(CCTV, 프린터 등)의 소유권은 고객에게 이전됩니다. 이후 청구되는 정상 임대료의 30% 금액은 임대료가 아닌 유지보수료이며, 신규 계약이 체결될 때까지 적용됩니다."
               />
             </li>
           )}

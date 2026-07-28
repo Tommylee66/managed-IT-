@@ -6,11 +6,17 @@ import type { Contract, QuoteRowRecord } from '@/types/domain';
 const EQUIPMENT_ROW_PREFIX = 'equipment';
 
 // Equipment left with the customer after the contract's own term ends (no
-// new contract signed yet) bills at a reduced month-to-month rate instead
-// of an abrupt cutoff or full-price continuation.
+// new contract signed yet) transfers ownership to the customer — this is no
+// longer a rental, so the reduced month-to-month charge is a maintenance
+// fee, not "reduced rent". The rate itself (30% of what the rental used to
+// be) is unchanged, only the characterization is.
 const POST_TERM_EQUIPMENT_RATE = 0.3;
 
-function getContractEndDate(contract: Contract): string {
+/** Also used by termination-form.tsx to tell whether a requested termination
+ * date falls after the contract's own term already ended — at that point
+ * equipment ownership has already passed to the customer (see the post-term
+ * maintenance-fee billing below), so there is nothing left to amortize. */
+export function getContractEndDate(contract: Contract): string {
   return (
     contract.end_date ??
     format(addDays(addMonths(new Date(contract.start_date), contract.months), -1), 'yyyy-MM-dd')
@@ -73,7 +79,7 @@ export interface InvoiceLineItem {
 export function invoiceLineItems(contract: Contract, month: string): InvoiceLineItem[] {
   if (!isContractActiveInMonth(contract, month)) {
     return postTermEquipmentRows(contract).map((r) => ({
-      label: `${r.label} (계약만료 후 ${Math.round(POST_TERM_EQUIPMENT_RATE * 100)}%)`,
+      label: `${r.label} 유지보수료`,
       amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
     }));
   }

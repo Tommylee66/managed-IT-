@@ -176,8 +176,8 @@ export function contractClauses(contract: Contract): ClauseSection[] {
           ko: `계약기간은 ${contract.months}개월이며, 서비스 시작일은 ${contract.start_date}, 계약종료일은 ${contract.end_date}이다.`,
         },
         {
-          id: 'Jika kontrak diakhiri lebih awal karena kesalahan atau kepentingan Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi/setting yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar 50% dari nilai pada (a); ditambah (c) biaya pembongkaran, penarikan, dan administrasi; ditambah (d) biaya yang belum lunas. Rincian dan jumlah akhir ditetapkan pada saat proses pengakhiran kontrak.',
-          ko: '고객의 귀책 또는 편의에 의한 조기해지 시 정산금액은 다음과 같이 산정한다: (a) BCT 제공 장비/설치/세팅 원가의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 50%에 해당하는 위약금을 더하고; (c) 철거·회수·행정비를 더하고; (d) 미납요금을 더하여 산정한다. 세부 산정 및 최종금액은 해지 처리 시점에 확정된다.',
+          id: 'Jika kontrak diakhiri lebih awal karena kesalahan atau kepentingan Pelanggan, jumlah penyelesaian dihitung sebagai: (a) nilai belum diamortisasi dari biaya perangkat/instalasi/setting yang disediakan BCT × (sisa bulan kontrak ÷ total bulan kontrak); ditambah (b) denda sebesar 50% dari nilai pada (a); ditambah (c) biaya pembongkaran, penarikan, dan administrasi; ditambah (d) biaya yang belum lunas. Rincian dan jumlah akhir ditetapkan pada saat proses pengakhiran kontrak. Contoh: jika biaya perangkat Rp10.000.000 dengan sisa 12 dari 24 bulan kontrak, maka (a) = Rp10.000.000 × 12/24 = Rp5.000.000; (b) = 50% × Rp5.000.000 = Rp2.500.000; sehingga (a)+(b) = Rp7.500.000, ditambah (c) dan (d) sesuai kondisi aktual.',
+          ko: '고객의 귀책 또는 편의에 의한 조기해지 시 정산금액은 다음과 같이 산정한다: (a) BCT 제공 장비/설치/세팅 원가의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 50%에 해당하는 위약금을 더하고; (c) 철거·회수·행정비를 더하고; (d) 미납요금을 더하여 산정한다. 세부 산정 및 최종금액은 해지 처리 시점에 확정된다. 예시: 장비 원가가 Rp10,000,000이고 24개월 계약 중 12개월이 남은 경우, (a) = Rp10,000,000 × 12/24 = Rp5,000,000; (b) = Rp5,000,000의 50% = Rp2,500,000; 따라서 (a)+(b) = Rp7,500,000이며, 여기에 실제 상황에 따른 (c), (d)가 추가된다.',
         },
         {
           id: 'Pada saat pengakhiran kontrak, BCT akan menarik kembali perangkat yang disediakan BCT, dan Pelanggan wajib memberikan akses lokasi yang diperlukan untuk proses penarikan tersebut.',
@@ -186,8 +186,8 @@ export function contractClauses(contract: Contract): ClauseSection[] {
         ...(hasRentedEquipment
           ? [
               {
-                id: 'Jika Pelanggan tetap menggunakan perangkat sewa yang disediakan BCT setelah masa kontrak berakhir tanpa perjanjian baru, biaya sewa bulanan perangkat tersebut ditagihkan sebesar 30% dari tarif sewa normal, sampai perangkat dikembalikan atau kontrak baru disepakati.',
-                ko: '계약기간이 종료된 이후에도 신규 계약 체결 없이 고객이 BCT 제공 임대 장비를 계속 사용하는 경우, 해당 장비의 월 임대료는 장비가 반환되거나 신규 계약이 체결될 때까지 정상 임대료의 30%로 청구된다.',
+                id: 'Jika kontrak berakhir sesuai masa kontrak tanpa perjanjian baru, kepemilikan perangkat sewa yang disediakan BCT (CCTV, printer, dll.) beralih kepada Pelanggan. Biaya bulanan sebesar 30% dari tarif sewa normal yang berlaku setelahnya merupakan biaya pemeliharaan (maintenance), bukan biaya sewa, dan berlaku sampai ada perjanjian baru.',
+                ko: '계약기간이 정상적으로 종료되고 신규 계약이 체결되지 않는 경우, BCT가 제공한 임대 장비(CCTV, 프린터 등)의 소유권은 고객에게 이전된다. 이후 청구되는 정상 임대료의 30% 금액은 임대료가 아닌 유지보수료이며, 신규 계약이 체결될 때까지 적용된다.',
               },
             ]
           : []),

@@ -91,10 +91,10 @@ export function ApplicationForm({
       emp: Number(v.emp),
       // Application intake doesn't select specific equipment or additional
       // services yet — that happens when the quote itself is built (see
-      // quote-calculator-form.tsx). AP/Hub/visit/VPN/security/priority no
-      // longer price as generic add-ons either way, so these stay at
-      // baseline. CCTV is a real input (base includes 4 units, extra billed
-      // per unit), same as employee count.
+      // quote-calculator-form.tsx). AP/Hub/visit/VPN/security no longer
+      // price as generic add-ons either way, so these stay at baseline.
+      // CCTV is a real input (base includes 4 units, extra billed per
+      // unit), same as employee count.
       ap: 1,
       hub: 1,
       cctv: Number(v.cctv),
@@ -103,7 +103,6 @@ export function ApplicationForm({
       vpn: "none",
       vpnBranches: 0,
       security: "none",
-      priority: "no",
       discount: Number(v.discount),
       discountMonths: 0,
       memo: v.memo,

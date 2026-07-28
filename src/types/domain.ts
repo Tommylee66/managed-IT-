@@ -143,7 +143,6 @@ export interface RatesCommissionItems {
   cctv: boolean;
   visit: boolean;
   location: boolean;
-  priority: boolean;
   vpn: boolean;
   security: boolean;
   discount: boolean;
@@ -158,7 +157,6 @@ export interface Rates {
   hub_unit: number;
   cctv_block: number;
   visit2_addon: number;
-  priority: number;
   vpn_base: number;
   vpn_branch: number;
   security_monitor: number;
@@ -182,7 +180,6 @@ export interface QuoteInputs {
   vpn: 'none' | 'base';
   vpnBranches: number;
   security: 'none' | 'monitor' | 'device';
-  priority: 'no' | 'yes';
   discount: number;
   /** How many months from contract start the discount applies for — 0 means
    * unlimited (applies for the life of the contract, the old behavior).

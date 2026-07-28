@@ -113,9 +113,9 @@ export function ChangeRequestForm({
     return {
       emp: Number(v.emp),
       // See quote-calculator-form.tsx — AP/Hub price only via equipment
-      // catalog selections, and visit/vpn/security/priority only via service
-      // catalog selections, below. CCTV is a real input (base includes 4
-      // units, extra billed per unit).
+      // catalog selections, and visit/vpn/security only via service catalog
+      // selections, below. CCTV is a real input (base includes 4 units,
+      // extra billed per unit).
       ap: 1,
       hub: 1,
       cctv: Number(v.cctv),
@@ -124,7 +124,6 @@ export function ChangeRequestForm({
       vpn: "none",
       vpnBranches: 0,
       security: "none",
-      priority: "no",
       discount: discountOverride ?? Number(v.discount),
       discountMonths: Number(v.discountMonths || 0),
       memo: v.memo,

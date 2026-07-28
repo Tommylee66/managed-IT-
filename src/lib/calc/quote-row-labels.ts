@@ -47,11 +47,6 @@ export const QUOTE_ROW_LABELS: Record<string, Record<Locale, string>> = {
     id: 'Lokasi: {name}',
     en: 'Location: {name}',
   },
-  priority: {
-    ko: '우선 장애대응',
-    id: 'Respons gangguan prioritas',
-    en: 'Priority incident response',
-  },
   vpnBase: {
     ko: 'Managed VPN 기본',
     id: 'Managed VPN dasar',
