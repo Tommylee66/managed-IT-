@@ -176,8 +176,20 @@
 @media print {
   h1, h2, h3, h4 {
     break-after: avoid;
+    page-break-after: avoid;
   }
   li, tr {
     break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* ui/table.tsx's table wrapper sets overflow-x-auto for on-screen
+   * horizontal scrolling on narrow viewports — but per the CSS overflow
+   * spec, setting overflow-x alone forces the computed overflow-y to 'auto'
+   * too (a browser can't scroll one axis and show the other as plain
+   * "visible"). That makes the whole table a scrollable/clipped box, which a
+   * print engine won't fragment across pages — long tables got cut off
+   * instead of flowing onto the next page. Force plain visible for print. */
+  [data-slot="table-container"] {
+    overflow: visible;
   }
 }
