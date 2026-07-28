@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Noto_Sans_KR } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
@@ -15,6 +15,18 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Geist has no Hangul glyphs, and headless Chromium in serverless PDF
+// generation (see src/lib/pdf/generate-document-pdf.ts) has no OS-level
+// Korean font to fall back to like a real desktop browser does — without
+// this, Korean text renders as tofu boxes in generated PDFs. Self-hosting
+// it via next/font guarantees the glyphs are available regardless of the
+// runtime environment's installed fonts.
+const notoSansKR = Noto_Sans_KR({
+  variable: "--font-noto-kr",
+  subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -42,7 +54,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${notoSansKR.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <NextIntlClientProvider messages={messages}>
