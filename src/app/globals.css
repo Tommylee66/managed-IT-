@@ -153,7 +153,7 @@
   }
 }
 
-/* This must match the `margin` passed to Puppeteer's page.pdf() in
+/* top/bottom must match the `margin` passed to Puppeteer's page.pdf() in
  * generate-document-pdf.ts. Discovered the hard way: when this was `0`,
  * any page that starts via a FORCED break (an `li`/`tr` with
  * break-inside:avoid that doesn't fit and gets pushed whole onto the next
@@ -162,13 +162,16 @@
  * flush at the physical page edge and collided with the repeating
  * header/footer template. Normal (non-forced) page breaks were unaffected,
  * which is why this only showed up on some pages of some documents.
- * Tradeoff: a real browser's print-dialog "Margins" setting set to
- * anything but "Default" still overrides this, and on "Default" it now
- * stacks with DocumentShell's own print padding (document-shell.tsx) for
- * the window.print() fallback path — acceptable since that path only
- * runs if server-side PDF generation itself fails. */
+ * left/right is 0 on purpose (see the same reasoning in
+ * generate-document-pdf.ts): DocumentShell's own print padding already
+ * reserves 15mm on every page, and it isn't a one-time top/bottom-style
+ * padding — adding another 15mm here doubled it up and cut off the
+ * widest table column. Tradeoff: a real browser's print-dialog "Margins"
+ * setting set to anything but "Default" still overrides this — acceptable
+ * since this only matters for the window.print() fallback path, which
+ * only runs if server-side PDF generation itself fails. */
 @page {
-  margin: 20mm 15mm 18mm 15mm;
+  margin: 20mm 0mm 18mm 0mm;
 }
 
 /* Page breaks in printed documents used to land wherever the content

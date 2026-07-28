@@ -440,13 +440,9 @@ export function QuoteCalculatorForm({
                   ? [
                       { label: t("monthlyCost"), value: formatRupiah(preview.monthlyCost ?? 0, locale as Locale) },
                       { label: t("totalCostWithInit"), value: formatRupiah(preview.totalCost ?? 0, locale as Locale) },
-                      { label: t("marginRate"), value: `${preview.margin.toFixed(1)}%` },
                       { label: t("ppn"), value: formatRupiah(preview.ppn, locale as Locale) },
                     ]
-                  : [
-                      { label: t("marginRateBucketed"), value: preview.marginBucket ?? "-" },
-                      { label: t("ppn"), value: formatRupiah(preview.ppn, locale as Locale) },
-                    ]
+                  : [{ label: t("ppn"), value: formatRupiah(preview.ppn, locale as Locale) }]
               }
             />
           )}

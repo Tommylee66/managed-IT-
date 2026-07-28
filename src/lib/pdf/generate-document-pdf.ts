@@ -49,14 +49,19 @@ export async function generateDocumentPdf(url: string, cookies: DocumentPdfCooki
     // version of it (accent bar + letterhead line, thin rule + page number)
     // on every page.
     //
-    // margin must match the `@page { margin }` rule in globals.css — a page
-    // that starts via a forced break (a break-inside:avoid li/tr pushed
-    // whole onto the next page) reflows its content using the CSS margin,
-    // not this one, so a mismatch causes content to collide with the header.
+    // margin.top/bottom must match the `@page { margin }` rule in globals.css
+    // — a page that starts via a forced break (a break-inside:avoid li/tr
+    // pushed whole onto the next page) reflows its content using the CSS
+    // margin, not this one, so a mismatch causes content to collide with the
+    // header. left/right is 0 here on purpose: DocumentShell's own CSS
+    // padding (print:p-[18mm_15mm]) already reserves 15mm on every page (it's
+    // part of the content box's width, not just its start/end like
+    // top/bottom padding is) — adding another 15mm here would double it up
+    // and was cutting off the widest table column.
     const pdf = await page.pdf({
       format: "A4",
       printBackground: true,
-      margin: { top: "20mm", bottom: "18mm", left: "15mm", right: "15mm" },
+      margin: { top: "20mm", bottom: "18mm", left: "0mm", right: "0mm" },
       displayHeaderFooter: true,
       headerTemplate:
         '<div style="width:100%;font-family:Arial,sans-serif;padding:0 15mm;box-sizing:border-box;">' +

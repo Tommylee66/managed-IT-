@@ -33,8 +33,6 @@ export default async function QuoteDetailPage({
     getTranslations("common"),
   ]);
 
-  const isMasked = Number.isNaN(quote.margin);
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -105,17 +103,6 @@ export default async function QuoteDetailPage({
               <span>{t("monthlyTotal")}</span>
               <span>{formatRupiah(quote.monthly, locale as Locale)}</span>
             </div>
-            {!isMasked ? (
-              <div className="flex justify-between text-muted-foreground">
-                <span>{t("marginRate")}</span>
-                <span>{quote.margin.toFixed(1)}%</span>
-              </div>
-            ) : (
-              <div className="flex justify-between text-muted-foreground">
-                <span>{t("marginRate")}</span>
-                <span>{tCommon("masterOnly")}</span>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
