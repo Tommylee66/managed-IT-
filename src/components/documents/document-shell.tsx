@@ -1,4 +1,5 @@
 import { PrintButton } from "@/components/documents/print-button";
+import { BctLogoMark } from "@/components/brand/bct-logo-mark";
 
 export function DocumentShell({
   title,
@@ -20,12 +21,7 @@ export function DocumentShell({
 
       <header className="flex items-start justify-between gap-4 pb-3">
         <div className="flex items-center gap-4">
-          <div
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-base font-black text-white shadow-md"
-            style={{ background: "var(--brand-gradient)" }}
-          >
-            BCT
-          </div>
+          <BctLogoMark size={64} />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
               PT. Bumi Cerdas Teknology &middot; Managed IT Services

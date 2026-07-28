@@ -40,7 +40,12 @@ export function buildReportEmailHtml(params: {
                 <table role="presentation" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="width:56px;height:56px;border-radius:14px;background-image:linear-gradient(135deg,#0f5f8f,#11a3b7);text-align:center;vertical-align:middle;">
-                      <span style="color:#ffffff;font-weight:800;font-size:14px;">BCT</span>
+                      <svg width="31" height="31" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;">
+                        <path d="M12 6.5L6.5 17.5M12 6.5L17.5 17.5M6.5 17.5L17.5 17.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+                        <circle cx="12" cy="6.5" r="2.1" fill="white"/>
+                        <circle cx="6.5" cy="17.5" r="2.1" fill="white"/>
+                        <circle cx="17.5" cy="17.5" r="2.1" fill="white"/>
+                      </svg>
                     </td>
                     <td style="padding-left:16px;">
                       <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;">
