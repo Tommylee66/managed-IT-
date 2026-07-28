@@ -1,32 +1,21 @@
-import { Quicksand } from "next/font/google";
+import Image from "next/image";
 
-const quicksand = Quicksand({
-  subsets: ["latin"],
-  weight: ["500", "600"],
-  variable: "--font-quicksand",
-});
+const NATIVE_WIDTH = 366;
+const NATIVE_HEIGHT = 222;
 
-/** The BCT wordmark: "BCT" set in a rounded geometric sans with tight,
- * near-touching tracking, "Total IT Care" beneath it smaller and muted —
- * this literally is appName ("BCT Total IT Care") split into two visual
- * tiers, not a separate brand element, so it replaces the old icon-badge
- * wherever that name would otherwise be repeated right next to it. */
+/** Renders the BCT logo exactly as provided (public/bct-logo.png) — only the
+ * overall size may vary by context, never the design, font, or color. */
 export function BctWordmark({ size = "lg" }: { size?: "sm" | "lg" }) {
-  const isSm = size === "sm";
+  const height = size === "sm" ? 36 : 56;
+  const width = Math.round((NATIVE_WIDTH / NATIVE_HEIGHT) * height);
   return (
-    <div className={`${quicksand.className} flex shrink-0 flex-col leading-none whitespace-nowrap`}>
-      <span
-        className={isSm ? "text-2xl" : "text-4xl"}
-        style={{ fontWeight: 600, letterSpacing: "-0.06em", color: "#0f172a" }}
-      >
-        BCT
-      </span>
-      <span
-        className={isSm ? "mt-0.5 text-xs" : "mt-1 text-sm"}
-        style={{ fontWeight: 500, letterSpacing: "-0.01em", color: "#8a94a3" }}
-      >
-        Total IT Care
-      </span>
-    </div>
+    <Image
+      src="/bct-logo.png"
+      alt="BCT Total IT Care"
+      width={width}
+      height={height}
+      className="shrink-0"
+      priority
+    />
   );
 }

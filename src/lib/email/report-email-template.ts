@@ -18,6 +18,7 @@ export function buildReportEmailHtml(params: {
   bodyText: string;
 }): string {
   const { customerName, monthLabel, bodyText } = params;
+  const logoUrl = `${process.env.NEXT_PUBLIC_APP_URL}/bct-logo.png`;
   const paragraphs = bodyText
     .split(/\n\s*\n/)
     .map((p) => escapeHtml(p.trim()).replace(/\n/g, '<br />'))
@@ -40,8 +41,7 @@ export function buildReportEmailHtml(params: {
                 <table role="presentation" cellpadding="0" cellspacing="0">
                   <tr>
                     <td style="vertical-align:middle;">
-                      <div style="font-size:22px;font-weight:300;letter-spacing:-0.03em;color:#0f172a;line-height:1;font-family:'Century Gothic',AppleGothic,Poppins,-apple-system,BlinkMacSystemFont,sans-serif;">BCT</div>
-                      <div style="font-size:8px;font-weight:600;letter-spacing:0.24em;color:#64748b;margin-top:2px;">TOTAL IT CARE</div>
+                      <img src="${logoUrl}" width="122" height="74" alt="BCT Total IT Care" style="display:block;" />
                     </td>
                     <td style="padding-left:16px;border-left:1px solid #e2e8f0;">
                       <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;">
