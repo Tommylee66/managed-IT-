@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { listCustomers } from "@/lib/data-access/customers";
-import { listAgents } from "@/lib/data-access/agents";
+import { listAgentsForSession } from "@/lib/data-access/agents";
 import { getRates } from "@/lib/data-access/rates";
 import { listEquipmentCatalog } from "@/lib/data-access/equipment";
 import { listServiceCatalog } from "@/lib/data-access/services";
@@ -19,13 +19,14 @@ export default async function NewQuotePage({
   const supabase = await createClient();
   const [customers, agents, rates, equipmentCatalog, serviceCatalog, t] = await Promise.all([
     listCustomers(supabase, session!.role),
-    listAgents(supabase, session!.role),
+    listAgentsForSession(supabase, session!),
     getRates(supabase, session!.role),
     listEquipmentCatalog(supabase, { activeOnly: true }),
     listServiceCatalog(supabase, { activeOnly: true }),
     getTranslations("quotes"),
   ]);
   const locationNames = rates.locations.map((l) => l.name);
+  const lockedAgentCode = session!.role === "sales_agent" ? session!.agentCode : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -36,6 +37,7 @@ export default async function NewQuotePage({
         locationNames={locationNames}
         equipmentCatalog={equipmentCatalog}
         serviceCatalog={serviceCatalog}
+        lockedAgentCode={lockedAgentCode}
       />
     </div>
   );

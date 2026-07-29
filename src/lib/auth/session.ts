@@ -9,6 +9,9 @@ export interface SessionContext {
   role: StaffRole;
   isActive: boolean;
   isApproved: boolean;
+  /** For role === 'sales_agent': the agents.code this login is scoped to
+   * by RLS. Null (including for every other role) means unscoped/unlinked. */
+  agentCode: string | null;
 }
 
 /**
@@ -31,7 +34,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('full_name, role, is_active, is_approved')
+    .select('full_name, role, is_active, is_approved, agent_code')
     .eq('id', user.id)
     .single();
 
@@ -44,6 +47,7 @@ export const getSessionContext = cache(async (): Promise<SessionContext | null> 
     role: profile.role,
     isActive: profile.is_active,
     isApproved: profile.is_approved,
+    agentCode: profile.agent_code,
   };
 });
 

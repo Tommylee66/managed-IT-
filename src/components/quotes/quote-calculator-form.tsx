@@ -85,6 +85,7 @@ export function QuoteCalculatorForm({
   equipmentCatalog,
   serviceCatalog,
   initialValues,
+  lockedAgentCode,
 }: {
   customers: Customer[];
   agents: Agent[];
@@ -92,6 +93,11 @@ export function QuoteCalculatorForm({
   equipmentCatalog: EquipmentCatalogItem[];
   serviceCatalog: ServiceCatalogItem[];
   initialValues?: QuoteEditInitialValues;
+  /** When set (a sales_agent session), the agent picker is replaced with a
+   * read-only display of this code — RLS would reject saving a quote under
+   * a different agent anyway. `null` means "sales_agent but not yet linked
+   * to an agent by master." */
+  lockedAgentCode?: string | null;
 }) {
   const t = useTranslations("serviceCalculator");
   const tQuotes = useTranslations("quotes");
@@ -137,6 +143,11 @@ export function QuoteCalculatorForm({
       memo: initialValues?.inputs.memo ?? "",
     },
   });
+
+  useEffect(() => {
+    if (lockedAgentCode !== undefined) setValue("agent_code", lockedAgentCode ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockedAgentCode]);
 
   function toInputs(v: FormValues, discountOverride?: number): QuoteInputs {
     return {
@@ -273,21 +284,29 @@ export function QuoteCalculatorForm({
             </div>
             <div className="flex flex-col gap-2 col-span-2">
               <Label>{t("salesAgent")}</Label>
-              <Select
-                defaultValue={initialValues?.agent_code ?? undefined}
-                onValueChange={(v) => setValue("agent_code", v)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("noAgentSelected")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {agents.map((a) => (
-                    <SelectItem key={a.code} value={a.code}>
-                      {a.code} - {a.name} ({a.rate}%)
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {lockedAgentCode !== undefined ? (
+                <p className="text-sm text-muted-foreground">
+                  {lockedAgentCode
+                    ? `${lockedAgentCode} - ${agents.find((a) => a.code === lockedAgentCode)?.name ?? ""}`
+                    : t("noAgentLinked")}
+                </p>
+              ) : (
+                <Select
+                  defaultValue={initialValues?.agent_code ?? undefined}
+                  onValueChange={(v) => setValue("agent_code", v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("noAgentSelected")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {agents.map((a) => (
+                      <SelectItem key={a.code} value={a.code}>
+                        {a.code} - {a.name} ({a.rate}%)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="start_date">{t("serviceStartDate")}</Label>

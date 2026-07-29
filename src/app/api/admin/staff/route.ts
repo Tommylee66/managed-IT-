@@ -9,6 +9,7 @@ const createStaffSchema = z.object({
   password: z.string().min(8),
   full_name: z.string().min(1),
   role: z.enum(['master', 'admin_dept', 'activation_dept', 'sales_agent']).default('admin_dept'),
+  agent_code: z.string().optional(),
 });
 
 const MAX_MASTER_ACCOUNTS = 2;
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   }
-  const { email, password, full_name, role } = parsed.data;
+  const { email, password, full_name, role, agent_code } = parsed.data;
 
   const supabase = await createClient();
   if (role === 'master') {
@@ -57,10 +58,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: createError?.message ?? 'Failed to create user' }, { status: 400 });
   }
 
-  if (role === 'master') {
+  // handle_new_user always inserts the profile as admin_dept — apply the
+  // requested role (and, for sales_agent, the linked agent) here.
+  if (role !== 'admin_dept') {
     const { error: roleError } = await supabase
       .from('profiles')
-      .update({ role: 'master' })
+      .update({ role, agent_code: role === 'sales_agent' ? (agent_code ?? null) : null })
       .eq('id', created.user.id);
     if (roleError) {
       return NextResponse.json({ error: roleError.message }, { status: 400 });

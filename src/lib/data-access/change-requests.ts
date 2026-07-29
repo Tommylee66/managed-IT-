@@ -95,6 +95,7 @@ export async function createChangeRequest(
       customer_code: contract.customer_code,
       customer_name: contract.customer_name,
       contract_no: contract.no,
+      agent_code: contract.agent_code,
       old_monthly: oldMonthly,
       new_monthly: calc.monthly,
       diff,

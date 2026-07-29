@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -28,7 +28,17 @@ import {
 import { createCustomerAction } from "@/app/[locale]/(dashboard)/customers/actions";
 import type { Agent } from "@/types/domain";
 
-export function CreateCustomerDialog({ agents }: { agents: Agent[] }) {
+export function CreateCustomerDialog({
+  agents,
+  lockedAgentCode,
+}: {
+  agents: Agent[];
+  /** When set (a sales_agent session), the agent picker is replaced with a
+   * read-only display of this code — RLS would reject creating a customer
+   * under a different agent anyway. `null` means "sales_agent but not yet
+   * linked to an agent by master." */
+  lockedAgentCode?: string | null;
+}) {
   const t = useTranslations("customers");
   const [open, setOpen] = useState(false);
 
@@ -52,6 +62,10 @@ export function CreateCustomerDialog({ agents }: { agents: Agent[] }) {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
+
+  useEffect(() => {
+    if (lockedAgentCode !== undefined) setValue("agent_code", lockedAgentCode ?? undefined);
+  }, [lockedAgentCode, setValue]);
 
   async function onSubmit(values: FormValues) {
     try {
@@ -107,18 +121,26 @@ export function CreateCustomerDialog({ agents }: { agents: Agent[] }) {
           </div>
           <div className="flex flex-col gap-2">
             <Label>{t("assignedAgent")}</Label>
-            <Select onValueChange={(v) => setValue("agent_code", v)}>
-              <SelectTrigger>
-                <SelectValue placeholder={t("noAgentSelected")} />
-              </SelectTrigger>
-              <SelectContent>
-                {agents.map((a) => (
-                  <SelectItem key={a.code} value={a.code}>
-                    {a.code} - {a.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {lockedAgentCode !== undefined ? (
+              <p className="text-sm text-muted-foreground">
+                {lockedAgentCode
+                  ? `${lockedAgentCode} - ${agents.find((a) => a.code === lockedAgentCode)?.name ?? ""}`
+                  : t("noAgentLinked")}
+              </p>
+            ) : (
+              <Select onValueChange={(v) => setValue("agent_code", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("noAgentSelected")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map((a) => (
+                    <SelectItem key={a.code} value={a.code}>
+                      {a.code} - {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="memo">{t("memo")}</Label>

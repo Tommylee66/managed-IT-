@@ -6,6 +6,7 @@ import { setProfileRole } from '@/lib/data-access/profiles';
 
 const schema = z.object({
   role: z.enum(['master', 'admin_dept', 'activation_dept', 'sales_agent']),
+  agent_code: z.string().nullable().optional(),
 });
 
 const MAX_MASTER_ACCOUNTS = 2;
@@ -48,7 +49,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ us
     }
   }
 
-  const profile = await setProfileRole(supabase, userId, parsed.data.role);
+  const profile = await setProfileRole(supabase, userId, parsed.data.role, parsed.data.agent_code ?? null);
 
   await supabase.rpc('log_audit', {
     p_action: 'STAFF_ROLE_CHANGED',

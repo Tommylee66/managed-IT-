@@ -25,11 +25,27 @@ export async function setProfileActive(
 export async function setProfileRole(
   supabase: SupabaseClient,
   userId: string,
-  role: StaffRole
+  role: StaffRole,
+  agentCode: string | null = null
 ): Promise<Profile> {
   const { data, error } = await supabase
     .from('profiles')
-    .update({ role })
+    .update({ role, agent_code: role === 'sales_agent' ? agentCode : null })
+    .eq('id', userId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Profile;
+}
+
+export async function setProfileAgentCode(
+  supabase: SupabaseClient,
+  userId: string,
+  agentCode: string | null
+): Promise<Profile> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ agent_code: agentCode })
     .eq('id', userId)
     .select('*')
     .single();

@@ -25,6 +25,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { Agent } from "@/types/domain";
 
 const ROLES = ["admin_dept", "activation_dept", "sales_agent", "master"] as const;
 
@@ -33,14 +34,17 @@ type FormValues = {
   email: string;
   password: string;
   role: (typeof ROLES)[number];
+  agent_code?: string;
 };
 
 export function CreateStaffDialog({
   defaultName,
   defaultEmail,
+  agents = [],
 }: {
   defaultName?: string;
   defaultEmail?: string;
+  agents?: Agent[];
 } = {}) {
   const t = useTranslations("admin");
   const tRoles = useTranslations("roles");
@@ -52,6 +56,7 @@ export function CreateStaffDialog({
     email: z.string().email(t("emailInvalid")),
     password: z.string().min(8, t("passwordTooShort")),
     role: z.enum(ROLES),
+    agent_code: z.string().optional(),
   });
 
   const {
@@ -64,6 +69,8 @@ export function CreateStaffDialog({
     resolver: zodResolver(schema),
     defaultValues: { role: "admin_dept", full_name: defaultName ?? "", email: defaultEmail ?? "" },
   });
+
+  const [selectedRole, setSelectedRole] = useState<FormValues["role"]>("admin_dept");
 
   async function onSubmit(values: FormValues) {
     const res = await fetch("/api/admin/staff", {
@@ -78,6 +85,7 @@ export function CreateStaffDialog({
     }
     toast.success(t("createSuccess"));
     reset();
+    setSelectedRole("admin_dept");
     setOpen(false);
     router.refresh();
   }
@@ -109,7 +117,13 @@ export function CreateStaffDialog({
           </div>
           <div className="flex flex-col gap-2">
             <Label>{t("role")}</Label>
-            <Select defaultValue="admin_dept" onValueChange={(v) => setValue("role", v as FormValues["role"])}>
+            <Select
+              defaultValue="admin_dept"
+              onValueChange={(v) => {
+                setValue("role", v as FormValues["role"]);
+                setSelectedRole(v as FormValues["role"]);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -122,6 +136,23 @@ export function CreateStaffDialog({
               </SelectContent>
             </Select>
           </div>
+          {selectedRole === "sales_agent" && (
+            <div className="flex flex-col gap-2">
+              <Label>{t("linkedAgent")}</Label>
+              <Select onValueChange={(v) => setValue("agent_code", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t("noAgentLinked")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map((a) => (
+                    <SelectItem key={a.code} value={a.code}>
+                      {a.code} - {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("creating") : t("create")}

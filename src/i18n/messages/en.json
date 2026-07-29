@@ -165,7 +165,8 @@
     "penaltyRate": "Penalty Rate",
     "adminFeeLabel": "Admin Fee",
     "unamortizedAmount": "Unamortized Balance",
-    "contractStartDate": "Contract Start Date"
+    "contractStartDate": "Contract Start Date",
+    "noAgentLinked": "No agent linked"
   },
   "agents": {
     "title": "Sales Agents",
@@ -354,7 +355,8 @@
     "calculateError": "Calculation failed.",
     "saveError": "Failed to save.",
     "saveSuccess": "Quote saved.",
-    "cctvCount": "CCTV Count"
+    "cctvCount": "CCTV Count",
+    "noAgentLinked": "No agent linked"
   },
   "activations": {
     "title": "Activations",
@@ -767,7 +769,11 @@
     "serviceDeleteError": "Failed to delete service",
     "saveErrorJson": "Invalid JSON format.",
     "roleChangeSuccess": "Role updated",
-    "roleChangeError": "Failed to update role"
+    "roleChangeError": "Failed to update role",
+    "linkedAgent": "Linked Agent",
+    "noAgentLinked": "Not linked",
+    "agentLinkSuccess": "Agent link updated.",
+    "agentLinkError": "Failed to update agent link."
   },
   "documents": {
     "printSave": "Print / Save PDF",

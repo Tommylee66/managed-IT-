@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSessionContext } from "@/lib/auth/session";
 import { listProfiles } from "@/lib/data-access/profiles";
+import { listAgents } from "@/lib/data-access/agents";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { CreateStaffDialog } from "@/components/admin/create-staff-dialog";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { ToggleActiveButton } from "@/components/admin/toggle-active-button";
 import { RoleSelect } from "@/components/admin/role-select";
+import { AgentCodeSelect } from "@/components/admin/agent-code-select";
 
 export default async function AdminStaffPage({
   params,
@@ -26,7 +28,11 @@ export default async function AdminStaffPage({
   if (!session || session.role !== "master") redirect("/dashboard");
 
   const supabase = await createClient();
-  const [profiles, t] = await Promise.all([listProfiles(supabase), getTranslations("admin")]);
+  const [profiles, agents, t] = await Promise.all([
+    listProfiles(supabase),
+    listAgents(supabase, "master"),
+    getTranslations("admin"),
+  ]);
   const approvedProfiles = profiles.filter((p) => p.is_approved);
 
   const admin = createAdminClient();
@@ -38,7 +44,7 @@ export default async function AdminStaffPage({
       <CardHeader>
         <CardTitle>{t("staffTitle")}</CardTitle>
         <CardAction>
-          <CreateStaffDialog defaultName={name} defaultEmail={email} />
+          <CreateStaffDialog defaultName={name} defaultEmail={email} agents={agents} />
         </CardAction>
       </CardHeader>
       <CardContent>
@@ -48,6 +54,7 @@ export default async function AdminStaffPage({
               <TableHead>{t("name")}</TableHead>
               <TableHead>{t("email")}</TableHead>
               <TableHead>{t("role")}</TableHead>
+              <TableHead>{t("linkedAgent")}</TableHead>
               <TableHead>{t("status")}</TableHead>
               <TableHead>{t("actions")}</TableHead>
             </TableRow>
@@ -59,6 +66,14 @@ export default async function AdminStaffPage({
                 <TableCell>{emailById.get(p.id) ?? "-"}</TableCell>
                 <TableCell>
                   <RoleSelect userId={p.id} role={p.role} disabled={p.id === session.userId} />
+                </TableCell>
+                <TableCell>
+                  <AgentCodeSelect
+                    userId={p.id}
+                    agentCode={p.agent_code}
+                    agents={agents}
+                    disabled={p.role !== "sales_agent"}
+                  />
                 </TableCell>
                 <TableCell>
                   <Badge variant={p.is_active ? "default" : "secondary"}>

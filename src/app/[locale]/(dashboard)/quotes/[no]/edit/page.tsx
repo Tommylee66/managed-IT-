@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getQuote } from "@/lib/data-access/quotes";
 import { listCustomers } from "@/lib/data-access/customers";
-import { listAgents } from "@/lib/data-access/agents";
+import { listAgentsForSession } from "@/lib/data-access/agents";
 import { getRates } from "@/lib/data-access/rates";
 import { listEquipmentCatalog } from "@/lib/data-access/equipment";
 import { listServiceCatalog } from "@/lib/data-access/services";
@@ -24,7 +24,7 @@ export default async function EditQuotePage({
 
   const [customers, agents, rates, equipmentCatalog, serviceCatalog, t] = await Promise.all([
     listCustomers(supabase, session!.role),
-    listAgents(supabase, session!.role),
+    listAgentsForSession(supabase, session!),
     getRates(supabase, session!.role),
     // Not activeOnly — this quote may already have selections pointing at
     // equipment/services that were deactivated since it was created. The
@@ -35,6 +35,7 @@ export default async function EditQuotePage({
     getTranslations("quotes"),
   ]);
   const locationNames = rates.locations.map((l) => l.name);
+  const lockedAgentCode = session!.role === "sales_agent" ? session!.agentCode : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -47,6 +48,7 @@ export default async function EditQuotePage({
         locationNames={locationNames}
         equipmentCatalog={equipmentCatalog}
         serviceCatalog={serviceCatalog}
+        lockedAgentCode={lockedAgentCode}
         initialValues={{
           no: quote.no,
           customer_code: quote.customer_code,

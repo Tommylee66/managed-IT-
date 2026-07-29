@@ -165,7 +165,8 @@
     "penaltyRate": "Persentase Penalti",
     "adminFeeLabel": "Biaya Administrasi",
     "unamortizedAmount": "Saldo Belum Diamortisasi",
-    "contractStartDate": "Tanggal Mulai Kontrak"
+    "contractStartDate": "Tanggal Mulai Kontrak",
+    "noAgentLinked": "Belum ada agen terhubung"
   },
   "agents": {
     "title": "Agen Penjualan",
@@ -354,7 +355,8 @@
     "calculateError": "Gagal menghitung.",
     "saveError": "Gagal menyimpan.",
     "saveSuccess": "Penawaran berhasil disimpan.",
-    "cctvCount": "Jumlah CCTV"
+    "cctvCount": "Jumlah CCTV",
+    "noAgentLinked": "Belum ada agen terhubung"
   },
   "activations": {
     "title": "Aktivasi",
@@ -767,7 +769,11 @@
     "serviceDeleteError": "Gagal menghapus layanan",
     "saveErrorJson": "Format JSON tidak valid.",
     "roleChangeSuccess": "Peran berhasil diubah",
-    "roleChangeError": "Gagal mengubah peran"
+    "roleChangeError": "Gagal mengubah peran",
+    "linkedAgent": "Agen Terhubung",
+    "noAgentLinked": "Belum Terhubung",
+    "agentLinkSuccess": "Tautan agen berhasil diperbarui.",
+    "agentLinkError": "Gagal memperbarui tautan agen."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF",

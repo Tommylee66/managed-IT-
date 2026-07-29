@@ -46,6 +46,10 @@ export interface Profile {
   role: StaffRole;
   is_active: boolean;
   is_approved: boolean;
+  /** For role === 'sales_agent': the agents.code this login is scoped to.
+   * Null means unlinked — the account sees no customers/quotes/contracts/
+   * change-requests until master links it (see current_agent_code() RLS). */
+  agent_code: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -562,6 +566,7 @@ export interface ChangeRequest {
   customer_code: string | null;
   customer_name: string | null;
   contract_no: string | null;
+  agent_code: string | null;
   old_monthly: number | null;
   new_monthly: number | null;
   diff: number | null;

@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { listCustomers } from "@/lib/data-access/customers";
-import { listAgents } from "@/lib/data-access/agents";
+import { listAgentsForSession } from "@/lib/data-access/agents";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,9 +20,10 @@ export default async function CustomersPage({
   const supabase = await createClient();
   const [customers, agents, t] = await Promise.all([
     listCustomers(supabase, session!.role),
-    listAgents(supabase, session!.role),
+    listAgentsForSession(supabase, session!),
     getTranslations("customers"),
   ]);
+  const lockedAgentCode = session!.role === "sales_agent" ? session!.agentCode : undefined;
 
   const STATUS_LABEL: Record<string, string> = {
     draft: t("statusDraft"),
@@ -35,7 +36,7 @@ export default async function CustomersPage({
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
         <CardAction>
-          <CreateCustomerDialog agents={agents} />
+          <CreateCustomerDialog agents={agents} lockedAgentCode={lockedAgentCode} />
         </CardAction>
       </CardHeader>
       <CardContent>

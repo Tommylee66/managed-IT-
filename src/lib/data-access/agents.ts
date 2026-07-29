@@ -3,6 +3,7 @@ import type { Agent, AgentBank, AgentRateHistoryEntry } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { maskBankAccount, maskPhoneNumber, maskEmail, maskTaxId } from '@/lib/masking/staff-masking';
 import { nextAgentCode } from '@/lib/numbering';
+import type { SessionContext } from '@/lib/auth/session';
 
 function applyAgentMasking(agent: Agent, role: StaffRole): Agent {
   if (role === 'master') return agent;
@@ -20,6 +21,20 @@ export async function listAgents(supabase: SupabaseClient, role: StaffRole): Pro
   const { data, error } = await supabase.from('agents').select('*').order('code');
   if (error) throw error;
   return (data as Agent[]).map((a) => applyAgentMasking(a, role));
+}
+
+/** Like listAgents, but for a sales_agent session returns only their own
+ * linked agent (or [] if unlinked) instead of every agent in the system —
+ * used by pages that feed an agent-picker the sales_agent role must not
+ * be able to pick a different agent from. */
+export async function listAgentsForSession(
+  supabase: SupabaseClient,
+  session: SessionContext
+): Promise<Agent[]> {
+  if (session.role !== 'sales_agent') return listAgents(supabase, session.role);
+  if (!session.agentCode) return [];
+  const agent = await getAgent(supabase, session.agentCode, session.role);
+  return agent ? [agent] : [];
 }
 
 export async function getAgent(
