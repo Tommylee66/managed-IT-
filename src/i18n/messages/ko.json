@@ -773,7 +773,13 @@
     "linkedAgent": "연결된 대리점",
     "noAgentLinked": "미연결",
     "agentLinkSuccess": "대리점 연결이 변경되었습니다.",
-    "agentLinkError": "대리점 연결 변경에 실패했습니다."
+    "agentLinkError": "대리점 연결 변경에 실패했습니다.",
+    "serviceOneTimeFee": "1회성 공사 대금",
+    "serviceOneTimeCost": "1회성 공사 내부원가",
+    "serviceBillingMode": "공사대금 청구방식",
+    "serviceBillingModeOneTime": "1회 청구",
+    "serviceBillingModeMonthly": "월 분할 청구",
+    "serviceOneTimeFeeHint": "1회 청구는 견적서/계약서에 별도 항목으로 표시되며 실제 청구는 직원이 수동으로 처리합니다. 월 분할 청구는 계약기간 동안 균등 분할되어 월 청구액에 자동으로 포함됩니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장",

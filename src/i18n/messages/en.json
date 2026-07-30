@@ -773,7 +773,13 @@
     "linkedAgent": "Linked Agent",
     "noAgentLinked": "Not linked",
     "agentLinkSuccess": "Agent link updated.",
-    "agentLinkError": "Failed to update agent link."
+    "agentLinkError": "Failed to update agent link.",
+    "serviceOneTimeFee": "One-Time Construction Fee",
+    "serviceOneTimeCost": "One-Time Internal Cost",
+    "serviceBillingMode": "Construction Fee Billing Mode",
+    "serviceBillingModeOneTime": "Billed Once",
+    "serviceBillingModeMonthly": "Split Monthly",
+    "serviceOneTimeFeeHint": "Billed Once shows as a separate line on the quote/contract, collected manually by staff. Split Monthly divides it evenly across the contract term and folds it automatically into the monthly bill."
   },
   "documents": {
     "printSave": "Print / Save PDF",

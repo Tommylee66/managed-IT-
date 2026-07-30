@@ -14,7 +14,7 @@ export async function listServiceCatalog(
   if (error) throw error;
   const items = data as ServiceCatalogItem[];
   if (role === 'master') return items;
-  return items.map((item) => ({ ...item, monthly_cost: null }));
+  return items.map((item) => ({ ...item, monthly_cost: null, one_time_cost: null }));
 }
 
 interface ServiceFields {
@@ -24,6 +24,9 @@ interface ServiceFields {
   description_ko?: string | null;
   monthly_rate?: number | null;
   monthly_cost?: number | null;
+  one_time_fee?: number | null;
+  one_time_cost?: number | null;
+  one_time_billing_mode?: 'one_time' | 'monthly';
 }
 
 export type CreateServiceInput = ServiceFields & { created_by: string };
@@ -42,6 +45,9 @@ export async function createServiceCatalogItem(
       description_ko: input.description_ko ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
+      one_time_fee: input.one_time_fee ?? null,
+      one_time_cost: input.one_time_cost ?? null,
+      one_time_billing_mode: input.one_time_billing_mode ?? 'one_time',
       created_by: input.created_by,
     })
     .select('*')
@@ -67,6 +73,9 @@ export async function updateServiceCatalogItem(
       description_ko: input.description_ko ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
+      one_time_fee: input.one_time_fee ?? null,
+      one_time_cost: input.one_time_cost ?? null,
+      one_time_billing_mode: input.one_time_billing_mode ?? 'one_time',
     })
     .eq('id', id)
     .select('*')

@@ -24,6 +24,11 @@ export function QuoteDocument({
 }) {
   const ppn = Math.round((quote.monthly * ppnRate) / 100);
   const total = quote.monthly + ppn;
+  const recurringRows = quote.rows.filter((r) => !r.oneTime);
+  const oneTimeRows = quote.rows.filter((r) => r.oneTime);
+  const oneTimeSubtotal = oneTimeRows.reduce((sum, r) => sum + r.amount, 0);
+  const oneTimePpn = Math.round((oneTimeSubtotal * ppnRate) / 100);
+  const oneTimeTotal = oneTimeSubtotal + oneTimePpn;
   const cctvRentalSelected = quote.equipment_selections.some(
     (e) => e.category === "cctv" && e.monthlyRate != null
   );
@@ -66,7 +71,7 @@ export function QuoteDocument({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {quote.rows
+          {recurringRows
             .filter((r) => r.amount !== 0)
             .map((r, i) => {
               const label = renderBilingualQuoteRowLabel(r);
@@ -98,6 +103,61 @@ export function QuoteDocument({
         </TableBody>
       </Table>
       </DocTable>
+
+      {oneTimeRows.length > 0 && (
+        <div>
+          <h3 className="mb-1 font-semibold">
+            <Bilingual id="Biaya Satu Kali (Ditagihkan Terpisah)" ko="일회성 항목 (별도 청구)" />
+          </h3>
+          <DocTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <Bilingual id="Item" ko="항목" />
+                </TableHead>
+                <TableHead className="text-right">
+                  <Bilingual id="Jumlah" ko="금액" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {oneTimeRows.map((r, i) => {
+                const label = renderBilingualQuoteRowLabel(r);
+                return (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Bilingual id={label.id} ko={label.ko} />
+                    </TableCell>
+                    <TableCell className="text-right">{formatRupiah(r.amount, "id")}</TableCell>
+                  </TableRow>
+                );
+              })}
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <Bilingual id="Subtotal Biaya Satu Kali" ko="일회성 항목 소계" />
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatRupiah(oneTimeSubtotal, "id")}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>PPN {ppnRate}%</TableCell>
+                <TableCell className="text-right">{formatRupiah(oneTimePpn, "id")}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <Bilingual id="Total Biaya Satu Kali" ko="일회성 항목 합계" />
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatRupiah(oneTimeTotal, "id")}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          </DocTable>
+        </div>
+      )}
 
       <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm">
         <Bilingual

@@ -1,9 +1,10 @@
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { contractClauses } from "@/components/documents/contract-clauses";
+import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
 import type { Contract } from "@/types/domain";
 
 export function ContractDocument({
@@ -24,6 +25,10 @@ export function ContractDocument({
   const sections = contractClauses(contract);
   const ppn = Math.round((contract.monthly_fee * ppnRate) / 100);
   const total = contract.monthly_fee + ppn;
+  const oneTimeRows = (contract.quote_snapshot?.rows ?? []).filter((r) => r.oneTime);
+  const oneTimeSubtotal = oneTimeRows.reduce((sum, r) => sum + r.amount, 0);
+  const oneTimePpn = Math.round((oneTimeSubtotal * ppnRate) / 100);
+  const oneTimeTotal = oneTimeSubtotal + oneTimePpn;
 
   return (
     <DocumentShell
@@ -83,6 +88,61 @@ export function ContractDocument({
         </TableBody>
       </Table>
       </DocTable>
+
+      {oneTimeRows.length > 0 && (
+        <div>
+          <h3 className="mb-1 font-semibold">
+            <Bilingual id="Biaya Satu Kali (Ditagihkan Terpisah)" ko="일회성 항목 (별도 청구)" />
+          </h3>
+          <DocTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <Bilingual id="Item" ko="항목" />
+                </TableHead>
+                <TableHead className="text-right">
+                  <Bilingual id="Jumlah" ko="금액" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {oneTimeRows.map((r, i) => {
+                const label = renderBilingualQuoteRowLabel(r);
+                return (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Bilingual id={label.id} ko={label.ko} />
+                    </TableCell>
+                    <TableCell className="text-right">{formatRupiah(r.amount, "id")}</TableCell>
+                  </TableRow>
+                );
+              })}
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <Bilingual id="Subtotal Biaya Satu Kali" ko="일회성 항목 소계" />
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatRupiah(oneTimeSubtotal, "id")}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>PPN {ppnRate}%</TableCell>
+                <TableCell className="text-right">{formatRupiah(oneTimePpn, "id")}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <Bilingual id="Total Biaya Satu Kali" ko="일회성 항목 합계" />
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatRupiah(oneTimeTotal, "id")}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          </DocTable>
+        </div>
+      )}
 
       <div className="flex flex-col gap-4">
         {sections.map((section) => (

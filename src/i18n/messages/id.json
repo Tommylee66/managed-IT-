@@ -773,7 +773,13 @@
     "linkedAgent": "Agen Terhubung",
     "noAgentLinked": "Belum Terhubung",
     "agentLinkSuccess": "Tautan agen berhasil diperbarui.",
-    "agentLinkError": "Gagal memperbarui tautan agen."
+    "agentLinkError": "Gagal memperbarui tautan agen.",
+    "serviceOneTimeFee": "Biaya Konstruksi Satu Kali",
+    "serviceOneTimeCost": "Biaya Internal Konstruksi",
+    "serviceBillingMode": "Cara Penagihan Biaya Konstruksi",
+    "serviceBillingModeOneTime": "Tagihan 1x",
+    "serviceBillingModeMonthly": "Dicicil Bulanan",
+    "serviceOneTimeFeeHint": "Tagihan 1x akan tampil sebagai item terpisah pada penawaran/kontrak dan ditagihkan secara manual oleh staf. Dicicil bulanan akan dibagi rata selama masa kontrak dan otomatis masuk ke tagihan bulanan."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF",

@@ -124,6 +124,9 @@ export default async function AdminRatesPage({
                 <TableHead>{t("serviceDescriptionKo")}</TableHead>
                 <TableHead className="text-right">{t("serviceMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("serviceMonthlyCost")}</TableHead>
+                <TableHead className="text-right">{t("serviceOneTimeFee")}</TableHead>
+                <TableHead className="text-right">{t("serviceOneTimeCost")}</TableHead>
+                <TableHead>{t("serviceBillingMode")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
                 <TableHead>{t("actions")}</TableHead>
               </TableRow>
@@ -141,6 +144,19 @@ export default async function AdminRatesPage({
                   <TableCell className="text-right">
                     {item.monthly_cost != null ? formatRupiah(item.monthly_cost, locale as Locale) : "-"}
                   </TableCell>
+                  <TableCell className="text-right">
+                    {item.one_time_fee != null ? formatRupiah(item.one_time_fee, locale as Locale) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.one_time_cost != null ? formatRupiah(item.one_time_cost, locale as Locale) : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {item.one_time_fee != null
+                      ? item.one_time_billing_mode === "monthly"
+                        ? t("serviceBillingModeMonthly")
+                        : t("serviceBillingModeOneTime")
+                      : "-"}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={item.is_active ? "default" : "secondary"}>
                       {item.is_active ? t("active") : t("inactive")}
@@ -155,7 +171,7 @@ export default async function AdminRatesPage({
               ))}
               {serviceItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center text-muted-foreground">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground">
                     {t("noService")}
                   </TableCell>
                 </TableRow>

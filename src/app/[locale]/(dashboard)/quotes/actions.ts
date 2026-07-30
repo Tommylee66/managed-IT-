@@ -18,9 +18,12 @@ export interface QuotePreview {
     key: string;
     label: string;
     labelKey?: string;
+    labelId?: string;
+    labelKo?: string;
     params?: Record<string, string | number>;
     amount: number;
     commissionable: boolean;
+    oneTime?: boolean;
   }[];
   monthly: number;
   ppn: number;
@@ -54,7 +57,8 @@ export async function calculateQuotePreviewAction(
   const resolvedServices = resolveServiceSelections(services, serviceCatalog);
   const calc = mergeServiceIntoCalc(
     mergeEquipmentIntoCalc(calcQuoteForInputs(rates, inputs, months), resolved),
-    resolvedServices
+    resolvedServices,
+    months
   );
   const ppn = Math.round((calc.monthly * rates.ppn) / 100);
 
@@ -62,9 +66,12 @@ export async function calculateQuotePreviewAction(
     key: r.key,
     label: r.label,
     labelKey: r.labelKey,
+    labelId: r.labelId,
+    labelKo: r.labelKo,
     params: r.params,
     amount: r.amount,
     commissionable: r.commissionable,
+    oneTime: r.oneTime,
   }));
 
   if (session.role === 'master') {

@@ -79,7 +79,8 @@ export async function createChangeRequest(
       calcQuoteForInputs(rates, input.new_inputs, contract.months),
       newEquipmentSelections
     ),
-    newServiceSelections
+    newServiceSelections,
+    contract.months
   );
   const diff = calc.monthly - oldMonthly;
   const settlementAmount = calcProratedSettlement(input.effective_date, diff);

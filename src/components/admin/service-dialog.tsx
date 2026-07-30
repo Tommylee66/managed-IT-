@@ -22,6 +22,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   createServiceCatalogItemAction,
   updateServiceCatalogItemAction,
 } from "@/app/[locale]/(dashboard)/admin/rates/actions";
@@ -42,6 +49,9 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
     description_ko: z.string().optional(),
     monthly_rate: z.string().optional(),
     monthly_cost: z.string().optional(),
+    one_time_fee: z.string().optional(),
+    one_time_cost: z.string().optional(),
+    one_time_billing_mode: z.enum(["one_time", "monthly"]),
   });
   type FormValues = z.infer<typeof schema>;
 
@@ -60,6 +70,9 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
       description_ko: item?.description_ko ?? "",
       monthly_rate: item?.monthly_rate?.toString() ?? "",
       monthly_cost: item?.monthly_cost?.toString() ?? "",
+      one_time_fee: item?.one_time_fee?.toString() ?? "",
+      one_time_cost: item?.one_time_cost?.toString() ?? "",
+      one_time_billing_mode: item?.one_time_billing_mode ?? "one_time",
     },
   });
 
@@ -71,6 +84,9 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
       description_ko: values.description_ko,
       monthly_rate: values.monthly_rate ? Number(values.monthly_rate) : null,
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
+      one_time_fee: values.one_time_fee ? Number(values.one_time_fee) : null,
+      one_time_cost: values.one_time_cost ? Number(values.one_time_cost) : null,
+      one_time_billing_mode: values.one_time_billing_mode,
     };
     try {
       if (isEdit) {
@@ -157,6 +173,59 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">{t("serviceRateHint")}</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="one_time_fee">{t("serviceOneTimeFee")}</Label>
+              <Controller
+                control={control}
+                name="one_time_fee"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="one_time_fee"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="one_time_cost">{t("serviceOneTimeCost")}</Label>
+              <Controller
+                control={control}
+                name="one_time_cost"
+                render={({ field }) => (
+                  <CurrencyInput
+                    id="one_time_cost"
+                    locale={locale}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  />
+                )}
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label>{t("serviceBillingMode")}</Label>
+            <Controller
+              control={control}
+              name="one_time_billing_mode"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="one_time">{t("serviceBillingModeOneTime")}</SelectItem>
+                    <SelectItem value="monthly">{t("serviceBillingModeMonthly")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">{t("serviceOneTimeFeeHint")}</p>
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("creating") : isEdit ? tCommon("save") : t("create")}

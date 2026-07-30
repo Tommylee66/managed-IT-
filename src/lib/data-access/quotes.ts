@@ -108,7 +108,8 @@ export async function createQuote(
       calcQuoteForInputs(rates, input.inputs, input.months),
       input.equipment_selections ?? []
     ),
-    input.service_selections ?? []
+    input.service_selections ?? [],
+    input.months
   );
   const no = await nextQuoteNo(supabase);
   const { data, error } = await supabase
@@ -165,7 +166,8 @@ export async function updateQuote(
       calcQuoteForInputs(rates, input.inputs, input.months),
       input.equipment_selections ?? []
     ),
-    input.service_selections ?? []
+    input.service_selections ?? [],
+    input.months
   );
   const { data, error } = await supabase
     .from('quotes')

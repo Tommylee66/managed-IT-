@@ -248,6 +248,13 @@ export interface ServiceCatalogItem {
   monthly_rate: number | null;
   /** Internal monthly cost, master-only — null if not tracked. */
   monthly_cost: number | null;
+  /** One-time construction/installation fee, customer-facing. Null = none. */
+  one_time_fee: number | null;
+  /** Internal cost of the one-time fee, master-only. */
+  one_time_cost: number | null;
+  /** How the one-time fee is collected: as a single lump sum, or spread
+   * evenly across the contract's months. */
+  one_time_billing_mode: 'one_time' | 'monthly';
   is_active: boolean;
   created_by: string | null;
   created_at: string;
@@ -266,6 +273,9 @@ export interface ServiceSelection {
   /** Rate/cost snapshotted at selection time — see ServiceCatalogItem. */
   monthlyRate: number | null;
   monthlyCost: number | null;
+  oneTimeFee: number | null;
+  oneTimeCost: number | null;
+  oneTimeBillingMode: 'one_time' | 'monthly';
 }
 
 export interface QuoteRowRecord {
@@ -284,6 +294,10 @@ export interface QuoteRowRecord {
   cost: number;
   init: number;
   commissionable: boolean;
+  /** Marks this row as a non-recurring one-time charge — excluded from the
+   * quote/contract's recurring monthly/margin/commission figures, rendered
+   * in its own section on the quote and contract documents instead. */
+  oneTime?: boolean;
 }
 
 export interface Quote {
