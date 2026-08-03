@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { AssetType, EquipmentCatalogItem } from '@/types/domain';
+import type { AssetType, EquipmentCatalogItem, EquipmentSelection, Quote } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 
 /** Staff can see the customer-facing monthly rate (they need it to explain
@@ -33,6 +33,7 @@ interface EquipmentFields {
   monthly_cost?: number | null;
   overage_rate?: number | null;
   overage_cost?: number | null;
+  suggestion_months?: number | null;
 }
 
 export type CreateEquipmentInput = EquipmentFields & { created_by: string };
@@ -54,6 +55,7 @@ export async function createEquipmentCatalogItem(
       monthly_cost: input.monthly_cost ?? null,
       overage_rate: input.overage_rate ?? null,
       overage_cost: input.overage_cost ?? null,
+      suggestion_months: input.suggestion_months ?? null,
       created_by: input.created_by,
     })
     .select('*')
@@ -82,6 +84,7 @@ export async function updateEquipmentCatalogItem(
       monthly_cost: input.monthly_cost ?? null,
       overage_rate: input.overage_rate ?? null,
       overage_cost: input.overage_cost ?? null,
+      suggestion_months: input.suggestion_months ?? null,
     })
     .eq('id', id)
     .select('*')
@@ -103,4 +106,56 @@ export async function setEquipmentCatalogActive(
     .single();
   if (error) throw error;
   return data as EquipmentCatalogItem;
+}
+
+/** Equipment catalog rows aren't referenced by foreign key — quotes/contracts/
+ * change-requests snapshot the selected item's spec/rate into their own JSONB
+ * columns, so "is this catalog item in use" means scanning those snapshots for
+ * a matching catalogId, not a DB-level referential check. */
+export async function listUsedEquipmentCatalogIds(supabase: SupabaseClient): Promise<Set<string>> {
+  const [quotes, contracts, changeRequests] = await Promise.all([
+    supabase.from('quotes').select('equipment_selections'),
+    supabase.from('contracts').select('quote_snapshot'),
+    supabase.from('change_requests').select('old_equipment_selections, new_equipment_selections'),
+  ]);
+  if (quotes.error) throw quotes.error;
+  if (contracts.error) throw contracts.error;
+  if (changeRequests.error) throw changeRequests.error;
+
+  const ids = new Set<string>();
+  for (const row of quotes.data ?? []) {
+    for (const sel of (row.equipment_selections ?? []) as EquipmentSelection[]) ids.add(sel.catalogId);
+  }
+  for (const row of contracts.data ?? []) {
+    const snapshot = row.quote_snapshot as Quote | null;
+    for (const sel of snapshot?.equipment_selections ?? []) ids.add(sel.catalogId);
+  }
+  for (const row of changeRequests.data ?? []) {
+    const oldSels = (row.old_equipment_selections ?? []) as EquipmentSelection[];
+    const newSels = (row.new_equipment_selections ?? []) as EquipmentSelection[];
+    for (const sel of [...oldSels, ...newSels]) ids.add(sel.catalogId);
+  }
+  return ids;
+}
+
+/** Deletes every catalog item NOT referenced by any existing quote/contract/
+ * change-request. Returns how many were actually deleted vs. skipped because
+ * they're in use, so the caller can report both counts to the user. */
+export async function deleteUnusedEquipmentCatalogItems(
+  supabase: SupabaseClient
+): Promise<{ deletedCount: number; skippedCount: number }> {
+  const [{ data: allItems, error: listError }, usedIds] = await Promise.all([
+    supabase.from('equipment_catalog').select('id'),
+    listUsedEquipmentCatalogIds(supabase),
+  ]);
+  if (listError) throw listError;
+
+  const allIds = (allItems ?? []).map((r) => r.id as string);
+  const idsToDelete = allIds.filter((id) => !usedIds.has(id));
+  const skippedCount = allIds.length - idsToDelete.length;
+  if (idsToDelete.length === 0) return { deletedCount: 0, skippedCount };
+
+  const { error: deleteError } = await supabase.from('equipment_catalog').delete().in('id', idsToDelete);
+  if (deleteError) throw deleteError;
+  return { deletedCount: idsToDelete.length, skippedCount };
 }

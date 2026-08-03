@@ -13,6 +13,7 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/componen
 import { formatRupiah } from "@/lib/utils/currency";
 import { EquipmentDialog } from "@/components/admin/equipment-dialog";
 import { ToggleEquipmentActiveButton } from "@/components/admin/toggle-equipment-active-button";
+import { DeleteAllEquipmentButton } from "@/components/admin/delete-all-equipment-button";
 import { ServiceDialog } from "@/components/admin/service-dialog";
 import { ToggleServiceActiveButton } from "@/components/admin/toggle-service-active-button";
 import { DeleteServiceButton } from "@/components/admin/delete-service-button";
@@ -45,7 +46,8 @@ export default async function AdminRatesPage({
       <Card>
         <CardHeader>
           <CardTitle>{t("equipmentTitle")}</CardTitle>
-          <CardAction>
+          <CardAction className="flex gap-2">
+            <DeleteAllEquipmentButton count={equipmentItems.length} />
             <EquipmentDialog />
           </CardAction>
         </CardHeader>
@@ -58,6 +60,7 @@ export default async function AdminRatesPage({
                 <TableHead>{t("equipmentSpecId")}</TableHead>
                 <TableHead>{t("equipmentSpecKo")}</TableHead>
                 <TableHead className="text-right">{t("equipmentPurchasePrice")}</TableHead>
+                <TableHead className="text-right">{t("equipmentSuggestionMonths")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
                 <TableHead className="text-right">{t("equipmentOverageRate")}</TableHead>
@@ -74,6 +77,9 @@ export default async function AdminRatesPage({
                   <TableCell>{item.spec_ko ?? "-"}</TableCell>
                   <TableCell className="text-right">
                     {item.purchase_price != null ? formatRupiah(item.purchase_price, locale as Locale) : "-"}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.suggestion_months ?? "-"}
                   </TableCell>
                   <TableCell className="text-right">
                     {item.monthly_rate != null ? formatRupiah(item.monthly_rate, locale as Locale) : "-"}
@@ -97,7 +103,7 @@ export default async function AdminRatesPage({
               ))}
               {equipmentItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground">
                     {t("noEquipment")}
                   </TableCell>
                 </TableRow>

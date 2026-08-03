@@ -19,8 +19,9 @@ export function DeleteServiceButton({ id, name }: { id: string; name: string }) 
       await deleteServiceCatalogItemAction(id);
       toast.success(t("serviceDeleteSuccess"));
       router.refresh();
-    } catch {
-      toast.error(t("serviceDeleteError"));
+    } catch (e) {
+      const inUse = e instanceof Error && e.message.includes("SERVICE_IN_USE");
+      toast.error(inUse ? t("serviceDeleteInUseError") : t("serviceDeleteError"));
     } finally {
       setIsSubmitting(false);
     }

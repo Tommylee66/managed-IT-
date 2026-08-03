@@ -60,8 +60,8 @@ const SUGGESTION_MONTHS_BY_CATEGORY: Partial<Record<AssetType, number>> = {
 // default margin, not derived from anything else. Master can override it.
 const SUGGESTION_COST_RATIO = 0.5;
 
-function suggestMonthly(purchasePrice: number, category: AssetType): number {
-  const months = SUGGESTION_MONTHS_BY_CATEGORY[category] ?? SUGGESTION_MONTHS_DEFAULT;
+function suggestMonthly(purchasePrice: number, category: AssetType, overrideMonths?: number): number {
+  const months = overrideMonths || SUGGESTION_MONTHS_BY_CATEGORY[category] || SUGGESTION_MONTHS_DEFAULT;
   return Math.round(purchasePrice / months / 1000) * 1000;
 }
 
@@ -75,6 +75,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
   const isEdit = !!item;
   const [rateTouched, setRateTouched] = useState(!!item?.monthly_rate);
   const [costTouched, setCostTouched] = useState(!!item?.monthly_cost);
+  const [category, setCategory] = useState<AssetType>(item?.category ?? "ap");
 
   const schema = z.object({
     category: z.enum(CATEGORIES as [AssetType, ...AssetType[]]),
@@ -82,6 +83,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     spec_id: z.string().optional(),
     spec_ko: z.string().optional(),
     purchase_price: z.string().optional(),
+    suggestion_months: z.string().optional(),
     monthly_rate: z.string().optional(),
     monthly_cost: z.string().optional(),
     overage_rate: z.string().optional(),
@@ -105,6 +107,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       spec_id: item?.spec_id ?? "",
       spec_ko: item?.spec_ko ?? "",
       purchase_price: item?.purchase_price?.toString() ?? "",
+      suggestion_months: item?.suggestion_months?.toString() ?? "",
       monthly_rate: item?.monthly_rate?.toString() ?? "",
       monthly_cost: item?.monthly_cost?.toString() ?? "",
       overage_rate: item?.overage_rate?.toString() ?? "",
@@ -112,9 +115,9 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     },
   });
 
-  function applySuggestion(price: number, category: AssetType) {
+  function applySuggestion(price: number, category: AssetType, overrideMonths?: number) {
     if (!price) return;
-    const suggested = suggestMonthly(price, category);
+    const suggested = suggestMonthly(price, category, overrideMonths);
     if (!rateTouched) setValue("monthly_rate", String(suggested));
     if (!costTouched) {
       setValue("monthly_cost", String(Math.round((suggested * SUGGESTION_COST_RATIO) / 1000) * 1000));
@@ -123,12 +126,22 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
 
   function onPurchasePriceChange(value: string) {
     setValue("purchase_price", value);
-    applySuggestion(Number(value), getValues("category"));
+    applySuggestion(Number(value), getValues("category"), Number(getValues("suggestion_months")) || undefined);
   }
 
-  function onCategoryChange(category: AssetType) {
-    setValue("category", category);
-    applySuggestion(Number(getValues("purchase_price")), category);
+  function onCategoryChange(newCategory: AssetType) {
+    setValue("category", newCategory);
+    setCategory(newCategory);
+    applySuggestion(
+      Number(getValues("purchase_price")),
+      newCategory,
+      Number(getValues("suggestion_months")) || undefined
+    );
+  }
+
+  function onSuggestionMonthsChange(value: string) {
+    setValue("suggestion_months", value);
+    applySuggestion(Number(getValues("purchase_price")), getValues("category"), Number(value) || undefined);
   }
 
   async function onSubmit(values: FormValues) {
@@ -138,6 +151,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       spec_id: values.spec_id,
       spec_ko: values.spec_ko,
       purchase_price: values.purchase_price ? Number(values.purchase_price) : null,
+      suggestion_months: values.suggestion_months ? Number(values.suggestion_months) : null,
       monthly_rate: values.monthly_rate ? Number(values.monthly_rate) : null,
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
       overage_rate: values.overage_rate ? Number(values.overage_rate) : null,
@@ -227,6 +241,26 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
               )}
             />
             <p className="text-xs text-muted-foreground">{t("equipmentPurchasePriceHint")}</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="suggestion_months">{t("equipmentSuggestionMonths")}</Label>
+            <Controller
+              control={control}
+              name="suggestion_months"
+              render={({ field }) => (
+                <Input
+                  id="suggestion_months"
+                  type="number"
+                  min={1}
+                  step={1}
+                  placeholder={String(SUGGESTION_MONTHS_BY_CATEGORY[category] ?? SUGGESTION_MONTHS_DEFAULT)}
+                  value={field.value ?? ""}
+                  onChange={(e) => onSuggestionMonthsChange(e.target.value)}
+                  onBlur={field.onBlur}
+                />
+              )}
+            />
+            <p className="text-xs text-muted-foreground">{t("equipmentSuggestionMonthsHint")}</p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
