@@ -8,7 +8,7 @@ import {
   createEquipmentCatalogItem,
   updateEquipmentCatalogItem,
   setEquipmentCatalogActive,
-  deleteUnusedEquipmentCatalogItems,
+  deleteEquipmentCatalogItem,
   type CreateEquipmentInput,
   type UpdateEquipmentInput,
 } from '@/lib/data-access/equipment';
@@ -56,12 +56,11 @@ export async function setEquipmentCatalogActiveAction(id: string, isActive: bool
   return item;
 }
 
-export async function deleteAllUnusedEquipmentCatalogItemsAction() {
+export async function deleteEquipmentCatalogItemAction(id: string) {
   await requireMaster();
   const supabase = await createClient();
-  const result = await deleteUnusedEquipmentCatalogItems(supabase);
+  await deleteEquipmentCatalogItem(supabase, id);
   revalidatePath('/admin/rates');
-  return result;
 }
 
 export async function createServiceCatalogItemAction(input: Omit<CreateServiceInput, 'created_by'>) {

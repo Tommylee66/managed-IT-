@@ -186,8 +186,8 @@ export function contractClauses(contract: Contract): ClauseSection[] {
         ...(hasRentedEquipment
           ? [
               {
-                id: 'Jika kontrak berakhir sesuai masa kontrak, kepemilikan perangkat sewa yang disediakan BCT beralih kepada Pelanggan. (Kecuali printer — biaya sewanya tetap sama meskipun masa kontrak telah berakhir.) Setelah kepemilikan beralih, biaya yang ditagihkan bukan lagi biaya sewa, melainkan biaya pemeliharaan sebesar 30% dari tarif sewa semula.',
-                ko: '계약기간이 정상적으로 종료되는 경우 BCT가 제공한 임대장비의 소유권은 고객에게 이전된다. (단, 프린터는 제외되며 계약기간이 지나도 임대비용은 동일하다.) 소유권이 이전된 이후에는 임대료가 아닌 유지보수료가 기존 임대료의 30% 금액으로 청구된다.',
+                id: 'Meskipun masa kontrak telah berakhir, kepemilikan perangkat sewa yang disediakan BCT tetap menjadi milik BCT. Dalam hal ini, biaya sewa yang ditagihkan adalah sebesar 70% dari tarif sewa semula. (Kecuali printer — biaya sewanya tetap sama meskipun masa kontrak telah berakhir.)',
+                ko: '계약기간이 종료된 이후에도 BCT가 제공한 임대장비의 소유권은 BCT에 있다. 이 경우 임대료는 기존 임대료의 70% 금액으로 청구된다. (단, 프린터는 제외되며 계약기간이 지나도 임대비용은 동일하다.)',
               },
             ]
           : []),

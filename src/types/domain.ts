@@ -213,11 +213,6 @@ export interface EquipmentCatalogItem {
   overage_rate: number | null;
   /** Internal cost per extra unit, master-only. */
   overage_cost: number | null;
-  /** Per-item override for the admin form's monthly-rate-from-purchase-price
-   * suggestion amortization period (in months). Null = fall back to the
-   * category default. Pure UI convenience — never read by the pricing engine
-   * or any calc/document. */
-  suggestion_months: number | null;
   is_active: boolean;
   created_by: string | null;
   created_at: string;

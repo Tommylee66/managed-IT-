@@ -22,7 +22,6 @@ import {
   isConfigAsset,
   type AssetDecisionInput,
 } from "@/lib/calc/termination-calc";
-import { getContractEndDate } from "@/lib/calc/invoice-calc";
 import { createTerminationPlanAction } from "@/app/[locale]/(dashboard)/termination/actions";
 import type { Contract, Asset } from "@/types/domain";
 import type { Locale } from "@/config/constants";
@@ -97,23 +96,10 @@ export function TerminationForm({
 
   const elapsed = contractElapsedMonths(contract.start_date, termDate, contract.months);
   const remaining = contractRemainingMonths(contract.start_date, termDate, contract.months);
-  // Once the contract's own term has already ended (this termination is
-  // happening during the post-term maintenance-fee period, not the original
-  // contract), equipment ownership has already passed to the customer — see
-  // the post-term clause in quote-document.tsx/contract-clauses.ts. There is
-  // nothing left to amortize or recover for it at that point.
-  const contractTermEnded = termDate > getContractEndDate(contract);
 
   const decisions = useMemo(
     () =>
       rows.map((r) => {
-        // Printers never transfer ownership post-term (they keep billing at
-        // full rate indefinitely instead) — so this override skips them,
-        // leaving their action/amortization to the normal per-asset logic
-        // below exactly as if the contract hadn't ended.
-        if (contractTermEnded && r.type !== "printer") {
-          return calcAssetDecision({ ...r, owner: "customer" }, 0, contract.months);
-        }
         // An asset can't have been in service before the contract existed —
         // clamp defensively, then measure THIS asset's own elapsed/remaining
         // time from when it was actually installed (see AssetDecisionInput.
@@ -126,7 +112,7 @@ export function TerminationForm({
         const rowRemaining = contractRemainingMonths(effectiveStart, termDate, contract.months);
         return calcAssetDecision(r, rowRemaining, contract.months);
       }),
-    [rows, termDate, contract.start_date, contract.months, contractTermEnded]
+    [rows, termDate, contract.start_date, contract.months]
   );
   const summary = useMemo(
     () => summarizeTerminationPlan(decisions, penaltyRate, adminFee, unpaid),

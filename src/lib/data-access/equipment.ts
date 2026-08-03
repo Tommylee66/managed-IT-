@@ -33,7 +33,6 @@ interface EquipmentFields {
   monthly_cost?: number | null;
   overage_rate?: number | null;
   overage_cost?: number | null;
-  suggestion_months?: number | null;
 }
 
 export type CreateEquipmentInput = EquipmentFields & { created_by: string };
@@ -55,7 +54,6 @@ export async function createEquipmentCatalogItem(
       monthly_cost: input.monthly_cost ?? null,
       overage_rate: input.overage_rate ?? null,
       overage_cost: input.overage_cost ?? null,
-      suggestion_months: input.suggestion_months ?? null,
       created_by: input.created_by,
     })
     .select('*')
@@ -84,7 +82,6 @@ export async function updateEquipmentCatalogItem(
       monthly_cost: input.monthly_cost ?? null,
       overage_rate: input.overage_rate ?? null,
       overage_cost: input.overage_cost ?? null,
-      suggestion_months: input.suggestion_months ?? null,
     })
     .eq('id', id)
     .select('*')
@@ -138,24 +135,14 @@ export async function listUsedEquipmentCatalogIds(supabase: SupabaseClient): Pro
   return ids;
 }
 
-/** Deletes every catalog item NOT referenced by any existing quote/contract/
- * change-request. Returns how many were actually deleted vs. skipped because
- * they're in use, so the caller can report both counts to the user. */
-export async function deleteUnusedEquipmentCatalogItems(
-  supabase: SupabaseClient
-): Promise<{ deletedCount: number; skippedCount: number }> {
-  const [{ data: allItems, error: listError }, usedIds] = await Promise.all([
-    supabase.from('equipment_catalog').select('id'),
-    listUsedEquipmentCatalogIds(supabase),
-  ]);
-  if (listError) throw listError;
-
-  const allIds = (allItems ?? []).map((r) => r.id as string);
-  const idsToDelete = allIds.filter((id) => !usedIds.has(id));
-  const skippedCount = allIds.length - idsToDelete.length;
-  if (idsToDelete.length === 0) return { deletedCount: 0, skippedCount };
-
-  const { error: deleteError } = await supabase.from('equipment_catalog').delete().in('id', idsToDelete);
-  if (deleteError) throw deleteError;
-  return { deletedCount: idsToDelete.length, skippedCount };
+/** Hard delete — rejects if the item is referenced by any existing
+ * quote/contract/change-request (see listUsedEquipmentCatalogIds), so an
+ * already-issued document never ends up pointing at a vanished catalog row. */
+export async function deleteEquipmentCatalogItem(supabase: SupabaseClient, id: string): Promise<void> {
+  const usedIds = await listUsedEquipmentCatalogIds(supabase);
+  if (usedIds.has(id)) {
+    throw new Error('EQUIPMENT_IN_USE');
+  }
+  const { error } = await supabase.from('equipment_catalog').delete().eq('id', id);
+  if (error) throw error;
 }
