@@ -11,7 +11,7 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'always',
 });
 
-const PROTECTED_PREFIXES = ['/dashboard', '/customers', '/agents', '/applications', '/quotes', '/contracts', '/activations', '/assets', '/change-requests', '/invoices', '/termination', '/service-logs', '/incident-logs', '/admin'];
+const PROTECTED_PREFIXES = ['/dashboard', '/customers', '/agents', '/applications', '/quotes', '/contracts', '/activations', '/assets', '/change-requests', '/invoices', '/termination', '/service-logs', '/incident-logs', '/admin', '/guide'];
 const AUTH_ROUTES = ['/login'];
 
 export async function proxy(request: NextRequest) {

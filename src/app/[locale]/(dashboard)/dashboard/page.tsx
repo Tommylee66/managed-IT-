@@ -81,6 +81,7 @@ export default async function DashboardPage({
   }));
 
   const isMaster = session!.role === "master";
+  const isSalesAgent = session!.role === "sales_agent";
   const can = (path: string) => canAccessPath(session!.role, path);
 
   const p = (path: string) => `/${locale}${path}`;
@@ -102,6 +103,9 @@ export default async function DashboardPage({
         ),
         !can("/agents") && can("/agents/commission") && (
           <MenuCard key="myCommission" href={p("/agents/commission")} icon="🧑‍💼" color="blue" title={tNav("myCommission")} description={tHome("cardMyCommissionDesc")} />
+        ),
+        isSalesAgent && (
+          <MenuCard key="guide" href={p("/guide")} icon="📘" color="blue" title={tNav("guide")} description={tHome("cardGuideDesc")} />
         ),
         can("/assets") && (
           <MenuCard key="assets" href={p("/assets")} icon="🧰" color="blue" title={tNav("assets")} description={tHome("cardAssetsDesc")} />
