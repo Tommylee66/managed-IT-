@@ -3,13 +3,12 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { requireMaster } from '@/lib/auth/session';
 import { setProfileRole } from '@/lib/data-access/profiles';
+import { MAX_MASTER_ACCOUNTS } from '@/lib/auth/constants';
 
 const schema = z.object({
   role: z.enum(['master', 'admin_dept', 'activation_dept', 'sales_agent']),
   agent_code: z.string().nullable().optional(),
 });
-
-const MAX_MASTER_ACCOUNTS = 2;
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ userId: string }> }) {
   let master;
@@ -21,7 +20,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ us
 
   const { userId } = await params;
   if (userId === master.userId) {
-    return NextResponse.json({ error: '자기 자신의 권한은 변경할 수 없습니다.' }, { status: 400 });
+    return NextResponse.json({ error: 'SELF_ROLE_CHANGE' }, { status: 400 });
   }
 
   const body = await request.json();
@@ -42,10 +41,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ us
       return NextResponse.json({ error: countError.message }, { status: 400 });
     }
     if ((count ?? 0) >= MAX_MASTER_ACCOUNTS) {
-      return NextResponse.json(
-        { error: `마스터 관리자는 최대 ${MAX_MASTER_ACCOUNTS}명까지만 가능합니다.` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'MAX_MASTER_ACCOUNTS' }, { status: 400 });
     }
   }
 

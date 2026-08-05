@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { StaffRole } from "@/types/domain";
+import { MAX_MASTER_ACCOUNTS } from "@/lib/auth/constants";
 
 const ROLES: StaffRole[] = ["admin_dept", "activation_dept", "sales_agent", "master"];
 
@@ -32,7 +33,13 @@ export function RoleSelect({ userId, role, disabled }: { userId: string; role: S
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        toast.error(body.error ?? t("roleChangeError"));
+        const message =
+          body.error === "SELF_ROLE_CHANGE"
+            ? t("roleChangeErrorSelf")
+            : body.error === "MAX_MASTER_ACCOUNTS"
+              ? t("roleChangeErrorMaxMaster", { max: MAX_MASTER_ACCOUNTS })
+              : t("roleChangeError");
+        toast.error(message);
         return;
       }
       toast.success(t("roleChangeSuccess"));

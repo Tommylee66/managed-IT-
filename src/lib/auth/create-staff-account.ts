@@ -2,8 +2,7 @@ import { randomInt } from 'crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { StaffRole } from '@/types/domain';
-
-const MAX_MASTER_ACCOUNTS = 2;
+import { MAX_MASTER_ACCOUNTS } from '@/lib/auth/constants';
 
 // Excludes visually ambiguous characters (I/l/1, O/0) since a generated
 // password may need to be read aloud or retyped by hand.
@@ -53,7 +52,9 @@ export async function createStaffAccount(
       .eq('is_active', true);
     if (countError) throw countError;
     if ((count ?? 0) >= MAX_MASTER_ACCOUNTS) {
-      throw new Error(`마스터 관리자는 최대 ${MAX_MASTER_ACCOUNTS}명까지만 가능합니다.`);
+      // Callers translate this stable code (see roleChangeErrorMaxMaster in
+      // messages/*.json) rather than displaying a hardcoded-locale message.
+      throw new Error('MAX_MASTER_ACCOUNTS');
     }
   }
 

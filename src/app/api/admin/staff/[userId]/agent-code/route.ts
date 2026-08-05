@@ -32,7 +32,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ us
     return NextResponse.json({ error: targetError?.message ?? 'Staff account not found' }, { status: 404 });
   }
   if (target.role !== 'sales_agent') {
-    return NextResponse.json({ error: '영업대리점 역할 계정만 대리점을 연결할 수 있습니다.' }, { status: 400 });
+    return NextResponse.json({ error: 'NOT_SALES_AGENT' }, { status: 400 });
   }
 
   const profile = await setProfileAgentCode(supabase, userId, parsed.data.agent_code);

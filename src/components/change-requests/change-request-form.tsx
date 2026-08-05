@@ -35,15 +35,7 @@ import { calculateQuotePreviewAction, type QuotePreview } from "@/app/[locale]/(
 import { createChangeRequestAction } from "@/app/[locale]/(dashboard)/change-requests/actions";
 import type { Contract, EquipmentCatalogItem, ServiceCatalogItem, QuoteInputs } from "@/types/domain";
 import type { Locale } from "@/config/constants";
-
-const TYPE_OPTIONS = [
-  { value: "장비 추가", key: "typeEquipmentAdd" },
-  { value: "장비 삭제", key: "typeEquipmentRemove" },
-  { value: "서비스 변경", key: "typeServiceChange" },
-  { value: "요금 변경", key: "typeFeeChange" },
-  { value: "로케이션 변경", key: "typeLocationChange" },
-  { value: "기타", key: "typeOther" },
-] as const;
+import { CHANGE_REQUEST_TYPE_OPTIONS as TYPE_OPTIONS } from "@/lib/constants/change-request-types";
 
 interface FormValues {
   type: string;

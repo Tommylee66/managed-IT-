@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { InvoiceLineItem } from "@/lib/calc/invoice-calc";
+import { renderInvoiceLineItemLabel } from "@/lib/calc/quote-row-labels";
 import type { Locale } from "@/config/constants";
 
 export default async function InvoiceDetailPage({
@@ -94,7 +95,7 @@ export default async function InvoiceDetailPage({
             <TableBody>
               {items.map((item, i) => (
                 <TableRow key={i}>
-                  <TableCell>{item.label}</TableCell>
+                  <TableCell>{renderInvoiceLineItemLabel(item, locale as Locale)}</TableCell>
                   <TableCell className="text-right">{formatRupiah(item.amount, locale as Locale)}</TableCell>
                 </TableRow>
               ))}
@@ -114,7 +115,11 @@ export default async function InvoiceDetailPage({
               <span>{formatRupiah(invoice.total, locale as Locale)}</span>
             </div>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">{invoice.memo}</p>
+          {/* invoice.memo is a fixed disclaimer frozen in Korean at write
+              time (see upsertInvoice) for the Korean-only print document —
+              the staff dashboard view renders the current-locale text
+              instead of the stored value so it isn't stuck in one language. */}
+          <p className="mt-4 text-sm text-muted-foreground">{t("invoiceMemo")}</p>
         </CardContent>
       </Card>
     </div>

@@ -36,6 +36,11 @@ export async function createActivationAction(
       ownerBct: tCommon('ownerBctShort'),
       ownerCustomer: tCommon('ownerCustomerShort'),
       noAssets: t('assetSummaryEmpty'),
+      assetHistoryType: t('assetHistoryType'),
+      serviceLogType: t('serviceLogType'),
+      billingDateLabel: t('serviceLogBillingDateLabel'),
+      engineerLabel: t('serviceLogEngineerLabel'),
+      assetsLabel: t('serviceLogAssetsLabel'),
     }
   );
 

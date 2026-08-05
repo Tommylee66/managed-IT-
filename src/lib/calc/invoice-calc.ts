@@ -93,7 +93,19 @@ function isDiscountExpired(contract: Contract, month: string): boolean {
 }
 
 export interface InvoiceLineItem {
+  /** Korean fallback/print text — invoice-document.tsx (deliberately
+   * Korean-only, unlike the bilingual quote/contract documents) renders this
+   * directly; the staff dashboard invoice page renders locale-aware text via
+   * renderInvoiceLineItemLabel(item, locale) instead. */
   label: string;
+  labelKey?: string;
+  labelId?: string;
+  labelKo?: string;
+  params?: Record<string, string | number>;
+  /** True for a post-term equipment row — renderInvoiceLineItemLabel appends
+   * the locale-appropriate "extended rental" suffix instead of it being
+   * baked into `label` at a single locale. */
+  postTermExtension?: boolean;
   amount: number;
 }
 
@@ -104,11 +116,20 @@ export interface InvoiceLineItem {
 export function invoiceLineItems(contract: Contract, month: string): InvoiceLineItem[] {
   if (!isContractActiveInMonth(contract, month)) {
     const postTermItems = postTermEquipmentRows(contract).map((r) => ({
-      label: `${r.label} 연장임대료`,
+      label: r.label,
+      labelKey: r.labelKey,
+      labelId: r.labelId,
+      labelKo: r.labelKo,
+      params: r.params,
+      postTermExtension: true,
       amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
     }));
     const printerItems = postTermPrinterRows(contract).map((r) => ({
       label: r.label,
+      labelKey: r.labelKey,
+      labelId: r.labelId,
+      labelKo: r.labelKo,
+      params: r.params,
       amount: r.amount,
     }));
     return [...postTermItems, ...printerItems];
@@ -119,7 +140,16 @@ export function invoiceLineItems(contract: Contract, month: string): InvoiceLine
     ? rows.filter((r) => r.key !== 'discount')
     : rows;
   const nonZero = effectiveRows.filter((r) => Number(r.amount || 0) !== 0);
-  if (nonZero.length) return nonZero.map((r) => ({ label: r.label, amount: r.amount }));
+  if (nonZero.length) {
+    return nonZero.map((r) => ({
+      label: r.label,
+      labelKey: r.labelKey,
+      labelId: r.labelId,
+      labelKo: r.labelKo,
+      params: r.params,
+      amount: r.amount,
+    }));
+  }
   return [{ label: 'Managed IT Outsourcing Service', amount: Number(contract.monthly_fee || 0) }];
 }
 

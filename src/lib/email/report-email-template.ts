@@ -48,6 +48,9 @@ export function buildReportEmailHtml(params: {
                         PT. Bumi Cerdas Teknology &middot; Managed IT Services
                       </div>
                       <div style="font-size:20px;font-weight:700;color:#0f172a;margin-top:2px;">
+                        Laporan Layanan ${escapeHtml(monthLabel)}
+                      </div>
+                      <div style="font-size:13px;font-weight:500;color:#64748b;margin-top:1px;">
                         ${escapeHtml(monthLabel)} 서비스 리포트
                       </div>
                     </td>
@@ -56,7 +59,12 @@ export function buildReportEmailHtml(params: {
               </td>
             </tr>
             <tr>
-              <td style="padding:24px 32px 8px 32px;font-size:14px;color:#475569;">
+              <td style="padding:24px 32px 0 32px;font-size:14px;color:#475569;">
+                Kepada Yth. Bapak/Ibu di ${escapeHtml(customerName)},
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:2px 32px 8px 32px;font-size:12.5px;color:#94a3b8;">
                 ${escapeHtml(customerName)} 담당자님께,
               </td>
             </tr>

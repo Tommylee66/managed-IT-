@@ -5,7 +5,13 @@ import { listChangeRequests } from "@/lib/data-access/change-requests";
 import { formatRupiah } from "@/lib/utils/currency";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { changeRequestTypeKey } from "@/lib/constants/change-request-types";
 import type { Locale } from "@/config/constants";
+
+function renderChangeRequestType(type: string | null, t: (key: string) => string): string {
+  const key = changeRequestTypeKey(type);
+  return key ? t(key) : (type ?? "");
+}
 
 export default async function ChangeRequestsPage({
   params,
@@ -53,7 +59,7 @@ export default async function ChangeRequestsPage({
                   )}
                 </TableCell>
                 <TableCell>{r.contract_no}</TableCell>
-                <TableCell>{r.type}</TableCell>
+                <TableCell>{renderChangeRequestType(r.type, t)}</TableCell>
                 <TableCell>{formatRupiah(r.old_monthly ?? 0, locale as Locale)}</TableCell>
                 <TableCell>{formatRupiah(r.new_monthly ?? 0, locale as Locale)}</TableCell>
                 <TableCell>{formatRupiah(r.diff ?? 0, locale as Locale)}</TableCell>

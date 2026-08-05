@@ -25,13 +25,7 @@ import type { Locale } from "@/config/constants";
 import { calculateQuotePreviewAction, type QuotePreview } from "@/app/[locale]/(dashboard)/quotes/actions";
 import { createApplicationAction } from "@/app/[locale]/(dashboard)/applications/actions";
 import type { Customer, Agent, QuoteInputs } from "@/types/domain";
-
-const SOURCE_OPTIONS = [
-  { value: "신규 직접입력", key: "sourceNewDirect" },
-  { value: "고객 소개", key: "sourceReferral" },
-  { value: "영업사원 접수", key: "sourceAgentIntake" },
-  { value: "기존 고객 추가신청", key: "sourceExistingCustomerAddon" },
-] as const;
+import { APPLICATION_SOURCE_OPTIONS as SOURCE_OPTIONS } from "@/lib/constants/application-sources";
 
 interface FormValues {
   source: string;

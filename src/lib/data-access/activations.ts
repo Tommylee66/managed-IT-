@@ -51,7 +51,16 @@ export async function createActivation(
   supabase: SupabaseClient,
   contract: Contract,
   input: CreateActivationInput,
-  labels: { ownerBct: string; ownerCustomer: string; noAssets: string }
+  labels: {
+    ownerBct: string;
+    ownerCustomer: string;
+    noAssets: string;
+    assetHistoryType: string;
+    serviceLogType: string;
+    billingDateLabel: string;
+    engineerLabel: string;
+    assetsLabel: string;
+  }
 ): Promise<Activation> {
   const activationId = nextActivationId();
   const summary = assetSummaryText(
@@ -95,7 +104,7 @@ export async function createActivation(
     id: nextAssetHistoryId(),
     contract_no: input.contract_no,
     customer_code: contract.customer_code,
-    type: '개통자산 등록',
+    type: labels.assetHistoryType,
     date: input.date,
     summary,
     activation_id: activationId,
@@ -104,13 +113,15 @@ export async function createActivation(
   });
   if (historyError) throw historyError;
 
+  // See change-requests.ts's createChangeRequest for the write-time-locale
+  // caveat this shares with every service_logs insert in this codebase.
   const { error: logError } = await supabase.from('service_logs').insert({
     id: nextServiceLogId(),
     customer_code: contract.customer_code,
     date: input.date,
-    type: '개통완료',
-    title: `과금시작일 ${input.billing_date}`,
-    memo: `개통요원 ${input.engineer ?? ''}\n자산 ${summary}\n${input.notes ?? ''}`,
+    type: labels.serviceLogType,
+    title: `${labels.billingDateLabel} ${input.billing_date}`,
+    memo: `${labels.engineerLabel} ${input.engineer ?? ''}\n${labels.assetsLabel} ${summary}\n${input.notes ?? ''}`,
     saved_by: input.saved_by,
   });
   if (logError) throw logError;

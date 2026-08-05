@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ConvertToQuoteButton } from "@/components/applications/convert-to-quote-button";
+import { applicationSourceKey } from "@/lib/constants/application-sources";
 
 export default async function ApplicationDetailPage({
   params,
@@ -64,7 +65,10 @@ export default async function ApplicationDetailPage({
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t("source")}</p>
-            <p>{application.source}</p>
+            <p>{(() => {
+              const key = applicationSourceKey(application.source);
+              return key ? t(key) : application.source;
+            })()}</p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground">{t("expectedStartDate")}</p>

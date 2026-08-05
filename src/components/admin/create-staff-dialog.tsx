@@ -26,6 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Agent } from "@/types/domain";
+import { MAX_MASTER_ACCOUNTS } from "@/lib/auth/constants";
 
 const ROLES = ["admin_dept", "activation_dept", "sales_agent", "master"] as const;
 
@@ -80,7 +81,11 @@ export function CreateStaffDialog({
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      toast.error(body.error ?? t("createError"));
+      const message =
+        body.error === "MAX_MASTER_ACCOUNTS"
+          ? t("roleChangeErrorMaxMaster", { max: MAX_MASTER_ACCOUNTS })
+          : t("createError");
+      toast.error(message);
       return;
     }
     toast.success(t("createSuccess"));

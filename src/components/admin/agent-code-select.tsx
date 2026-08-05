@@ -44,7 +44,9 @@ export function AgentCodeSelect({
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        toast.error(body.error ?? t("agentLinkError"));
+        const message =
+          body.error === "NOT_SALES_AGENT" ? t("agentLinkErrorNotSalesAgent") : t("agentLinkError");
+        toast.error(message);
         return;
       }
       toast.success(t("agentLinkSuccess"));

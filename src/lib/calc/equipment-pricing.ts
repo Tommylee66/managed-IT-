@@ -58,9 +58,16 @@ export function equipmentPricedRows(selections: EquipmentSelection[]): QuoteRowR
       });
     }
     if (s.overageQty > 0 && s.overageRate != null) {
+      // modelName is a product model name (not itself locale-specific), only
+      // the "additional usage" suffix needs a bilingual pair — same pattern
+      // as service-pricing.ts's labelId/labelKo rows.
+      const labelKo = `${s.modelName} 추가 사용량 ${s.overageQty}`;
+      const labelId = `${s.modelName} Pemakaian Tambahan ${s.overageQty}`;
       rows.push({
         key: `equipment-overage:${s.catalogId}`,
-        label: `${s.modelName} 추가 사용량 ${s.overageQty}`,
+        label: labelKo,
+        labelId,
+        labelKo,
         amount: s.overageRate * s.overageQty,
         cost: (s.overageCost ?? 0) * s.overageQty,
         init: 0,

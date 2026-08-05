@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getTranslations } from 'next-intl/server';
 import type { TerminationPlan, AssetDecision } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { bucketAmount } from '@/lib/masking/staff-masking';
@@ -121,13 +122,16 @@ export async function createTerminationPlan(
     .single();
   if (error) throw error;
 
+  // See change-requests.ts's createChangeRequest for the write-time-locale
+  // caveat this shares with every service_logs insert in this codebase.
+  const t = await getTranslations('termination');
   const { error: logError } = await supabase.from('service_logs').insert({
     id: nextServiceLogId(),
     customer_code: input.customer_code,
     date: input.term_date,
-    type: '해지신청',
-    title: '중도해지 장비 처리 신청',
-    memo: `해지예정일 ${input.term_date} / 수거 ${collectQty}대 / 고객 잔존 정산 ${billQty}대`,
+    type: t('serviceLogType'),
+    title: t('serviceLogTitle'),
+    memo: t('serviceLogMemo', { termDate: input.term_date, collectQty, billQty }),
     saved_by: input.saved_by,
   });
   if (logError) throw logError;

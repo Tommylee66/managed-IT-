@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getTranslations } from 'next-intl/server';
 import type { ChangeRequest, Contract, EquipmentSelection, ServiceSelection, QuoteInputs, Rates } from '@/types/domain';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
 import { mergeEquipmentIntoCalc } from '@/lib/calc/equipment-pricing';
@@ -134,13 +135,19 @@ export async function createChangeRequest(
     .eq('no', contract.no);
   if (contractError) throw contractError;
 
+  // Resolved in the acting staff member's current locale at write time (same
+  // tradeoff as invoices/actions.ts's service_logs writes) — a log written
+  // in Korean stays Korean for a later Indonesian-locale viewer. The proper
+  // long-term fix is storing a type_key/params pair and translating at
+  // render time, matching how quote rows use labelKey (see quote-row-labels.ts).
+  const t = await getTranslations('changeRequests');
   await supabase.from('service_logs').insert({
     id: `LOG${Date.now().toString(36)}`,
     customer_code: contract.customer_code,
     date: input.effective_date,
-    type: '변경신청',
-    title: `${no} / ${input.type} / 월 ${oldMonthly} → ${calc.monthly}`,
-    memo: `월 증감액 ${diff}, 당월 정산액 ${settlementAmount}\n${input.memo ?? ''}`,
+    type: t('serviceLogType'),
+    title: t('serviceLogTitle', { no, type: input.type, oldMonthly, newMonthly: calc.monthly }),
+    memo: `${t('serviceLogMemo', { diff, settlement: settlementAmount })}\n${input.memo ?? ''}`,
     saved_by: input.created_by,
   });
 

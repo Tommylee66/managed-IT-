@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { getTranslations } from 'next-intl/server';
 import type { Application, QuoteInputs, Rates } from '@/types/domain';
 import { calcQuoteForInputs } from '@/lib/calc/quote-calc';
 import { nextApplicationNo, nextQuoteNo } from '@/lib/numbering';
@@ -72,13 +73,16 @@ export async function createApplication(
     .single();
   if (error) throw error;
 
+  // See change-requests.ts's createChangeRequest for the write-time-locale
+  // caveat this shares with every service_logs insert in this codebase.
+  const t = await getTranslations('applications');
   await supabase.from('service_logs').insert({
     id: `LOG${Date.now().toString(36)}`,
     customer_code: input.customer_code,
     date: input.start_date,
-    type: '신규신청',
-    title: `${no} / 신청접수`,
-    memo: `월 예상금액 ${calc.monthly}`,
+    type: t('serviceLogType'),
+    title: `${no} / ${t('statusReceived')}`,
+    memo: t('serviceLogMemo', { amount: calc.monthly }),
     saved_by: input.created_by,
   });
 

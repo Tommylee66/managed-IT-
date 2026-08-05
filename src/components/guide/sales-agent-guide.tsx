@@ -1,24 +1,26 @@
 "use client";
 
 import { useState } from "react";
-
-const STEP_LABELS = [
-  "시작하기",
-  "로그인",
-  "대시보드",
-  "고객 등록",
-  "견적 작성",
-  "견적 결과",
-  "계약 생성",
-  "계약 확인",
-  "변경 요청",
-  "내 수수료",
-  "마무리",
-];
+import { useTranslations } from "next-intl";
 
 export function SalesAgentGuide() {
+  const t = useTranslations("guide");
   const [current, setCurrent] = useState(0);
-  const last = STEP_LABELS.length - 1;
+
+  const stepLabels = [
+    t("stepIntro"),
+    t("stepLogin"),
+    t("stepDashboard"),
+    t("stepCustomer"),
+    t("stepQuoteForm"),
+    t("stepQuoteResult"),
+    t("stepContractCreate"),
+    t("stepContractDetail"),
+    t("stepChangeRequest"),
+    t("stepCommission"),
+    t("stepClosing"),
+  ];
+  const last = stepLabels.length - 1;
 
   function go(i: number) {
     setCurrent(Math.max(0, Math.min(last, i)));
@@ -33,16 +35,16 @@ export function SalesAgentGuide() {
             <div className="g-brand">
               <div className="g-logo">BCT</div>
               <div>
-                <h1>영업대리점 사용 가이드</h1>
-                <p>BCT Total IT Care · 단계별로 따라 하면 끝나요</p>
+                <h1>{t("brandTitle")}</h1>
+                <p>{t("brandSubtitle")}</p>
               </div>
             </div>
-            <div className="g-progress-pill">{current + 1} / {STEP_LABELS.length} 단계</div>
+            <div className="g-progress-pill">{t("progress", { current: current + 1, total: stepLabels.length })}</div>
           </div>
 
           <div className="g-layout">
-            <nav className="g-rail" aria-label="단계 목록">
-              {STEP_LABELS.map((label, i) => (
+            <nav className="g-rail" aria-label="steps">
+              {stepLabels.map((label, i) => (
                 <button
                   key={label}
                   type="button"
@@ -56,24 +58,24 @@ export function SalesAgentGuide() {
             </nav>
 
             <main className="g-panel">
-              {current === 0 && <StepIntro />}
-              {current === 1 && <StepLogin />}
-              {current === 2 && <StepDashboard />}
-              {current === 3 && <StepCustomer />}
-              {current === 4 && <StepQuoteForm />}
-              {current === 5 && <StepQuoteResult />}
-              {current === 6 && <StepContractCreate />}
-              {current === 7 && <StepContractDetail />}
-              {current === 8 && <StepChangeRequest />}
-              {current === 9 && <StepCommission />}
-              {current === 10 && <StepClosing />}
+              {current === 0 && <StepIntro t={t} />}
+              {current === 1 && <StepLogin t={t} />}
+              {current === 2 && <StepDashboard t={t} />}
+              {current === 3 && <StepCustomer t={t} />}
+              {current === 4 && <StepQuoteForm t={t} />}
+              {current === 5 && <StepQuoteResult t={t} />}
+              {current === 6 && <StepContractCreate t={t} />}
+              {current === 7 && <StepContractDetail t={t} />}
+              {current === 8 && <StepChangeRequest t={t} />}
+              {current === 9 && <StepCommission t={t} />}
+              {current === 10 && <StepClosing t={t} />}
 
               <div className="g-nav-row">
                 <button type="button" className="g-nav-btn prev" disabled={current === 0} onClick={() => go(current - 1)}>
-                  이전
+                  {t("prev")}
                 </button>
                 <button type="button" className="g-nav-btn next" onClick={() => go(current === last ? 0 : current + 1)}>
-                  {current === last ? "처음으로" : "다음"}
+                  {current === last ? t("restart") : t("next")}
                 </button>
               </div>
             </main>
@@ -84,173 +86,160 @@ export function SalesAgentGuide() {
   );
 }
 
-function StepIntro() {
+type T = ReturnType<typeof useTranslations>;
+
+function StepIntro({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">시작하기</p>
-      <h2>이 가이드로 무엇을 할 수 있나요?</h2>
-      <p className="g-lede">
-        이 가이드는 영업대리점(sales_agent) 계정으로 로그인했을 때 실제로 보게 될 화면을 그대로 따라가며, 고객 등록부터 계약, 수수료
-        확인까지 전체 흐름을 안내합니다. 왼쪽 목록을 클릭하거나 아래 &quot;다음&quot; 버튼으로 이동하세요.
-      </p>
+      <p className="g-eyebrow">{t("step0Eyebrow")}</p>
+      <h2>{t("step0Title")}</h2>
+      <p className="g-lede">{t("step0Lede")}</p>
       <div className="g-tip">
-        <b>영업대리점 계정으로 할 수 있는 일</b>
-        <br />① 고객 등록 및 조회 · ② 견적 작성 · ③ 계약 확인 · ④ 변경 요청 등록 · ⑤ 본인의 수수료 현황 확인. 이 다섯 가지 외의
-        메뉴(요율 설정, 직원 관리 등)는 관리자 전용이라 보이지 않습니다.
+        <b>{t("step0TipTitle")}</b>
+        <br />
+        {t("step0TipBody")}
       </div>
       <div className="g-menu-grid" style={{ maxWidth: 520 }}>
         <div className="g-menu-section">
-          <h4>① 고객·영업 관리</h4>
-          <div className="g-menu-card"><span className="g-ic">🏢</span>고객/등록</div>
-          <div className="g-menu-card"><span className="g-ic">💰</span>내 수수료 현황</div>
+          <h4>{t("mockSectionCustomerSales")}</h4>
+          <div className="g-menu-card"><span className="g-ic">🏢</span>{t("mockMenuCustomers")}</div>
+          <div className="g-menu-card"><span className="g-ic">💰</span>{t("mockMenuMyCommission")}</div>
         </div>
         <div className="g-menu-section">
-          <h4>② 신청·견적·계약</h4>
-          <div className="g-menu-card"><span className="g-ic">🔎</span>조회</div>
-          <div className="g-menu-card"><span className="g-ic">🧾</span>신규신청(견적 작업)</div>
-          <div className="g-menu-card"><span className="g-ic">📄</span>계약</div>
-          <div className="g-menu-card"><span className="g-ic">🔁</span>변경 요청</div>
+          <h4>{t("mockSectionAppContract")}</h4>
+          <div className="g-menu-card"><span className="g-ic">🔎</span>{t("mockMenuLookup")}</div>
+          <div className="g-menu-card"><span className="g-ic">🧾</span>{t("mockMenuNewApplication")}</div>
+          <div className="g-menu-card"><span className="g-ic">📄</span>{t("mockMenuContract")}</div>
+          <div className="g-menu-card"><span className="g-ic">🔁</span>{t("mockMenuChangeRequest")}</div>
         </div>
       </div>
     </section>
   );
 }
 
-function StepLogin() {
+function StepLogin({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">1단계</p>
-      <h2>로그인하기</h2>
-      <p className="g-lede">
-        관리자로부터 받은 이메일과 임시 비밀번호로 로그인합니다. 언어는 오른쪽 위에서 한국어 / Bahasa Indonesia / English 중 선택할 수
-        있습니다.
-      </p>
+      <p className="g-eyebrow">{t("step1Eyebrow")}</p>
+      <h2>{t("step1Title")}</h2>
+      <p className="g-lede">{t("step1Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div style={{ display: "flex", justifyContent: "center", padding: "36px 16px" }}>
             <div className="g-login-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                <b style={{ fontSize: 14 }}>BCT Total IT Care</b>
-                <span className="g-mock-pill">한국어 ▾</span>
+                <b style={{ fontSize: 14 }}>{t("mockAppName")}</b>
+                <span className="g-mock-pill">{t("mockLanguagePill")}</span>
               </div>
-              <p style={{ fontSize: 11.5, color: "var(--guide-muted)", margin: "0 0 14px" }}>직원 계정으로 로그인하세요</p>
-              <div className="g-field" style={{ marginBottom: 10 }}><label>이메일</label><div className="g-val">agent03@bct.co.id</div></div>
-              <div className="g-field" style={{ marginBottom: 8 }}><label>비밀번호</label><div className="g-val">••••••••••••</div></div>
-              <p style={{ fontSize: 10.5, color: "var(--guide-teal)", textAlign: "right", margin: "0 0 12px" }}>비밀번호를 잊으셨나요?</p>
-              <div className="g-btn primary" style={{ width: "100%", justifyContent: "center" }}>로그인</div>
+              <p style={{ fontSize: 11.5, color: "var(--guide-muted)", margin: "0 0 14px" }}>{t("mockLoginPrompt")}</p>
+              <div className="g-field" style={{ marginBottom: 10 }}><label>{t("mockEmailLabel")}</label><div className="g-val">agent03@bct.co.id</div></div>
+              <div className="g-field" style={{ marginBottom: 8 }}><label>{t("mockPasswordLabel")}</label><div className="g-val">••••••••••••</div></div>
+              <p style={{ fontSize: 10.5, color: "var(--guide-teal)", textAlign: "right", margin: "0 0 12px" }}>{t("mockForgotPassword")}</p>
+              <div className="g-btn primary" style={{ width: "100%", justifyContent: "center" }}>{t("mockLoginButton")}</div>
             </div>
           </div>
         </div>
       </div>
       <div className="g-tip warn">
-        <b>처음 로그인이라면</b>
-        <br />관리자가 알려준 임시 비밀번호를 그대로 입력해 로그인한 뒤, 안전을 위해 가급적 빠른 시일 내에 &quot;비밀번호를 잊으셨나요?&quot;를
-        눌러 본인만 아는 비밀번호로 바꿔두세요.
+        <b>{t("step1TipTitle")}</b>
+        <br />
+        {t("step1TipBody")}
       </div>
     </section>
   );
 }
 
-function StepDashboard() {
+function StepDashboard({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">2단계</p>
-      <h2>대시보드 살펴보기</h2>
-      <p className="g-lede">
-        로그인하면 가장 먼저 보이는 화면입니다. 위쪽에는 이번 달 실적 요약이, 아래쪽에는 실제로 사용할 메뉴 카드가 나옵니다.
-        영업대리점 계정에는 딱 필요한 메뉴만 두 묶음으로 깔끔하게 보입니다.
-      </p>
+      <p className="g-eyebrow">{t("step2Eyebrow")}</p>
+      <h2>{t("step2Title")}</h2>
+      <p className="g-lede">{t("step2Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-topbar">
-            <span className="g-mock-logo">BCT Total IT Care</span>
-            <div className="g-mock-actions"><span>직원</span><span className="g-mock-pill">첫화면</span><span>한국어 ▾</span><span>로그아웃</span></div>
+            <span className="g-mock-logo">{t("mockAppName")}</span>
+            <div className="g-mock-actions"><span>{t("mockStaffBadge")}</span><span className="g-mock-pill">{t("mockHomeButton")}</span><span>{t("mockLanguagePill")}</span><span>{t("mockLogout")}</span></div>
           </div>
           <div className="g-mock-pad">
             <div className="g-mock-hero">
-              <h3>업무 메뉴</h3>
-              <p>필요한 업무로 바로 이동하세요.</p>
+              <h3>{t("mockHeroTitle")}</h3>
+              <p>{t("mockHeroSubtitle")}</p>
               <div className="g-stat-row">
-                <div className="g-stat-card"><div className="l">당월 신규 고객</div><div className="v">0</div></div>
-                <div className="g-stat-card"><div className="l">당월 확정 계약</div><div className="v">0</div></div>
-                <div className="g-stat-card"><div className="l">활성 영업사원</div><div className="v">4</div></div>
-                <div className="g-stat-card"><div className="l">당월 개통 대기</div><div className="v">0</div></div>
+                <div className="g-stat-card"><div className="l">{t("mockStatNewCustomers")}</div><div className="v">0</div></div>
+                <div className="g-stat-card"><div className="l">{t("mockStatNewContracts")}</div><div className="v">0</div></div>
+                <div className="g-stat-card"><div className="l">{t("mockStatActiveAgents")}</div><div className="v">4</div></div>
+                <div className="g-stat-card"><div className="l">{t("mockStatPendingActivation")}</div><div className="v">0</div></div>
               </div>
             </div>
             <div className="g-menu-grid">
               <div className="g-menu-section">
-                <h4>① 고객 · 영업 관리</h4>
-                <div className="g-menu-card"><span className="g-ic">🏢</span>고객/등록</div>
-                <div className="g-menu-card highlight"><span className="g-ic">💰</span>내 수수료 현황</div>
+                <h4>{t("mockSectionCustomerSales")}</h4>
+                <div className="g-menu-card"><span className="g-ic">🏢</span>{t("mockMenuCustomers")}</div>
+                <div className="g-menu-card highlight"><span className="g-ic">💰</span>{t("mockMenuMyCommission")}</div>
               </div>
               <div className="g-menu-section">
-                <h4>② 신청 · 견적 · 계약</h4>
-                <div className="g-menu-card"><span className="g-ic">🔎</span>조회</div>
-                <div className="g-menu-card"><span className="g-ic">🧾</span>신규신청(견적 작업)</div>
-                <div className="g-menu-card"><span className="g-ic">📄</span>계약</div>
-                <div className="g-menu-card"><span className="g-ic">🔁</span>변경 요청</div>
+                <h4>{t("mockSectionAppContract")}</h4>
+                <div className="g-menu-card"><span className="g-ic">🔎</span>{t("mockMenuLookup")}</div>
+                <div className="g-menu-card"><span className="g-ic">🧾</span>{t("mockMenuNewApplication")}</div>
+                <div className="g-menu-card"><span className="g-ic">📄</span>{t("mockMenuContract")}</div>
+                <div className="g-menu-card"><span className="g-ic">🔁</span>{t("mockMenuChangeRequest")}</div>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div className="g-tip">
-        <b>다른 메뉴가 안 보여요</b>
-        <br />정상입니다. 요율 설정, 직원 관리 같은 관리자 전용 메뉴는 영업대리점 계정에는 아예 나타나지 않습니다. 빈 칸 없이 실제로
-        쓸 수 있는 메뉴만 표시됩니다.
+        <b>{t("step2TipTitle")}</b>
+        <br />
+        {t("step2TipBody")}
       </div>
     </section>
   );
 }
 
-function StepCustomer() {
+function StepCustomer({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">3단계</p>
-      <h2>고객 등록하기</h2>
-      <p className="g-lede">
-        &quot;① 고객·영업 관리 → 고객/등록&quot;으로 들어가면 지금까지 내가 담당한 고객 목록이 보입니다. 오른쪽 위 &quot;새 고객&quot;
-        버튼으로 신규 고객을 등록할 수 있습니다.
-      </p>
+      <p className="g-eyebrow">{t("step3Eyebrow")}</p>
+      <h2>{t("step3Title")}</h2>
+      <p className="g-lede">{t("step3Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-pad">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <b style={{ fontSize: 14 }}>고객</b>
-              <span className="g-btn primary">새 고객</span>
+              <b style={{ fontSize: 14 }}>{t("mockCustomerListTitle")}</b>
+              <span className="g-btn primary">{t("mockNewCustomerButton")}</span>
             </div>
             <table className="g-mock-table">
               <tbody>
-                <tr><th>코드</th><th>고객명</th><th>담당자</th><th>연락처</th><th>이메일</th><th>상태</th></tr>
+                <tr><th>{t("mockColCode")}</th><th>{t("mockColCustomerName")}</th><th>{t("mockColManager")}</th><th>{t("mockColContact")}</th><th>{t("mockColEmail")}</th><th>{t("mockColStatus")}</th></tr>
                 <tr>
                   <td>CUS002</td><td>PT. Sung Shin Best Indonesia</td><td>-</td>
                   <td className="masked">***</td><td className="masked">***@***.***</td>
-                  <td><span className="g-badge neutral">미계약</span></td>
+                  <td><span className="g-badge neutral">{t("mockStatusUncontracted")}</span></td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-      <p className="g-lede" style={{ marginTop: 2 }}>
-        &quot;새 고객&quot; 버튼을 누르면 아래와 같은 등록 창이 열립니다. <b style={{ color: "var(--guide-ink)" }}>담당 영업 대리점은
-        자동으로 내 대리점으로 고정</b>되어 있어서, 별도로 고를 필요가 없습니다.
-      </p>
+      <p className="g-lede" style={{ marginTop: 2 }}>{t("step3Lede2")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-pad" style={{ maxWidth: 420, margin: "0 auto" }}>
-            <b style={{ fontSize: 13 }}>고객 등록</b>
-            <div className="g-field" style={{ margin: "10px 0" }}><label>고객명</label><div className="g-val filled">(예시) PT. Contoh Jaya</div></div>
+            <b style={{ fontSize: 13 }}>{t("mockCustomerRegisterTitle")}</b>
+            <div className="g-field" style={{ margin: "10px 0" }}><label>{t("mockCustomerNameLabel")}</label><div className="g-val filled">({t("mockExampleTag")}) {t("mockExampleCompany")}</div></div>
             <div className="g-field-row">
-              <div className="g-field"><label>담당자</label><div className="g-val filled">Budi Santoso</div></div>
-              <div className="g-field"><label>연락처</label><div className="g-val filled">081234567890</div></div>
+              <div className="g-field"><label>{t("mockManagerLabel")}</label><div className="g-val filled">Budi Santoso</div></div>
+              <div className="g-field"><label>{t("mockContactLabel")}</label><div className="g-val filled">081234567890</div></div>
             </div>
-            <div className="g-field" style={{ marginBottom: 10 }}><label>담당 영업 대리점</label><div className="g-val locked">AGT003 - Heedo Park (자동)</div></div>
-            <div className="g-btn primary" style={{ width: "100%", justifyContent: "center" }}>등록</div>
+            <div className="g-field" style={{ marginBottom: 10 }}><label>{t("mockAgentLabel")}</label><div className="g-val locked">AGT003 - Heedo Park ({t("mockAutoTag")})</div></div>
+            <div className="g-btn primary" style={{ width: "100%", justifyContent: "center" }}>{t("mockRegisterButton")}</div>
           </div>
         </div>
       </div>
@@ -258,37 +247,34 @@ function StepCustomer() {
   );
 }
 
-function StepQuoteForm() {
+function StepQuoteForm({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">4단계</p>
-      <h2>견적 작성하기</h2>
-      <p className="g-lede">
-        &quot;② 신청·견적·계약 → 신규신청(견적 작업)&quot;에서 고객을 선택하고 계약 조건을 입력합니다. 여기서도 영업 대리점은 자동으로
-        내 이름으로 고정됩니다.
-      </p>
+      <p className="g-eyebrow">{t("step4Eyebrow")}</p>
+      <h2>{t("step4Title")}</h2>
+      <p className="g-lede">{t("step4Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-pad">
-            <div className="g-field" style={{ marginBottom: 10 }}><label>고객</label><div className="g-val filled">CUS002 - PT. Sung Shin Best Indonesia</div></div>
-            <div className="g-field" style={{ marginBottom: 10 }}><label>영업 대리점</label><div className="g-val locked">AGT003 - Heedo Park (자동)</div></div>
+            <div className="g-field" style={{ marginBottom: 10 }}><label>{t("mockCustomerFieldLabel")}</label><div className="g-val filled">CUS002 - PT. Sung Shin Best Indonesia</div></div>
+            <div className="g-field" style={{ marginBottom: 10 }}><label>{t("mockAgentFieldLabel")}</label><div className="g-val locked">AGT003 - Heedo Park ({t("mockAutoTag")})</div></div>
             <div className="g-field-row">
-              <div className="g-field"><label>계약 개월수</label><div className="g-val filled">36</div></div>
-              <div className="g-field"><label>직원/PC 수</label><div className="g-val filled">20</div></div>
+              <div className="g-field"><label>{t("mockContractMonthsLabel")}</label><div className="g-val filled">36</div></div>
+              <div className="g-field"><label>{t("mockEmployeeCountLabel")}</label><div className="g-val filled">20</div></div>
             </div>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--guide-muted)", margin: "12px 0 4px" }}>③ 추가 장비 선택</p>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--guide-muted)", margin: "12px 0 4px" }}>{t("mockEquipmentSectionLabel")}</p>
             <div className="g-checklist-row">
               <div className="g-chk on" />
-              <div><div className="name">TP LINK EAP110 <span style={{ fontWeight: 400, color: "var(--guide-muted)" }}>[AP(무선망)]</span></div><div className="desc">OMADA 300Mbps Wireless N Mount AP</div></div>
-              <div className="price">Rp 22,000/월</div>
+              <div><div className="name">TP LINK EAP110 <span style={{ fontWeight: 400, color: "var(--guide-muted)" }}>{t("mockCategoryAP")}</span></div><div className="desc">{t("mockDescriptionAP")}</div></div>
+              <div className="price">Rp 22,000{t("perMonthSuffix")}</div>
             </div>
             <div className="g-checklist-row">
               <div className="g-chk" />
-              <div><div className="name">Mikrotik CCR2004-16G-2S+ <span style={{ fontWeight: 400, color: "var(--guide-muted)" }}>[라우터]</span></div></div>
-              <div className="price">Rp 500,000/월</div>
+              <div><div className="name">Mikrotik CCR2004-16G-2S+ <span style={{ fontWeight: 400, color: "var(--guide-muted)" }}>{t("mockCategoryRouter")}</span></div></div>
+              <div className="price">Rp 500,000{t("perMonthSuffix")}</div>
             </div>
-            <div style={{ marginTop: 12, textAlign: "right" }}><span className="g-btn primary">계산하기</span></div>
+            <div style={{ marginTop: 12, textAlign: "right" }}><span className="g-btn primary">{t("mockCalculateButton")}</span></div>
           </div>
         </div>
       </div>
@@ -296,29 +282,26 @@ function StepQuoteForm() {
   );
 }
 
-function StepQuoteResult() {
+function StepQuoteResult({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">5단계</p>
-      <h2>견적 결과 확인하기</h2>
-      <p className="g-lede">
-        &quot;계산하기&quot;를 누르면 오른쪽에 월 청구액이 항목별로 바로 계산되어 나타납니다. PPN(부가세)도 자동으로 포함되어
-        표시됩니다.
-      </p>
+      <p className="g-eyebrow">{t("step5Eyebrow")}</p>
+      <h2>{t("step5Title")}</h2>
+      <p className="g-lede">{t("step5Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-pad">
             <div className="g-result-card">
-              <div className="l">월 합계</div>
+              <div className="l">{t("mockMonthlyTotal")}</div>
               <div className="v">Rp 5,463,420</div>
               <div className="ppn">PPN &nbsp; Rp 541,420</div>
             </div>
             <table className="g-mock-table">
               <tbody>
-                <tr><th>항목</th><th style={{ textAlign: "right" }}>월 금액</th></tr>
-                <tr><td>Managed IT 기본 서비스</td><td style={{ textAlign: "right" }}>Rp 4,900,000</td></tr>
-                <tr><td>월 1회 방문점검 원가 반영</td><td style={{ textAlign: "right" }}>Rp 0</td></tr>
+                <tr><th>{t("mockRowItem")}</th><th style={{ textAlign: "right" }}>{t("mockRowMonthlyAmount")}</th></tr>
+                <tr><td>{t("mockRowManagedIT")}</td><td style={{ textAlign: "right" }}>Rp 4,900,000</td></tr>
+                <tr><td>{t("mockRowVisitCost")}</td><td style={{ textAlign: "right" }}>Rp 0</td></tr>
                 <tr><td>TP LINK EAP110</td><td style={{ textAlign: "right" }}>Rp 22,000</td></tr>
               </tbody>
             </table>
@@ -326,123 +309,111 @@ function StepQuoteResult() {
         </div>
       </div>
       <div className="g-tip">
-        <b>저장하는 것을 잊지 마세요</b>
-        <br />결과가 마음에 들면 아래쪽 &quot;견적 저장&quot; 버튼을 꼭 눌러야 견적번호가 생성되고 이후 계약으로 진행할 수 있습니다.
+        <b>{t("step5TipTitle")}</b>
+        <br />
+        {t("step5TipBody")}
       </div>
     </section>
   );
 }
 
-function StepContractCreate() {
+function StepContractCreate({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">6단계</p>
-      <h2>견적 저장 → 계약 생성</h2>
-      <p className="g-lede">
-        견적을 저장하면 견적번호(QUO...)가 생기고, 고객에게 보여줄 인쇄용 견적서도 바로 만들 수 있습니다. 고객이 계약을 확정하면 같은
-        화면에서 &quot;계약 생성&quot; 버튼 하나로 정식 계약이 만들어집니다.
-      </p>
+      <p className="g-eyebrow">{t("step6Eyebrow")}</p>
+      <h2>{t("step6Title")}</h2>
+      <p className="g-lede">{t("step6Lede")}</p>
       <div className="g-doc-frame">
         <div className="g-doc-topbar" />
         <div className="g-doc-body">
           <div className="g-doc-head">
             <div className="g-doc-logo" />
             <div>
-              <div className="k">PT. Bumi Cerdas Teknology · Managed IT Services</div>
-              <div className="t">Penawaran Layanan Managed IT BCT</div>
-              <div className="s">Quotation No. QUO20260805-001 · BCT Managed IT 서비스 견적서</div>
+              <div className="k">{t("mockDocOrgLine")}</div>
+              <div className="t">{t("mockDocTitle")}</div>
+              <div className="s">{t("mockDocSubtitle")}</div>
             </div>
           </div>
           <table className="g-mock-table">
             <tbody>
-              <tr><th>서비스</th><th style={{ textAlign: "right" }}>월 금액</th></tr>
-              <tr><td>Managed IT 기본 서비스</td><td style={{ textAlign: "right" }}>Rp 4.900.000</td></tr>
+              <tr><th>{t("mockDocColService")}</th><th style={{ textAlign: "right" }}>{t("mockDocColMonthlyAmount")}</th></tr>
+              <tr><td>{t("mockRowManagedIT")}</td><td style={{ textAlign: "right" }}>Rp 4.900.000</td></tr>
               <tr><td>TP LINK EAP110</td><td style={{ textAlign: "right" }}>Rp 22.000</td></tr>
-              <tr><td><b>월 청구액 소계</b></td><td style={{ textAlign: "right" }}><b>Rp 4.922.000</b></td></tr>
+              <tr><td><b>{t("mockDocRowTotal")}</b></td><td style={{ textAlign: "right" }}><b>Rp 4.922.000</b></td></tr>
             </tbody>
           </table>
-          <p style={{ fontSize: 10.5, color: "var(--guide-muted)", marginTop: 10 }}>
-            인도네시아어가 먼저, 한국어가 그 아래 함께 표시되는 이중언어 문서입니다.
-          </p>
+          <p style={{ fontSize: 10.5, color: "var(--guide-muted)", marginTop: 10 }}>{t("mockDocCaption")}</p>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--guide-card)", border: "1px solid var(--guide-line)", borderRadius: 12, padding: "12px 16px" }}>
         <div>
-          <b style={{ fontSize: 13 }}>견적 QUO20260805-001</b>
-          <div style={{ fontSize: 11, color: "var(--guide-muted)" }}>월 합계 Rp 4,922,000 · 36개월</div>
+          <b style={{ fontSize: 13 }}>{t("mockQuoteFooterLabel")}</b>
+          <div style={{ fontSize: 11, color: "var(--guide-muted)" }}>{t("mockQuoteFooterSummary")}</div>
         </div>
-        <span className="g-btn primary">계약 생성</span>
+        <span className="g-btn primary">{t("mockCreateContractButton")}</span>
       </div>
     </section>
   );
 }
 
-function StepContractDetail() {
+function StepContractDetail({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">7단계</p>
-      <h2>계약 확인하기</h2>
-      <p className="g-lede">
-        &quot;계약 생성&quot;을 누르면 계약번호(CTR...)가 자동으로 만들어지고, &quot;② 신청·견적·계약 → 계약&quot; 메뉴에서 언제든
-        다시 확인할 수 있습니다. 여기서 개통 등록, 변경 요청, 해지 처리도 시작합니다.
-      </p>
+      <p className="g-eyebrow">{t("step7Eyebrow")}</p>
+      <h2>{t("step7Title")}</h2>
+      <p className="g-lede">{t("step7Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
-          <div className="g-mock-pad">
+          <div className="g-mock-pad contract-body">
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <b style={{ fontSize: 15 }}>계약 CTR20260805-001</b>
-              <span className="g-badge good">계약완료</span>
+              <b style={{ fontSize: 15 }}>CTR20260805-001</b>
+              <span className="g-badge good">{t("mockContractStatusDone")}</span>
             </div>
             <div className="g-info-grid">
-              <div><div className="k">고객</div><div className="v">PT. Sung Shin Best Indonesia</div></div>
-              <div><div className="k">월 청구금액</div><div className="v">Rp 4,922,000</div></div>
-              <div><div className="k">기간</div><div className="v">36개월</div></div>
-              <div><div className="k">과금 시작일</div><div className="v">2026-08-05</div></div>
+              <div><div className="k">{t("mockInfoCustomer")}</div><div className="v">PT. Sung Shin Best Indonesia</div></div>
+              <div><div className="k">{t("mockInfoMonthlyFee")}</div><div className="v">Rp 4,922,000</div></div>
+              <div><div className="k">{t("mockInfoPeriod")}</div><div className="v">36</div></div>
+              <div><div className="k">{t("mockInfoBillingStart")}</div><div className="v">2026-08-05</div></div>
             </div>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--guide-muted)", margin: "14px 0 6px" }}>영업 수수료</p>
-            <p style={{ fontSize: 12, color: "var(--guide-muted-2)", margin: 0 }}>관리자만 조회 가능</p>
-            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--guide-muted)", margin: "14px 0 6px" }}>이 화면에서 바로 할 수 있는 것</p>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--guide-muted)", margin: "14px 0 6px" }}>{t("mockCommissionLabel")}</p>
+            <p style={{ fontSize: 12, color: "var(--guide-muted-2)", margin: 0 }}>{t("mockCommissionHidden")}</p>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--guide-muted)", margin: "14px 0 6px" }}>{t("mockAvailableActionsLabel")}</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span className="g-btn ghost">개통 등록</span>
-              <span className="g-btn ghost">변경 요청 등록</span>
-              <span className="g-btn ghost">해지 신청</span>
+              <span className="g-btn ghost">{t("mockActivationButton")}</span>
+              <span className="g-btn ghost">{t("mockChangeRequestButton")}</span>
+              <span className="g-btn ghost">{t("mockTerminationButton")}</span>
             </div>
           </div>
         </div>
       </div>
       <div className="g-tip">
-        <b>수수료 금액은 여기서 안 보여요</b>
-        <br />계약서 화면의 &quot;영업 수수료&quot;는 관리자만 조회할 수 있도록 가려져 있습니다. 내 수수료가 궁금하면 10단계
-        &quot;내 수수료 현황&quot; 메뉴를 이용하세요 — 거기서는 내 몫만 정확히 볼 수 있습니다.
+        <b>{t("step7TipTitle")}</b>
+        <br />
+        {t("step7TipBody")}
       </div>
     </section>
   );
 }
 
-function StepChangeRequest() {
+function StepChangeRequest({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">8단계</p>
-      <h2>변경 요청 등록하기</h2>
-      <p className="g-lede">
-        계약 후에 장비나 서비스를 추가/변경해야 하면, 계약 상세 화면의 &quot;변경 요청 등록&quot; 버튼으로 시작합니다.
-        &quot;② 신청·견적·계약 → 변경 요청&quot;에서 지금까지의 변경 이력을 모아볼 수 있습니다.
-      </p>
+      <p className="g-eyebrow">{t("step8Eyebrow")}</p>
+      <h2>{t("step8Title")}</h2>
+      <p className="g-lede">{t("step8Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-pad">
-            <b style={{ fontSize: 14 }}>변경 요청</b>
-            <p style={{ fontSize: 12, color: "var(--guide-muted)", margin: "6px 0 14px" }}>
-              계약 상세 페이지에서 &quot;변경 요청&quot;을 눌러 새 변경 요청을 등록하세요.
-            </p>
+            <b style={{ fontSize: 14 }}>{t("mockChangeRequestTitle")}</b>
+            <p style={{ fontSize: 12, color: "var(--guide-muted)", margin: "6px 0 14px" }}>{t("mockChangeRequestInstruction")}</p>
             <table className="g-mock-table">
               <tbody>
-                <tr><th>변경번호</th><th>고객</th><th>계약번호</th><th>유형</th><th>변경 전</th><th>변경 후</th></tr>
+                <tr><th>{t("mockColChangeNo")}</th><th>{t("mockInfoCustomer")}</th><th>{t("mockColChangeContractNo")}</th><th>{t("mockColChangeType")}</th><th>{t("mockColChangeBefore")}</th><th>{t("mockColChangeAfter")}</th></tr>
               </tbody>
             </table>
-            <p style={{ textAlign: "center", fontSize: 12, color: "var(--guide-muted-2)", padding: "16px 0" }}>변경 요청 내역이 없습니다.</p>
+            <p style={{ textAlign: "center", fontSize: 12, color: "var(--guide-muted-2)", padding: "16px 0" }}>{t("mockChangeRequestEmpty")}</p>
           </div>
         </div>
       </div>
@@ -450,62 +421,56 @@ function StepChangeRequest() {
   );
 }
 
-function StepCommission() {
+function StepCommission({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">9단계</p>
-      <h2>내 수수료 현황 확인하기</h2>
-      <p className="g-lede">
-        &quot;① 고객·영업 관리 → 내 수수료 현황&quot;에서 내가 지금까지 유치한 모든 고객의 계약별 누적 수수료와 월별 이력을 한눈에 볼
-        수 있습니다. 다른 영업대리점의 수수료는 보이지 않고, 오직 내 몫만 표시됩니다.
-      </p>
+      <p className="g-eyebrow">{t("step9Eyebrow")}</p>
+      <h2>{t("step9Title")}</h2>
+      <p className="g-lede">{t("step9Lede")}</p>
       <div className="g-frame">
         <div className="g-frame-bar"><span /><span /><span /></div>
         <div className="g-frame-body">
           <div className="g-mock-pad">
             <div className="g-stat-row" style={{ marginTop: 0 }}>
-              <div className="g-stat-card soft"><div className="l">유치한 고객 수</div><div className="v">1</div></div>
-              <div className="g-stat-card soft"><div className="l">활성 계약 수</div><div className="v">1</div></div>
-              <div className="g-stat-card soft" style={{ gridColumn: "span 2" }}><div className="l">누적 수수료 (현재까지)</div><div className="v">Rp 428,690</div></div>
+              <div className="g-stat-card soft"><div className="l">{t("mockStatCustomersBrought")}</div><div className="v">1</div></div>
+              <div className="g-stat-card soft"><div className="l">{t("mockStatActiveContracts")}</div><div className="v">1</div></div>
+              <div className="g-stat-card soft" style={{ gridColumn: "span 2" }}><div className="l">{t("mockStatTotalCommission")}</div><div className="v">Rp 428,690</div></div>
             </div>
             <div style={{ marginTop: 14, border: "1px solid var(--guide-line)", borderRadius: 12, padding: "12px 14px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <b style={{ fontSize: 13 }}>PT. Sung Shin Best Indonesia <span style={{ fontWeight: 400, color: "var(--guide-muted)", fontSize: 11 }}>CTR20260805-001</span></b>
-                <span className="g-badge good">계약완료</span>
+                <span className="g-badge good">{t("mockContractStatusDone")}</span>
               </div>
               <div className="g-info-grid" style={{ marginTop: 10 }}>
-                <div><div className="k">계약 시작일</div><div className="v" style={{ fontSize: 12 }}>2026-08-05</div></div>
-                <div><div className="k">월 수수료 (100%)</div><div className="v" style={{ fontSize: 12 }}>Rp 492,200</div></div>
-                <div><div className="k">월 수수료 (50%)</div><div className="v" style={{ fontSize: 12 }}>Rp 246,100</div></div>
-                <div><div className="k">누적 수수료</div><div className="v" style={{ fontSize: 12 }}>Rp 428,690</div></div>
+                <div><div className="k">{t("mockInfoContractStart")}</div><div className="v" style={{ fontSize: 12 }}>2026-08-05</div></div>
+                <div><div className="k">{t("mockInfoFullCommission")}</div><div className="v" style={{ fontSize: 12 }}>Rp 492,200</div></div>
+                <div><div className="k">{t("mockInfoHalfCommission")}</div><div className="v" style={{ fontSize: 12 }}>Rp 246,100</div></div>
+                <div><div className="k">{t("mockInfoTotalCommission")}</div><div className="v" style={{ fontSize: 12 }}>Rp 428,690</div></div>
               </div>
-              <div className="g-expand">▸ 월별 내역 보기 (1개월)</div>
+              <div className="g-expand">{t("mockViewHistory", { count: 1 })}</div>
             </div>
           </div>
         </div>
       </div>
       <div className="g-tip">
-        <b>이력 포함이란?</b>
-        <br />&quot;월별 내역 보기&quot;를 펼치면 계약을 시작한 달부터 이번 달까지, 달마다 실제로 얼마씩 쌓였는지 전부 확인할 수
-        있습니다.
+        <b>{t("step9TipTitle")}</b>
+        <br />
+        {t("step9TipBody")}
       </div>
     </section>
   );
 }
 
-function StepClosing() {
+function StepClosing({ t }: { t: T }) {
   return (
     <section className="g-step">
-      <p className="g-eyebrow">마지막 단계</p>
-      <h2>정리하며</h2>
-      <p className="g-lede">여기까지가 영업대리점 계정으로 할 수 있는 전체 업무 흐름입니다. 순서를 다시 한 번 정리하면 아래와 같습니다.</p>
+      <p className="g-eyebrow">{t("step10Eyebrow")}</p>
+      <h2>{t("step10Title")}</h2>
+      <p className="g-lede">{t("step10Lede")}</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 520 }}>
-        <div className="g-tip">1 고객 등록 → 2 견적 작성 → 3 견적 저장 → 4 계약 생성 → 5 필요 시 변경 요청 → 6 내 수수료 현황에서 확인</div>
+        <div className="g-tip">{t("step10Flow")}</div>
       </div>
-      <p className="g-lede" style={{ marginTop: 16 }}>
-        화면이 헷갈리거나 문제가 생기면 언제든 관리자에게 문의하세요. 로그인 정보(이메일/비밀번호)는 남에게 알려주지 말고, 자리를
-        비울 땐 반드시 오른쪽 위 &quot;로그아웃&quot;을 눌러주세요.
-      </p>
+      <p className="g-lede" style={{ marginTop: 16 }}>{t("step10Final")}</p>
     </section>
   );
 }
