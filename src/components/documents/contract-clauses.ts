@@ -51,6 +51,10 @@ export function contractClauses(contract: Contract): ClauseSection[] {
           ko: '미포함 서비스: CCTV 신규 설치 및 장비 구매, PC 부품·소모품·라이선스, OS 재설치, 데이터복구, 랜섬웨어/해킹 사고복구, 대규모 배선공사, 타사 서비스 장애복구, 고객 과실로 인한 장비 파손, 별도 보안컨설팅.',
         },
         {
+          id: 'Layanan dukungan tambahan yang dapat disediakan atas permintaan (ditagih terpisah per kasus): perbaikan PC/perangkat IT milik pengguna (biaya komponen ditagih sesuai harga aktual), instalasi software/aplikasi pada PC, jasa pembelian perangkat IT (ditagih sebesar harga beli ditambah biaya penanganan 15%), pengaturan printer jaringan, pemeliharaan jalur kabel internal, pemeliharaan perangkat Starlink, serta dukungan pemeliharaan IT umum lainnya.',
+          ko: '요청 시 제공 가능한 추가 지원 서비스(건별로 별도 청구): 사용자 PC/IT 장비 수리(부품은 실비 청구), PC 소프트웨어/어플리케이션 설치, IT 장비 구매대행(구매원가에 핸들링차지 15% 가산 청구), 네트워크 프린터 셋팅, 구내 통신회선 유지보수, Starlink 장비 유지보수, 기타 IT 관련 유지보수 전반 지원.',
+        },
+        {
           id: 'Pekerjaan yang tidak tercantum dalam surat penawaran atau perjanjian tambahan akan dilaksanakan setelah ada penawaran biaya terpisah dan persetujuan dari Pelanggan.',
           ko: '견적서 또는 부속합의서에 명시되지 않은 작업은 별도 견적 및 고객 승인 후 진행한다.',
         },
