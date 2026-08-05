@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { createAdminClient } from '@/lib/supabase/admin';
 import { requireMaster } from '@/lib/auth/session';
+import { createStaffAccount } from '@/lib/auth/create-staff-account';
 
 const createStaffSchema = z.object({
   email: z.string().email(),
@@ -11,8 +11,6 @@ const createStaffSchema = z.object({
   role: z.enum(['master', 'admin_dept', 'activation_dept', 'sales_agent']).default('admin_dept'),
   agent_code: z.string().optional(),
 });
-
-const MAX_MASTER_ACCOUNTS = 2;
 
 export async function POST(request: Request) {
   let master;
@@ -27,55 +25,13 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Invalid input' }, { status: 400 });
   }
-  const { email, password, full_name, role, agent_code } = parsed.data;
 
   const supabase = await createClient();
-  if (role === 'master') {
-    const { count, error: countError } = await supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'master')
-      .eq('is_active', true);
-    if (countError) {
-      return NextResponse.json({ error: countError.message }, { status: 400 });
-    }
-    if ((count ?? 0) >= MAX_MASTER_ACCOUNTS) {
-      return NextResponse.json(
-        { error: `마스터 관리자는 최대 ${MAX_MASTER_ACCOUNTS}명까지만 가능합니다.` },
-        { status: 400 }
-      );
-    }
+  try {
+    const created = await createStaffAccount(supabase, master.userId, parsed.data);
+    return NextResponse.json(created);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Failed to create user';
+    return NextResponse.json({ error: message }, { status: 400 });
   }
-
-  const admin = createAdminClient();
-  const { data: created, error: createError } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { full_name, pre_approved: true },
-  });
-  if (createError || !created.user) {
-    return NextResponse.json({ error: createError?.message ?? 'Failed to create user' }, { status: 400 });
-  }
-
-  // handle_new_user always inserts the profile as admin_dept — apply the
-  // requested role (and, for sales_agent, the linked agent) here.
-  if (role !== 'admin_dept') {
-    const { error: roleError } = await supabase
-      .from('profiles')
-      .update({ role, agent_code: role === 'sales_agent' ? (agent_code ?? null) : null })
-      .eq('id', created.user.id);
-    if (roleError) {
-      return NextResponse.json({ error: roleError.message }, { status: 400 });
-    }
-  }
-
-  await supabase.rpc('log_audit', {
-    p_action: 'STAFF_CREATED',
-    p_target_table: 'profiles',
-    p_target_id: created.user.id,
-    p_details: { email, role, created_by: master.userId },
-  });
-
-  return NextResponse.json({ id: created.user.id, email, full_name, role });
 }

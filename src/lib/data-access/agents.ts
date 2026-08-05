@@ -106,6 +106,7 @@ export async function changeAgentRate(
 }
 
 export interface UpdateAgentInfoInput {
+  name?: string;
   phone?: string;
   email?: string;
   bank?: AgentBank;

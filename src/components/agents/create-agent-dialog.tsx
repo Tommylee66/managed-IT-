@@ -30,6 +30,9 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
   const [open, setOpen] = useState(false);
   const [createdAgentName, setCreatedAgentName] = useState<string | null>(null);
   const [createdAgentEmail, setCreatedAgentEmail] = useState<string | undefined>(undefined);
+  const [staffAccount, setStaffAccount] = useState<{ email: string; tempPassword: string } | null>(
+    null
+  );
 
   const schema = z.object({
     name: z.string().min(1, t("nameRequired")),
@@ -55,7 +58,7 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
 
   async function onSubmit(values: FormValues) {
     try {
-      await createAgentAction({
+      const { staffAccount: created } = await createAgentAction({
         name: values.name,
         rate: values.rate,
         phone: values.phone,
@@ -74,6 +77,7 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
       toast.success(t("createSuccess"));
       setCreatedAgentName(values.name);
       setCreatedAgentEmail(values.email);
+      setStaffAccount(created);
       reset();
     } catch {
       toast.error(t("createError"));
@@ -85,6 +89,7 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
     if (!next) {
       setCreatedAgentName(null);
       setCreatedAgentEmail(undefined);
+      setStaffAccount(null);
     }
   }
 
@@ -109,11 +114,24 @@ export function CreateAgentDialog({ isMaster }: { isMaster: boolean }) {
         {createdAgentName ? (
           <div className="flex flex-col gap-4">
             <p className="text-sm">{t("createSuccessDetail", { name: createdAgentName })}</p>
+            {staffAccount ? (
+              <div className="flex flex-col gap-2 rounded-md border bg-muted/50 p-3">
+                <p className="text-sm font-medium">{t("staffAutoCreated")}</p>
+                <p className="text-sm">
+                  {t("staffLoginEmail")}: <span className="font-mono">{staffAccount.email}</span>
+                </p>
+                <p className="text-sm">
+                  {t("staffTempPassword")}:{" "}
+                  <span className="font-mono font-semibold">{staffAccount.tempPassword}</span>
+                </p>
+                <p className="text-xs text-muted-foreground">{t("staffTempPasswordHint")}</p>
+              </div>
+            ) : null}
             <DialogFooter className="gap-2 sm:justify-between">
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
                 {tCommon("close")}
               </Button>
-              {isMaster && (
+              {isMaster && !staffAccount && (
                 <Button onClick={goToStaffRegistration}>{t("goToStaffRegistration")}</Button>
               )}
             </DialogFooter>

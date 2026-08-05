@@ -13,33 +13,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { updateAgentInfoAction } from "@/app/[locale]/(dashboard)/agents/actions";
 import type { Agent } from "@/types/domain";
 
-const schema = z.object({
-  phone: z.string().optional(),
-  email: z.string().optional(),
-  bankName: z.string().optional(),
-  accountNumber: z.string().optional(),
-  holderName: z.string().optional(),
-  npwp: z.string().optional(),
-  ktp: z.string().optional(),
-  address: z.string().optional(),
-  memo: z.string().optional(),
-});
-
-type FormValues = z.infer<typeof schema>;
-
 /** Only rendered for `master`, who receives the unmasked agent record — a
  * `staff` viewer editing this form would silently overwrite real npwp/ktp/
  * bank values with the masked placeholders, same rule as EditCustomerForm. */
 export function EditAgentForm({ agent }: { agent: Agent }) {
   const t = useTranslations("agents");
   const tCommon = useTranslations("common");
+
+  const schema = z.object({
+    name: z.string().min(1, t("nameRequired")),
+    phone: z.string().optional(),
+    email: z.string().optional(),
+    bankName: z.string().optional(),
+    accountNumber: z.string().optional(),
+    holderName: z.string().optional(),
+    npwp: z.string().optional(),
+    ktp: z.string().optional(),
+    address: z.string().optional(),
+    memo: z.string().optional(),
+  });
+  type FormValues = z.infer<typeof schema>;
+
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      name: agent.name,
       phone: agent.phone ?? "",
       email: agent.email ?? "",
       bankName: agent.bank?.bankName ?? "",
@@ -55,6 +57,7 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
   async function onSubmit(values: FormValues) {
     try {
       await updateAgentInfoAction(agent.code, {
+        name: values.name,
         phone: values.phone,
         email: values.email,
         bank: {
@@ -80,6 +83,11 @@ export function EditAgentForm({ agent }: { agent: Agent }) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="name">{t("name")}</Label>
+            <Input id="name" {...register("name")} />
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+          </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             <div className="flex flex-col gap-2">
               <Label htmlFor="phone">{t("phone")}</Label>
