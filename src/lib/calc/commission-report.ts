@@ -1,4 +1,4 @@
-import type { Contract } from '@/types/domain';
+import type { Contract, ContractStatus } from '@/types/domain';
 
 export interface ContractCommissionRow {
   contractNo: string;
@@ -128,4 +128,78 @@ export function calcMonthlyCommissionReport(
   }
 
   return Array.from(groups.values()).sort((a, b) => a.agentCode.localeCompare(b.agentCode));
+}
+
+function monthKeysBetween(startMonthKey: string, endMonthKey: string): string[] {
+  const [startYear, startMonth] = startMonthKey.split('-').map(Number);
+  const [endYear, endMonth] = endMonthKey.split('-').map(Number);
+  const keys: string[] = [];
+  let year = startYear;
+  let month = startMonth;
+  while (year < endYear || (year === endYear && month <= endMonth)) {
+    keys.push(`${year}-${String(month).padStart(2, '0')}`);
+    month += 1;
+    if (month > 12) {
+      month = 1;
+      year += 1;
+    }
+  }
+  return keys;
+}
+
+export interface ContractCommissionHistoryEntry {
+  month: string;
+  amount: number;
+}
+
+export interface ContractCommissionSummary {
+  contractNo: string;
+  customerCode: string;
+  customerName: string;
+  startDate: string;
+  status: ContractStatus;
+  monthlyCommission: number;
+  halfMonthlyCommission: number;
+  commissionFullEnd: string | null;
+  commissionHalfStart: string | null;
+  commissionEnd: string | null;
+  /** Every month (from contract start through `uptoMonthKey`) that earned
+   * a nonzero commission — the "history" a sales agent needs to see their
+   * own full track record, not just the current month's snapshot. */
+  history: ContractCommissionHistoryEntry[];
+  totalToDate: number;
+}
+
+/** One agent's full commission track record across every customer they've
+ * brought in — every contract, with a month-by-month history and a
+ * cumulative total, through `uptoMonthKey`. Unlike calcMonthlyCommissionReport
+ * (a single month, all agents), this is one agent, every month to date. */
+export function calcAgentCommissionHistory(
+  contracts: Contract[],
+  agentCode: string,
+  uptoMonthKey: string
+): ContractCommissionSummary[] {
+  return contracts
+    .filter((c) => c.agent_code === agentCode)
+    .map((c): ContractCommissionSummary => {
+      const startMonthKey = c.start_date.slice(0, 7);
+      const history = monthKeysBetween(startMonthKey, uptoMonthKey)
+        .map((month) => ({ month, amount: calcContractCommissionForMonth(c, month) }))
+        .filter((entry) => entry.amount > 0);
+      return {
+        contractNo: c.no,
+        customerCode: c.customer_code,
+        customerName: c.customer_name,
+        startDate: c.start_date,
+        status: c.status,
+        monthlyCommission: c.monthly_commission,
+        halfMonthlyCommission: c.half_monthly_commission,
+        commissionFullEnd: c.commission_full_end,
+        commissionHalfStart: c.commission_half_start,
+        commissionEnd: c.commission_end,
+        history,
+        totalToDate: history.reduce((sum, entry) => sum + entry.amount, 0),
+      };
+    })
+    .sort((a, b) => a.startDate.localeCompare(b.startDate));
 }

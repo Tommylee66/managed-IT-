@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -84,6 +85,86 @@ export default async function DashboardPage({
 
   const p = (path: string) => `/${locale}${path}`;
 
+  // Each section's card list is filtered to what this role can see first;
+  // a section with zero visible cards is dropped entirely rather than
+  // rendering as an empty box next to full ones (the "gap-toothed" look a
+  // partial-access role like sales_agent or activation_dept used to get).
+  const menuSections = [
+    {
+      key: "customerSales",
+      title: tHome("sectionCustomerSales"),
+      cards: [
+        can("/customers") && (
+          <MenuCard key="customers" href={p("/customers")} icon="🏢" color="blue" title={tNav("customers")} description={tHome("cardCustomersDesc")} />
+        ),
+        can("/agents") && (
+          <MenuCard key="agents" href={p("/agents")} icon="🧑‍💼" color="blue" title={tNav("agents")} description={tHome("cardAgentsDesc")} />
+        ),
+        !can("/agents") && can("/agents/commission") && (
+          <MenuCard key="myCommission" href={p("/agents/commission")} icon="🧑‍💼" color="blue" title={tNav("myCommission")} description={tHome("cardMyCommissionDesc")} />
+        ),
+        can("/assets") && (
+          <MenuCard key="assets" href={p("/assets")} icon="🧰" color="blue" title={tNav("assets")} description={tHome("cardAssetsDesc")} />
+        ),
+        isMaster && (
+          <MenuCard key="adminStaff" href={p("/admin/staff")} icon="👤" color="blue" title={tNav("adminStaff")} description={tHome("cardAdminStaffDesc")} />
+        ),
+      ].filter(Boolean),
+    },
+    {
+      key: "applicationContract",
+      title: tHome("sectionApplicationContract"),
+      cards: [
+        can("/customers") && (
+          <MenuCard key="applications" href={p("/customers")} icon="🔎" color="purple" title={tNav("applications")} description={tHome("cardApplicationsDesc")} />
+        ),
+        can("/quotes") && (
+          <MenuCard key="quotes" href={p("/quotes")} icon="🧾" color="purple" title={tNav("quotes")} description={tHome("cardQuotesDesc")} />
+        ),
+        can("/contracts") && (
+          <MenuCard key="contracts" href={p("/contracts")} icon="📄" color="purple" title={tNav("contracts")} description={tHome("cardContractsDesc")} />
+        ),
+        can("/change-requests") && (
+          <MenuCard key="changeRequests" href={p("/change-requests")} icon="🔁" color="purple" title={tNav("changeRequests")} description={tHome("cardChangeRequestsDesc")} />
+        ),
+      ].filter(Boolean),
+    },
+    {
+      key: "operations",
+      title: tHome("sectionOperations"),
+      cards: [
+        can("/activations") && (
+          <MenuCard key="activations" href={p("/activations")} icon="🛠️" color="orange" title={tNav("activations")} description={tHome("cardActivationsDesc")} />
+        ),
+        can("/incident-logs") && (
+          <MenuCard key="incidentLogs" href={p("/incident-logs")} icon="🚨" color="orange" title={tNav("incidentLogs")} description={tHome("cardIncidentLogsDesc")} />
+        ),
+        can("/service-logs") && (
+          <MenuCard key="serviceLogs" href={p("/service-logs")} icon="📝" color="orange" title={tNav("serviceLogs")} description={tHome("cardServiceLogsDesc")} />
+        ),
+        can("/termination") && (
+          <MenuCard key="termination" href={p("/termination")} icon="⚠️" color="orange" title={tNav("termination")} description={tHome("cardTerminationDesc")} />
+        ),
+      ].filter(Boolean),
+    },
+    {
+      key: "billingAdmin",
+      title: tHome("sectionBillingAdmin"),
+      cards: [
+        can("/invoices") && (
+          <MenuCard key="invoices" href={p("/invoices")} icon="💳" color="green" title={tNav("invoices")} description={tHome("cardInvoicesDesc")} />
+        ),
+        isMaster && (
+          <Fragment key="adminGroup">
+            <MenuCard href={p("/admin/approvals")} icon="✅" color="green" title={tNav("adminApprovals")} description={tHome("cardAdminApprovalsDesc")} />
+            <MenuCard href={p("/admin/rates")} icon="⚙️" color="green" title={tNav("adminRates")} description={tHome("cardAdminRatesDesc")} />
+            <MenuCard href={p("/admin/audit-log")} icon="📋" color="green" title={tNav("adminAuditLog")} description={tHome("cardAdminAuditLogDesc")} />
+          </Fragment>
+        ),
+      ].filter(Boolean),
+    },
+  ].filter((section) => section.cards.length > 0);
+
   return (
     <div className="flex flex-col gap-5">
       <div
@@ -133,64 +214,12 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.05fr_1.25fr_1.05fr_0.95fr]">
-        <MenuSection title={tHome("sectionCustomerSales")}>
-          {can("/customers") && (
-            <MenuCard href={p("/customers")} icon="🏢" color="blue" title={tNav("customers")} description={tHome("cardCustomersDesc")} />
-          )}
-          {can("/agents") && (
-            <MenuCard href={p("/agents")} icon="🧑‍💼" color="blue" title={tNav("agents")} description={tHome("cardAgentsDesc")} />
-          )}
-          {can("/assets") && (
-            <MenuCard href={p("/assets")} icon="🧰" color="blue" title={tNav("assets")} description={tHome("cardAssetsDesc")} />
-          )}
-          {isMaster && (
-            <MenuCard href={p("/admin/staff")} icon="👤" color="blue" title={tNav("adminStaff")} description={tHome("cardAdminStaffDesc")} />
-          )}
-        </MenuSection>
-
-        <MenuSection title={tHome("sectionApplicationContract")}>
-          {can("/customers") && (
-            <MenuCard href={p("/customers")} icon="🔎" color="purple" title={tNav("applications")} description={tHome("cardApplicationsDesc")} />
-          )}
-          {can("/quotes") && (
-            <MenuCard href={p("/quotes")} icon="🧾" color="purple" title={tNav("quotes")} description={tHome("cardQuotesDesc")} />
-          )}
-          {can("/contracts") && (
-            <MenuCard href={p("/contracts")} icon="📄" color="purple" title={tNav("contracts")} description={tHome("cardContractsDesc")} />
-          )}
-          {can("/change-requests") && (
-            <MenuCard href={p("/change-requests")} icon="🔁" color="purple" title={tNav("changeRequests")} description={tHome("cardChangeRequestsDesc")} />
-          )}
-        </MenuSection>
-
-        <MenuSection title={tHome("sectionOperations")}>
-          {can("/activations") && (
-            <MenuCard href={p("/activations")} icon="🛠️" color="orange" title={tNav("activations")} description={tHome("cardActivationsDesc")} />
-          )}
-          {can("/incident-logs") && (
-            <MenuCard href={p("/incident-logs")} icon="🚨" color="orange" title={tNav("incidentLogs")} description={tHome("cardIncidentLogsDesc")} />
-          )}
-          {can("/service-logs") && (
-            <MenuCard href={p("/service-logs")} icon="📝" color="orange" title={tNav("serviceLogs")} description={tHome("cardServiceLogsDesc")} />
-          )}
-          {can("/termination") && (
-            <MenuCard href={p("/termination")} icon="⚠️" color="orange" title={tNav("termination")} description={tHome("cardTerminationDesc")} />
-          )}
-        </MenuSection>
-
-        <MenuSection title={tHome("sectionBillingAdmin")}>
-          {can("/invoices") && (
-            <MenuCard href={p("/invoices")} icon="💳" color="green" title={tNav("invoices")} description={tHome("cardInvoicesDesc")} />
-          )}
-          {isMaster && (
-            <>
-              <MenuCard href={p("/admin/approvals")} icon="✅" color="green" title={tNav("adminApprovals")} description={tHome("cardAdminApprovalsDesc")} />
-              <MenuCard href={p("/admin/rates")} icon="⚙️" color="green" title={tNav("adminRates")} description={tHome("cardAdminRatesDesc")} />
-              <MenuCard href={p("/admin/audit-log")} icon="📋" color="green" title={tNav("adminAuditLog")} description={tHome("cardAdminAuditLogDesc")} />
-            </>
-          )}
-        </MenuSection>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
+        {menuSections.map((section) => (
+          <MenuSection key={section.key} title={section.title}>
+            {section.cards}
+          </MenuSection>
+        ))}
       </div>
     </div>
   );

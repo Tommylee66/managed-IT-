@@ -7,6 +7,7 @@ const ALL_ROLE_PATHS = [
   '/dashboard',
   '/customers',
   '/agents',
+  '/agents/commission',
   '/applications',
   '/quotes',
   '/contracts',
@@ -35,8 +36,15 @@ export const ROLE_PATHS: Record<StaffRole, string[]> = {
   ),
   // 조회(customer lookup) + 개통 + 장애처리 및 정기점검 only.
   activation_dept: ['/dashboard', '/customers', '/activations', '/incident-logs'],
-  // 고객/등록, 조회, 신규신청(견적작업), 계약, 변경 요청 only.
-  sales_agent: ['/dashboard', '/customers', '/quotes', '/contracts', '/change-requests'],
+  // 고객/등록, 조회, 신규신청(견적작업), 계약, 변경 요청, 그리고 본인 수수료 현황만.
+  sales_agent: [
+    '/dashboard',
+    '/customers',
+    '/quotes',
+    '/contracts',
+    '/change-requests',
+    '/agents/commission',
+  ],
 };
 
 export function canAccessPath(role: StaffRole, pathname: string): boolean {
