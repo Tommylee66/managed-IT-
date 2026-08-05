@@ -66,26 +66,35 @@ export function calcQuoteForInputs(
 
   if (m === 24) add('term', '24개월 계약 추가요금', rates.contract24_addon, 0, 0, true, 'term');
 
-  const emp = Math.max(0, Number(inputs.emp || 0) - 20);
+  const totalEmp = Number(inputs.emp || 0);
+  const emp = Math.max(0, totalEmp - 20);
   if (emp)
-    add('employee', `직원/PC 추가 ${emp}명`, emp * rates.employee_unit, emp * cost.costEmp, 0, true, 'employeeExtra', {
-      emp,
-    });
+    add(
+      'employee',
+      `직원/PC 추가 ${emp}명 (총 ${totalEmp}명)`,
+      emp * rates.employee_unit,
+      emp * cost.costEmp,
+      0,
+      true,
+      'employeeExtra',
+      { emp, total: totalEmp }
+    );
 
   // Base service includes 4 CCTV units (see baseServiceDescription in the
   // i18n messages) — same "N included, extra billed per unit" shape as
   // employee/PC count above, not the old block-based cctv_block pricing.
-  const cctvExtra = Math.max(0, Number(inputs.cctv || 0) - 4);
+  const totalCctv = Number(inputs.cctv || 0);
+  const cctvExtra = Math.max(0, totalCctv - 4);
   if (cctvExtra)
     add(
       'cctv',
-      `CCTV 추가 ${cctvExtra}대`,
+      `CCTV 추가 ${cctvExtra}대 (총 ${totalCctv}대)`,
       cctvExtra * rates.cctv_block,
       cctvExtra * cost.costCctv,
       0,
       true,
       'cctvExtra',
-      { cctvExtra }
+      { cctvExtra, total: totalCctv }
     );
 
   // Visit frequency, priority response, VPN, and security add-ons no longer

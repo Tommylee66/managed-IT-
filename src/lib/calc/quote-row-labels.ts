@@ -13,9 +13,9 @@ export const QUOTE_ROW_LABELS: Record<string, Record<Locale, string>> = {
     en: '24-month contract add-on fee',
   },
   employeeExtra: {
-    ko: '직원/PC 추가 {emp}명',
-    id: 'Tambahan {emp} karyawan/PC',
-    en: 'Additional {emp} employees/PCs',
+    ko: '직원/PC 추가 {emp}명 (총 {total}명)',
+    id: 'Tambahan {emp} karyawan/PC (total {total})',
+    en: 'Additional {emp} employees/PCs (total {total})',
   },
   apExtra: {
     ko: 'AP 추가 {ap}대',
@@ -28,9 +28,9 @@ export const QUOTE_ROW_LABELS: Record<string, Record<Locale, string>> = {
     en: 'Additional {hub} hub/switch units',
   },
   cctvExtra: {
-    ko: 'CCTV 유지보수 추가 {cctvExtra}대',
-    id: 'Tambahan pemeliharaan {cctvExtra} unit CCTV',
-    en: 'Additional CCTV maintenance for {cctvExtra} units',
+    ko: 'CCTV 유지보수 추가 {cctvExtra}대 (총 {total}대)',
+    id: 'Tambahan pemeliharaan {cctvExtra} unit CCTV (total {total} unit)',
+    en: 'Additional CCTV maintenance for {cctvExtra} units (total {total} units)',
   },
   visitTwice: {
     ko: '월 2회 방문점검 추가',
@@ -107,4 +107,22 @@ export function renderBilingualQuoteRowLabel(row: LabelSource): { id: string; ko
   const entry = row.labelKey ? QUOTE_ROW_LABELS[row.labelKey] : undefined;
   if (!entry) return { id: row.label, ko: row.label };
   return { id: interpolate(entry.id, row.params), ko: interpolate(entry.ko, row.params) };
+}
+
+const POST_TERM_EXTENSION_SUFFIX: Record<Locale, string> = {
+  ko: ' 연장임대료',
+  id: ' (Sewa Perpanjangan)',
+  en: ' (Extended Rental)',
+};
+
+/** Renders an invoice line item's label, appending the post-term rental
+ * extension suffix (see invoice-calc.ts's postTermEquipmentRows) when
+ * applicable — used instead of a raw `.label` field so the suffix isn't
+ * frozen into a single locale at billing time. */
+export function renderInvoiceLineItemLabel(
+  item: LabelSource & { postTermExtension?: boolean },
+  locale: Locale
+): string {
+  const base = renderQuoteRowLabel(item, locale);
+  return item.postTermExtension ? `${base}${POST_TERM_EXTENSION_SUFFIX[locale]}` : base;
 }
