@@ -84,6 +84,23 @@ function interpolate(template: string, params?: Record<string, string | number>)
   return template.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? ''));
 }
 
+// Matches the "included in the base fee" thresholds in quote-calc.ts (emp:
+// 20, cctv: 4). Rows saved before {total} was added to these two labelKeys
+// only carry the extra count (emp/cctvExtra), not the running total — this
+// derives it for display so those older quotes/contracts don't render a
+// blank "(총 명)"/"(total )" instead of a real number.
+function withDerivedTotal(row: Pick<QuoteRowRecord, 'labelKey' | 'params'>): Record<string, string | number> | undefined {
+  const params = row.params;
+  if (!params || params.total !== undefined) return params;
+  if (row.labelKey === 'employeeExtra' && params.emp !== undefined) {
+    return { ...params, total: Number(params.emp) + 20 };
+  }
+  if (row.labelKey === 'cctvExtra' && params.cctvExtra !== undefined) {
+    return { ...params, total: Number(params.cctvExtra) + 4 };
+  }
+  return params;
+}
+
 type LabelSource = Pick<QuoteRowRecord, 'label' | 'labelKey' | 'params' | 'labelId' | 'labelKo'>;
 
 /** Renders a quote row's label in the given locale. Catalog-sourced rows
@@ -95,7 +112,7 @@ export function renderQuoteRowLabel(row: LabelSource, locale: Locale): string {
   if (row.labelId || row.labelKo) return (locale === 'ko' ? row.labelKo : row.labelId) ?? row.label;
   const entry = row.labelKey ? QUOTE_ROW_LABELS[row.labelKey] : undefined;
   if (!entry) return row.label;
-  return interpolate(entry[locale], row.params);
+  return interpolate(entry[locale], withDerivedTotal(row));
 }
 
 /** Renders a quote row's label in both Indonesian and Korean, for the
@@ -106,7 +123,8 @@ export function renderBilingualQuoteRowLabel(row: LabelSource): { id: string; ko
   }
   const entry = row.labelKey ? QUOTE_ROW_LABELS[row.labelKey] : undefined;
   if (!entry) return { id: row.label, ko: row.label };
-  return { id: interpolate(entry.id, row.params), ko: interpolate(entry.ko, row.params) };
+  const params = withDerivedTotal(row);
+  return { id: interpolate(entry.id, params), ko: interpolate(entry.ko, params) };
 }
 
 const POST_TERM_EXTENSION_SUFFIX: Record<Locale, string> = {
