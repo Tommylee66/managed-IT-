@@ -16,7 +16,17 @@ export interface QuoteCalcResult {
 }
 
 export function calcQuoteForInputs(
-  rates: Pick<Rates, 'base_monthly' | 'contract24_addon' | 'employee_unit' | 'cctv_block' | 'locations' | 'commission_items'> & {
+  rates: Pick<
+    Rates,
+    | 'base_monthly'
+    | 'contract24_addon'
+    | 'employee_unit'
+    | 'cctv_block'
+    | 'locations'
+    | 'commission_items'
+    | 'employee_base_count'
+    | 'cctv_base_count'
+  > & {
     cost_fields?: Rates['cost_fields'];
     init_fields?: Rates['init_fields'];
   },
@@ -67,7 +77,7 @@ export function calcQuoteForInputs(
   if (m === 24) add('term', '24개월 계약 추가요금', rates.contract24_addon, 0, 0, true, 'term');
 
   const totalEmp = Number(inputs.emp || 0);
-  const emp = Math.max(0, totalEmp - 20);
+  const emp = Math.max(0, totalEmp - rates.employee_base_count);
   if (emp)
     add(
       'employee',
@@ -80,11 +90,12 @@ export function calcQuoteForInputs(
       { emp, total: totalEmp }
     );
 
-  // Base service includes 4 CCTV units (see baseServiceDescription in the
-  // i18n messages) — same "N included, extra billed per unit" shape as
-  // employee/PC count above, not the old block-based cctv_block pricing.
+  // Base service includes rates.cctv_base_count CCTV units (see
+  // baseServiceDescription in the i18n messages) — same "N included, extra
+  // billed per unit" shape as employee/PC count above, not the old
+  // block-based cctv_block pricing.
   const totalCctv = Number(inputs.cctv || 0);
-  const cctvExtra = Math.max(0, totalCctv - 4);
+  const cctvExtra = Math.max(0, totalCctv - rates.cctv_base_count);
   if (cctvExtra)
     add(
       'cctv',

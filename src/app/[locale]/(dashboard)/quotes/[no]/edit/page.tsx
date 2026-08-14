@@ -49,6 +49,8 @@ export default async function EditQuotePage({
         equipmentCatalog={equipmentCatalog}
         serviceCatalog={serviceCatalog}
         lockedAgentCode={lockedAgentCode}
+        employeeBaseCount={rates.employee_base_count}
+        cctvBaseCount={rates.cctv_base_count}
         initialValues={{
           no: quote.no,
           customer_code: quote.customer_code,

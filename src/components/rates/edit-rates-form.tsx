@@ -20,6 +20,8 @@ interface FormValues {
   employee_unit: number;
   cctv_block: number;
   ppn: number;
+  employee_base_count: number;
+  cctv_base_count: number;
   locations: { name: string; fee: number; cost: number }[];
   cost_fields_json: string;
   init_fields_json: string;
@@ -44,6 +46,8 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
       employee_unit: rates.employee_unit,
       cctv_block: rates.cctv_block,
       ppn: rates.ppn,
+      employee_base_count: rates.employee_base_count,
+      cctv_base_count: rates.cctv_base_count,
       locations: rates.locations,
       cost_fields_json: JSON.stringify(rates.cost_fields, null, 2),
       init_fields_json: JSON.stringify(rates.init_fields, null, 2),
@@ -104,6 +108,18 @@ export function EditRatesForm({ rates }: { rates: Rates }) {
           <div className="flex flex-col gap-2">
             <Label htmlFor="ppn">{t("ppnRate")}</Label>
             <Input id="ppn" type="number" {...register("ppn", { valueAsNumber: true })} />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="employee_base_count">{t("employeeBaseCount")}</Label>
+            <Input
+              id="employee_base_count"
+              type="number"
+              {...register("employee_base_count", { valueAsNumber: true })}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cctv_base_count">{t("cctvBaseCount")}</Label>
+            <Input id="cctv_base_count" type="number" {...register("cctv_base_count", { valueAsNumber: true })} />
           </div>
         </CardContent>
       </Card>

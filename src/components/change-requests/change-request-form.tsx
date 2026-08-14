@@ -54,11 +54,16 @@ export function ChangeRequestForm({
   locationNames,
   equipmentCatalog,
   serviceCatalog,
+  employeeBaseCount,
+  cctvBaseCount,
 }: {
   contract: Contract;
   locationNames: string[];
   equipmentCatalog: EquipmentCatalogItem[];
   serviceCatalog: ServiceCatalogItem[];
+  /** Admin-configurable counts included in the base fee (rates.employee_base_count/cctv_base_count) — interpolated into baseServiceDescription. */
+  employeeBaseCount: number;
+  cctvBaseCount: number;
 }) {
   const t = useTranslations("changeRequests");
   const tCalc = useTranslations("serviceCalculator");
@@ -283,7 +288,7 @@ export function ChangeRequestForm({
           <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
             <Label className="text-sm font-semibold">{tQuotes("baseServiceTitle")}</Label>
             <p className="text-sm text-muted-foreground whitespace-pre-line">
-              {tQuotes("baseServiceDescription")}
+              {tQuotes("baseServiceDescription", { emp: employeeBaseCount, cctv: cctvBaseCount })}
             </p>
           </div>
           <div className="flex flex-col gap-2">

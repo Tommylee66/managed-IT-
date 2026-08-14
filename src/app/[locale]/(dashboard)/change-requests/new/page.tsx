@@ -44,6 +44,8 @@ export default async function NewChangeRequestPage({
         locationNames={locationNames}
         equipmentCatalog={equipmentCatalog}
         serviceCatalog={serviceCatalog}
+        employeeBaseCount={rates.employee_base_count}
+        cctvBaseCount={rates.cctv_base_count}
       />
     </div>
   );

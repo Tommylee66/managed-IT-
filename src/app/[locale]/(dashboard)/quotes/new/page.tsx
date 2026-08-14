@@ -38,6 +38,8 @@ export default async function NewQuotePage({
         equipmentCatalog={equipmentCatalog}
         serviceCatalog={serviceCatalog}
         lockedAgentCode={lockedAgentCode}
+        employeeBaseCount={rates.employee_base_count}
+        cctvBaseCount={rates.cctv_base_count}
       />
     </div>
   );

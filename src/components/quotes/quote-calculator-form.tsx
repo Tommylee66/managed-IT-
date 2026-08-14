@@ -86,6 +86,8 @@ export function QuoteCalculatorForm({
   serviceCatalog,
   initialValues,
   lockedAgentCode,
+  employeeBaseCount,
+  cctvBaseCount,
 }: {
   customers: Customer[];
   agents: Agent[];
@@ -98,6 +100,9 @@ export function QuoteCalculatorForm({
    * a different agent anyway. `null` means "sales_agent but not yet linked
    * to an agent by master." */
   lockedAgentCode?: string | null;
+  /** Admin-configurable counts included in the base fee (rates.employee_base_count/cctv_base_count) — interpolated into baseServiceDescription. */
+  employeeBaseCount: number;
+  cctvBaseCount: number;
 }) {
   const t = useTranslations("serviceCalculator");
   const tQuotes = useTranslations("quotes");
@@ -403,7 +408,7 @@ export function QuoteCalculatorForm({
           <div className="flex flex-col gap-2 rounded-md border bg-muted/40 p-3">
             <Label className="text-sm font-semibold">{tQuotes("baseServiceTitle")}</Label>
             <p className="text-sm text-muted-foreground whitespace-pre-line">
-              {tQuotes("baseServiceDescription")}
+              {tQuotes("baseServiceDescription", { emp: employeeBaseCount, cctv: cctvBaseCount })}
             </p>
           </div>
 

@@ -166,6 +166,8 @@ export interface Rates {
   security_monitor: number;
   security_device: number;
   ppn: number;
+  employee_base_count: number;
+  cctv_base_count: number;
   cost_fields: RatesCostFields;
   init_fields: RatesInitFields;
   locations: RateLocation[];
