@@ -522,6 +522,7 @@ export interface AssetDecision {
   originalCost: number;
   unitCost: number;
   unamortized: number;
+  monthlyRate?: number;
 }
 
 export interface TerminationPlan {

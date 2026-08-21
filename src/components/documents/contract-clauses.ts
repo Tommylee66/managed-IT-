@@ -184,6 +184,10 @@ export function contractClauses(contract: Contract): ClauseSection[] {
           ko: '고객의 귀책 또는 편의에 의한 조기해지 시 정산금액은 다음과 같이 산정한다: (a) BCT 제공 장비/설치/세팅 원가의 미상각 잔액 × (계약 잔여개월 ÷ 총 계약개월); 여기에 (b) (a) 금액의 50%에 해당하는 위약금을 더하고; (c) 장비 원가의 8%에 해당하는 철거·회수·행정비를 더하고; (d) 미납요금을 더하여 산정한다. 세부 산정 및 최종금액은 해지 처리 시점에 확정된다. 예시: 장비 원가가 Rp10,000,000이고 24개월 계약 중 12개월이 남은 경우, (a) = Rp10,000,000 × 12/24 = Rp5,000,000; (b) = Rp5,000,000의 50% = Rp2,500,000; (c) = Rp10,000,000의 8% = Rp800,000; 따라서 (a)+(b)+(c) = Rp8,300,000이며, 여기에 실제 상황에 따른 (d)가 추가된다.',
         },
         {
+          id: 'Namun, untuk printer, denda pengakhiran dini dihitung bukan dengan cara (a)~(c) di atas, melainkan sebagai "sisa masa kontrak (bulan) × biaya sewa bulanan printer".',
+          ko: '다만, 프린터의 경우 위 (a)~(c) 산정 방식이 아닌 "계약 잔여기간(개월) × 프린터 월 임대료"를 조기해지 패널티로 적용한다.',
+        },
+        {
           id: 'Pada saat pengakhiran kontrak, BCT akan menarik kembali perangkat yang disediakan BCT, dan Pelanggan wajib memberikan akses lokasi yang diperlukan untuk proses penarikan tersebut.',
           ko: '해지 시 BCT는 BCT 제공 장비를 회수하고, 고객은 회수에 필요한 현장접근을 제공해야 한다.',
         },

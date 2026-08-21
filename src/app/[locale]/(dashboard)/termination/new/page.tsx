@@ -42,12 +42,37 @@ export default async function NewTerminationPage({
     );
   }
 
+  // Printers' early-termination exit cost is based on their own monthly
+  // rental rate (see calcAssetDecision), which isn't stored on the asset
+  // row itself — only in the contract's frozen quote_snapshot. There's no
+  // ID linking an Asset back to the equipment_selection it came from, so
+  // this matches on category + model name (the only fields both sides
+  // carry); master can still correct it by hand in the form if a printer's
+  // model name doesn't match exactly (e.g. it was renamed since).
+  const equipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
+  const monthlyRateByKey = new Map<string, number>();
+  for (const sel of equipmentSelections) {
+    if (sel.monthlyRate == null) continue;
+    monthlyRateByKey.set(`${sel.category}::${sel.modelName.trim().toLowerCase()}`, sel.monthlyRate);
+  }
+  const defaultMonthlyRates: Record<string, number> = {};
+  for (const asset of assets) {
+    const key = `${asset.type}::${(asset.model ?? '').trim().toLowerCase()}`;
+    const rate = monthlyRateByKey.get(key);
+    if (rate != null) defaultMonthlyRates[asset.id] = rate;
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold">
         {t("requestTitle")} — {contract.no}
       </h1>
-      <TerminationForm contract={contract} assets={assets} defaultCosts={defaultCosts} />
+      <TerminationForm
+        contract={contract}
+        assets={assets}
+        defaultCosts={defaultCosts}
+        defaultMonthlyRates={defaultMonthlyRates}
+      />
     </div>
   );
 }

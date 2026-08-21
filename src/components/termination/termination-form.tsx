@@ -35,10 +35,12 @@ export function TerminationForm({
   contract,
   assets,
   defaultCosts,
+  defaultMonthlyRates,
 }: {
   contract: Contract;
   assets: Asset[];
   defaultCosts: Record<string, number>;
+  defaultMonthlyRates: Record<string, number>;
 }) {
   const t = useTranslations("termination");
   const router = useRouter();
@@ -81,6 +83,7 @@ export function TerminationForm({
         collectQty: nonRecoverable || configAsset ? 0 : total,
         billQty: 0,
         registeredAt: a.registered_at,
+        monthlyRate: defaultMonthlyRates[a.id],
       };
     })
   );
@@ -206,6 +209,7 @@ export function TerminationForm({
                 <TableHead>{t("collectQty")}</TableHead>
                 <TableHead>{t("remainingQty")}</TableHead>
                 <TableHead>{t("unitCost")}</TableHead>
+                <TableHead>{t("printerMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("unamortizedAmount")}</TableHead>
                 <TableHead>{t("action")}</TableHead>
               </TableRow>
@@ -252,6 +256,18 @@ export function TerminationForm({
                         onChange={(digits) => updateRow(i, { originalCost: digits ? Number(digits) : 0 })}
                       />
                     </TableCell>
+                    <TableCell>
+                      {row.type === "printer" ? (
+                        <CurrencyInput
+                          className="w-32"
+                          locale={locale as Locale}
+                          value={String(row.monthlyRate ?? 0)}
+                          onChange={(digits) => updateRow(i, { monthlyRate: digits ? Number(digits) : 0 })}
+                        />
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">{formatRupiah(decision.unamortized, locale as Locale)}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {ACTION_LABEL[decision.action]}
@@ -261,7 +277,7 @@ export function TerminationForm({
               })}
               {rows.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center text-muted-foreground">
                     {t("noAssets")}
                   </TableCell>
                 </TableRow>

@@ -67,6 +67,11 @@ export interface AssetDecisionInput {
    * time than the contract's own start date would imply, so its unamortized
    * value must be computed from its own install date, not the contract's. */
   registeredAt: string;
+  /** Per-unit monthly rental rate, matched from the contract's
+   * quote_snapshot.equipment_selections by model name — only used for
+   * `type === 'printer'` rows (see calcAssetDecision). Undefined/0 for
+   * everything else, and for printers with no matching catalog rate. */
+  monthlyRate?: number;
 }
 
 export interface AssetDecisionResult extends AssetDecisionInput {
@@ -94,6 +99,21 @@ export function calcAssetDecision(
 
   const action = billQty > 0 && collectQty > 0 ? 'partial' : billQty > 0 ? 'leave_bill' : 'collect';
   const unitCost = total ? input.originalCost / total : 0;
+
+  // Printers keep billing at their full monthly rate indefinitely after the
+  // contract's own term ends instead of dropping to the reduced post-term
+  // rate other equipment gets (see invoice-calc.ts's postTermPrinterRows) —
+  // so a printer's early-termination exit cost is what the customer would
+  // otherwise have kept paying for the rest of the term (remaining months ×
+  // monthly rate), not a depreciation-style unamortized-cost calc. This
+  // value already IS the final exit cost for the row — summarizeTerminationPlan
+  // excludes printer rows from the penaltyRate surcharge applied to everyone
+  // else's unamortized figure, so it isn't penalized twice.
+  if (input.type === 'printer' && input.monthlyRate) {
+    const unamortized = billQty > 0 ? Math.round(input.monthlyRate * billQty * remainingMonths) : 0;
+    return { ...input, collectQty, billQty, action, unitCost, unamortized };
+  }
+
   const unamortized = billQty > 0 && totalMonths ? Math.round(unitCost * billQty * remainingMonths / totalMonths) : 0;
 
   return { ...input, collectQty, billQty, action, unitCost, unamortized };
@@ -108,13 +128,22 @@ export interface TerminationSummary {
 }
 
 export function summarizeTerminationPlan(
-  decisions: AssetDecisionResult[],
+  // Structural, not `AssetDecisionResult[]` — this is also called with the
+  // stored `AssetDecision[]` shape (see data-access/termination.ts's toView),
+  // which doesn't carry every AssetDecisionResult field (e.g. registeredAt).
+  decisions: Pick<AssetDecisionResult, 'type' | 'unamortized' | 'collectQty' | 'billQty'>[],
   penaltyRate: number,
   adminFee: number,
   unpaid: number
 ): TerminationSummary {
   const unamortizedTotal = decisions.reduce((s, d) => s + Number(d.unamortized || 0), 0);
-  const penalty = Math.round((unamortizedTotal * penaltyRate) / 100);
+  // Printer rows' `unamortized` already IS the full exit cost (see
+  // calcAssetDecision) — only non-printer rows' unamortized-cost figure
+  // still needs the penaltyRate surcharge applied on top.
+  const penaltyBase = decisions
+    .filter((d) => d.type !== 'printer')
+    .reduce((s, d) => s + Number(d.unamortized || 0), 0);
+  const penalty = Math.round((penaltyBase * penaltyRate) / 100);
   const collectQtyTotal = decisions.reduce((s, d) => s + Number(d.collectQty || 0), 0);
   const leaveQtyTotal = decisions.reduce((s, d) => s + Number(d.billQty || 0), 0);
   return {

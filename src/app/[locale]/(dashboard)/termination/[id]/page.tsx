@@ -33,11 +33,7 @@ export default async function TerminationPlanDetailPage({
     partial: t("actionPartial"),
   };
 
-  const penalty = Math.round((plan.unamortizedTotal ?? 0) * plan.penalty_rate) / 100;
-  const totalExact =
-    plan.unamortizedTotal !== null
-      ? plan.unamortizedTotal + Math.round((plan.unamortizedTotal * plan.penalty_rate) / 100) + plan.admin_fee + plan.unpaid
-      : null;
+  const { penalty, total: totalExact } = plan;
 
   return (
     <div className="flex flex-col gap-4">
@@ -131,7 +127,7 @@ export default async function TerminationPlanDetailPage({
               },
               {
                 label: t("earlyTerminationPenalty", { rate: plan.penalty_rate }),
-                value: plan.unamortizedTotal !== null ? formatRupiah(penalty, locale as Locale) : t("masked"),
+                value: penalty !== null ? formatRupiah(penalty, locale as Locale) : t("masked"),
               },
               { label: t("removalAdminFee"), value: formatRupiah(plan.admin_fee, locale as Locale) },
               { label: t("unpaidFeeLabel"), value: formatRupiah(plan.unpaid, locale as Locale) },

@@ -489,6 +489,7 @@
     "collectQty": "Jumlah Ditarik BCT",
     "remainingQty": "Jumlah Tersisa/Ditagihkan ke Pelanggan",
     "unitCost": "Biaya Peralatan",
+    "printerMonthlyRate": "Tarif Sewa Bulanan Printer",
     "unamortizedAmount": "Sisa Nilai Belum Teramortisasi",
     "action": "Tindakan",
     "noAssets": "Belum ada aset yang terdaftar.",

@@ -489,6 +489,7 @@
     "collectQty": "BCT 수거수량",
     "remainingQty": "고객 잔존/정산수량",
     "unitCost": "장비 원가",
+    "printerMonthlyRate": "프린터 월 임대료",
     "unamortizedAmount": "정산 미상각액",
     "action": "처리",
     "noAssets": "등록된 자산이 없습니다.",

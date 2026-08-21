@@ -85,12 +85,8 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
   const collected = plan.asset_decisions.filter((d) => d.collectQty > 0);
   const remain = plan.asset_decisions.filter((d) => d.action === "remain_customer" || d.billQty > 0);
   const configClose = plan.asset_decisions.filter((d) => d.action === "close_config");
-  const penalty =
-    plan.unamortizedTotal !== null ? Math.round((plan.unamortizedTotal * plan.penalty_rate) / 100) : null;
-  const total =
-    plan.unamortizedTotal !== null && penalty !== null
-      ? plan.unamortizedTotal + penalty + plan.admin_fee + plan.unpaid
-      : null;
+  const { penalty, total } = plan;
+  const hasPrinterSettlement = plan.asset_decisions.some((d) => d.type === "printer" && d.billQty > 0);
 
   return (
     <DocumentShell
@@ -265,6 +261,20 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
               </TableCell>
               <TableCell className="text-right">{penalty !== null ? formatRupiah(penalty, "id") : "***"}</TableCell>
             </TableRow>
+            {hasPrinterSettlement && (
+              <TableRow>
+                <TableCell>
+                  <Bilingual id="Penyelesaian Printer" ko="프린터 정산" />
+                </TableCell>
+                <TableCell>
+                  <Bilingual
+                    id="Sisa masa kontrak (bulan) × biaya sewa bulanan printer — bukan nilai belum diamortisasi × persentase denda di atas."
+                    ko="계약 잔여기간(개월) × 프린터 월 임대료 — 위 미상각액 × 패널티율 방식이 아닌 별도 계산입니다."
+                  />
+                </TableCell>
+                <TableCell className="text-right">-</TableCell>
+              </TableRow>
+            )}
             <TableRow>
               <TableCell>
                 <Bilingual id="Biaya Pembongkaran/Penarikan/Administrasi" ko="철거/회수/행정비" />

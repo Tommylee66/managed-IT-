@@ -4,20 +4,24 @@ import type { TerminationPlan, AssetDecision } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { bucketAmount } from '@/lib/masking/staff-masking';
 import { nextTerminationPlanId, nextServiceLogId } from '@/lib/numbering';
+import { summarizeTerminationPlan } from '@/lib/calc/termination-calc';
 
 export interface TerminationPlanView extends TerminationPlan {
-  /** Total unamortized settlement — bucketed for staff, exact for master.
-   * Computed from the raw data before per-row masking, since summing
-   * masked (NaN) rows would just produce NaN. */
+  /** Total unamortized settlement, penalty, and grand total — bucketed for
+   * staff, exact for master. Computed from the raw data (via the same
+   * summarizeTerminationPlan() the creation form uses) before per-row
+   * masking, since summing masked (NaN) rows would just produce NaN. */
   unamortizedTotal: number | null;
+  penalty: number | null;
+  total: number | null;
   unamortizedTotalBucket: string;
 }
 
 function toView(plan: TerminationPlan, role: StaffRole): TerminationPlanView {
-  const rawTotal = plan.asset_decisions.reduce((s, d) => s + Number(d.unamortized || 0), 0);
-  const bucket = bucketAmount(rawTotal);
+  const summary = summarizeTerminationPlan(plan.asset_decisions, plan.penalty_rate, plan.admin_fee, plan.unpaid);
+  const bucket = bucketAmount(summary.unamortizedTotal);
   if (role === 'master') {
-    return { ...plan, unamortizedTotal: rawTotal, unamortizedTotalBucket: bucket };
+    return { ...plan, unamortizedTotal: summary.unamortizedTotal, penalty: summary.penalty, total: summary.total, unamortizedTotalBucket: bucket };
   }
   return {
     ...plan,
@@ -27,6 +31,8 @@ function toView(plan: TerminationPlan, role: StaffRole): TerminationPlanView {
     // (here and per-row) is hidden/bucketed, not the cost inputs behind it.
     asset_decisions: plan.asset_decisions.map((d) => ({ ...d, unamortized: NaN })),
     unamortizedTotal: null,
+    penalty: null,
+    total: null,
     unamortizedTotalBucket: bucket,
   };
 }

@@ -489,6 +489,7 @@
     "collectQty": "Qty Collected by BCT",
     "remainingQty": "Qty Left with Customer / Billed",
     "unitCost": "Equipment Cost",
+    "printerMonthlyRate": "Printer Monthly Rate",
     "unamortizedAmount": "Unamortized Amount",
     "action": "Disposition",
     "noAssets": "No assets registered.",
