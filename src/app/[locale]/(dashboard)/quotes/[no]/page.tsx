@@ -6,6 +6,7 @@ import { getSessionContext } from "@/lib/auth/session";
 import { getQuote } from "@/lib/data-access/quotes";
 import { getCustomer } from "@/lib/data-access/customers";
 import { getAgent } from "@/lib/data-access/agents";
+import { getContractByQuoteNo } from "@/lib/data-access/contracts";
 import { formatRupiah } from "@/lib/utils/currency";
 import { renderQuoteRowLabel } from "@/lib/calc/quote-row-labels";
 import type { Locale } from "@/config/constants";
@@ -26,11 +27,13 @@ export default async function QuoteDetailPage({
   const quote = await getQuote(supabase, no, session!.role);
   if (!quote) notFound();
 
-  const [customer, agent, t, tCommon] = await Promise.all([
+  const [customer, agent, existingContract, t, tCommon, tContracts] = await Promise.all([
     getCustomer(supabase, quote.customer_code, session!.role),
     quote.agent_code ? getAgent(supabase, quote.agent_code, session!.role) : null,
+    getContractByQuoteNo(supabase, quote.no),
     getTranslations("quotes"),
     getTranslations("common"),
+    getTranslations("contracts"),
   ]);
 
   return (
@@ -46,11 +49,21 @@ export default async function QuoteDetailPage({
           <Button variant="outline" asChild>
             <Link href={`/${locale}/quotes/${quote.no}/print`}>{tCommon("print")}</Link>
           </Button>
-          <CreateContractButton quoteNo={quote.no} disabled={!quote.agent_code} />
+          {existingContract ? (
+            <Button variant="outline" asChild>
+              <Link href={`/${locale}/contracts/${existingContract.no}`}>{t("viewContract")}</Link>
+            </Button>
+          ) : (
+            <CreateContractButton quoteNo={quote.no} disabled={!quote.agent_code} />
+          )}
         </div>
       </div>
-      {!quote.agent_code && (
-        <p className="text-sm text-muted-foreground">{t("noAgentWarning")}</p>
+      {existingContract ? (
+        <p className="text-sm text-muted-foreground">
+          {tContracts("contractAlreadyExistsError", { no: existingContract.no })}
+        </p>
+      ) : (
+        !quote.agent_code && <p className="text-sm text-muted-foreground">{t("noAgentWarning")}</p>
       )}
 
       <Card>

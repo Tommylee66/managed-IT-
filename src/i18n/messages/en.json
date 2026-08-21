@@ -262,6 +262,7 @@
     "createContract": "Create Contract",
     "creatingContract": "Creating...",
     "noAgentWarning": "Cannot convert to a contract because no sales agent is assigned.",
+    "viewContract": "View Contract",
     "basicInfo": "Basic Information",
     "salesAgent": "Sales Agent",
     "serviceStartDate": "Service Start Date",

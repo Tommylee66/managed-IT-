@@ -262,6 +262,7 @@
     "createContract": "계약 생성",
     "creatingContract": "생성 중...",
     "noAgentWarning": "영업 대리점이 지정되지 않아 계약으로 전환할 수 없습니다.",
+    "viewContract": "계약 보기",
     "basicInfo": "기본 정보",
     "salesAgent": "영업 대리점",
     "serviceStartDate": "서비스 시작일",

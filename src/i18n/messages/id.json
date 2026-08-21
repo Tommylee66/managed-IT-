@@ -262,6 +262,7 @@
     "createContract": "Buat Kontrak",
     "creatingContract": "Membuat...",
     "noAgentWarning": "Tidak dapat dikonversi menjadi kontrak karena agen penjualan belum ditentukan.",
+    "viewContract": "Lihat Kontrak",
     "basicInfo": "Informasi Dasar",
     "salesAgent": "Agen Penjualan",
     "serviceStartDate": "Tanggal Mulai Layanan",
