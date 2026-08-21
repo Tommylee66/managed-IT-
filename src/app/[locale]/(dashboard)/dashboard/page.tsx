@@ -50,13 +50,21 @@ export default async function DashboardPage({
   ]);
   const terminations = terminationPlans ?? [];
 
+  // "확정" (confirmed) in these labels means a master has explicitly
+  // confirmed the contract via ConfirmContractButton — a contracts row
+  // existing (status='contracted') is not by itself real, countable
+  // revenue. Every revenue/confirmed-count figure below reads from
+  // confirmedContracts; statPendingActivation stays on the raw list since
+  // it's an operational queue (work still to do), not a revenue figure.
+  const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
+
   const currentMonth = monthKey(new Date());
   const statNewCustomers = customers.filter((c) => c.created_at.startsWith(currentMonth)).length;
-  const statNewContracts = contracts.filter((c) => c.created_at.startsWith(currentMonth)).length;
+  const statNewContracts = confirmedContracts.filter((c) => c.confirmed_at!.startsWith(currentMonth)).length;
   const statActiveAgents = agents.filter((a) => a.active).length;
   const statPendingActivation = contracts.filter((c) => c.status !== "activated").length;
 
-  const activeContracts = contracts.filter((c) => c.status !== "terminated");
+  const activeContracts = confirmedContracts.filter((c) => c.status !== "terminated");
   const thisMonthMrr = activeContracts.reduce((s, c) => s + c.monthly_fee, 0);
   const monthsElapsedThisYear = new Date().getMonth() + 1;
   const yearRevenue = thisMonthMrr * monthsElapsedThisYear;
@@ -64,18 +72,20 @@ export default async function DashboardPage({
   const months = lastMonths(6);
   const revenueByMonth = months.map(({ date, key }) => ({
     label: date.toLocaleDateString(locale, { month: "short" }),
-    value: contracts.filter((c) => c.created_at.startsWith(key)).reduce((s, c) => s + c.monthly_fee, 0),
+    value: confirmedContracts
+      .filter((c) => c.confirmed_at!.startsWith(key))
+      .reduce((s, c) => s + c.monthly_fee, 0),
   }));
   const signupCancelByMonth = months.map(({ date, key }) => ({
     label: date.toLocaleDateString(locale, { month: "short" }),
-    signups: contracts.filter((c) => c.start_date.startsWith(key)).length,
+    signups: confirmedContracts.filter((c) => c.start_date.startsWith(key)).length,
     cancellations: terminations.filter((t) => (t.saved_at ?? "").startsWith(key)).length,
   }));
 
   const years = lastYears(3);
   const revenueByYear = years.map((year) => ({
     label: String(year),
-    value: contracts
+    value: confirmedContracts
       .filter((c) => c.start_date.startsWith(String(year)))
       .reduce((s, c) => s + c.monthly_fee, 0),
   }));

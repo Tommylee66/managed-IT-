@@ -64,6 +64,33 @@ export async function getContractRaw(
   return data as Contract | null;
 }
 
+/** Used to guard against converting the same quote into a contract more
+ * than once — nothing previously stopped the "create contract" action from
+ * being called repeatedly against one quote_no, which produced duplicate
+ * contract rows (and duplicated MRR) for a single real deal. */
+export async function getContractByQuoteNo(
+  supabase: SupabaseClient,
+  quoteNo: string
+): Promise<Contract | null> {
+  const { data, error } = await supabase.from('contracts').select('*').eq('quote_no', quoteNo).maybeSingle();
+  if (error) throw error;
+  return data as Contract | null;
+}
+
+/** Flips a contract from "just created from a quote" to "confirmed real
+ * business" — see the `confirmed_at` doc comment on the Contract type for
+ * what this does and does not gate. */
+export async function confirmContract(supabase: SupabaseClient, no: string): Promise<Contract> {
+  const { data, error } = await supabase
+    .from('contracts')
+    .update({ confirmed_at: new Date().toISOString() })
+    .eq('no', no)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Contract;
+}
+
 /** Ported 1:1 from the source app's contractFromApplication()/quote-confirm
  * flow: locks in commission terms at contract creation and flips the
  * customer's status to 'contracted'. */

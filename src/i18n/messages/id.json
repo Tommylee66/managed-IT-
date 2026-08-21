@@ -318,7 +318,15 @@
     "quoteNotFoundError": "Penawaran tidak ditemukan.",
     "agentRequiredError": "Agen penjualan harus ditentukan untuk membuat kontrak.",
     "agentNotFoundError": "Data agen penjualan tidak ditemukan.",
-    "customerNotFoundError": "Data pelanggan tidak ditemukan."
+    "customerNotFoundError": "Data pelanggan tidak ditemukan.",
+    "contractAlreadyExistsError": "Penawaran ini sudah dikonversi menjadi kontrak ({no}).",
+    "confirmedBadge": "Terkonfirmasi",
+    "unconfirmedBadge": "Menunggu Konfirmasi",
+    "confirmedColumn": "Status Konfirmasi",
+    "confirmContract": "Konfirmasi Kontrak",
+    "confirming": "Mengonfirmasi...",
+    "confirmContractSuccess": "Kontrak telah dikonfirmasi.",
+    "confirmContractError": "Gagal mengonfirmasi kontrak."
   },
   "assets": {
     "title": "Aset",
@@ -842,7 +850,7 @@
     "statActiveAgents": "Agen Penjualan Aktif",
     "statPendingActivation": "Menunggu Aktivasi Bulan Ini",
     "chartMonthlyTitle": "Kontrak Terkonfirmasi per Bulan",
-    "chartMonthlyCaption": "6 bulan terakhir · berdasarkan tanggal pembuatan kontrak",
+    "chartMonthlyCaption": "6 bulan terakhir · berdasarkan tanggal konfirmasi kontrak",
     "chartMonthlyRevenueTitle": "Pendapatan Baru per Bulan",
     "chartMonthlyRevenueCaption": "6 bulan terakhir · total biaya bulanan kontrak",
     "sectionCustomerSales": "① Pelanggan & Agen Penjualan",

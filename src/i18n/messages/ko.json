@@ -318,7 +318,15 @@
     "quoteNotFoundError": "견적을 찾을 수 없습니다.",
     "agentRequiredError": "영업사원이 지정되어야 계약을 생성할 수 있습니다.",
     "agentNotFoundError": "영업사원 정보를 찾을 수 없습니다.",
-    "customerNotFoundError": "고객 정보를 찾을 수 없습니다."
+    "customerNotFoundError": "고객 정보를 찾을 수 없습니다.",
+    "contractAlreadyExistsError": "이 견적은 이미 계약({no})으로 전환되었습니다.",
+    "confirmedBadge": "확정",
+    "unconfirmedBadge": "확정 대기",
+    "confirmedColumn": "확정여부",
+    "confirmContract": "계약 확정",
+    "confirming": "확정 처리 중...",
+    "confirmContractSuccess": "계약이 확정되었습니다.",
+    "confirmContractError": "계약 확정에 실패했습니다."
   },
   "assets": {
     "title": "자산",
@@ -842,7 +850,7 @@
     "statActiveAgents": "활성 영업사원",
     "statPendingActivation": "당월 개통 대기",
     "chartMonthlyTitle": "월별 확정 계약",
-    "chartMonthlyCaption": "최근 6개월 · 계약 생성일 기준",
+    "chartMonthlyCaption": "최근 6개월 · 계약 확정일 기준",
     "chartMonthlyRevenueTitle": "월별 신규 매출",
     "chartMonthlyRevenueCaption": "최근 6개월 · 계약월 요금 합계",
     "sectionCustomerSales": "① 고객 · 영업 관리",

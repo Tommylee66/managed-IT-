@@ -7,13 +7,16 @@ import { getSessionContext } from '@/lib/auth/session';
 import { getQuoteRaw } from '@/lib/data-access/quotes';
 import { getAgent } from '@/lib/data-access/agents';
 import { getCustomerRaw } from '@/lib/data-access/customers';
-import { createContractFromQuote } from '@/lib/data-access/contracts';
+import { createContractFromQuote, getContractByQuoteNo, confirmContract } from '@/lib/data-access/contracts';
 
 export async function createContractFromQuoteAction(quoteNo: string) {
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
   const supabase = await createClient();
   const t = await getTranslations('contracts');
+
+  const existing = await getContractByQuoteNo(supabase, quoteNo);
+  if (existing) throw new Error(t('contractAlreadyExistsError', { no: existing.no }));
 
   const quote = await getQuoteRaw(supabase, quoteNo);
   if (!quote) throw new Error(t('quoteNotFoundError'));
@@ -28,5 +31,16 @@ export async function createContractFromQuoteAction(quoteNo: string) {
   const contract = await createContractFromQuote(supabase, quote, agent, customer, session.userId);
   revalidatePath('/contracts');
   revalidatePath('/customers');
+  return contract;
+}
+
+export async function confirmContractAction(contractNo: string) {
+  const session = await getSessionContext();
+  if (!session || session.role !== 'master') throw new Error('Unauthorized');
+  const supabase = await createClient();
+  const contract = await confirmContract(supabase, contractNo);
+  revalidatePath('/contracts');
+  revalidatePath(`/contracts/${contractNo}`);
+  revalidatePath('/dashboard');
   return contract;
 }

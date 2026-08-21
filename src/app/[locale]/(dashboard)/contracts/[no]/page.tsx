@@ -9,6 +9,7 @@ import { formatRupiah } from "@/lib/utils/currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ConfirmContractButton } from "@/components/contracts/confirm-contract-button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Locale } from "@/config/constants";
 
@@ -58,10 +59,18 @@ export default async function ContractDetailPage({
           <Badge variant={contract.status === "activated" ? "default" : "secondary"}>
             {STATUS_LABEL[contract.status]}
           </Badge>
+          <Badge variant={contract.confirmed_at ? "default" : "outline"}>
+            {contract.confirmed_at ? t("confirmedBadge") : t("unconfirmedBadge")}
+          </Badge>
         </div>
-        <Button variant="outline" asChild>
-          <Link href={`/${locale}/contracts/${contract.no}/print`}>{t("printContract")}</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {!contract.confirmed_at && session!.role === "master" && (
+            <ConfirmContractButton contractNo={contract.no} />
+          )}
+          <Button variant="outline" asChild>
+            <Link href={`/${locale}/contracts/${contract.no}/print`}>{t("printContract")}</Link>
+          </Button>
+        </div>
       </div>
 
       <Card>

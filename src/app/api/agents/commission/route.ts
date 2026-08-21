@@ -21,7 +21,10 @@ export async function GET(request: Request) {
   const supabase = await createClient();
   const [contracts, agents] = await Promise.all([listContracts(supabase, 'master'), listAgents(supabase, 'master')]);
   const npwpByAgentCode = new Map(agents.map((a) => [a.code, a.npwp]));
-  const groups = calcMonthlyCommissionReport(contracts, month, npwpByAgentCode);
+  // Same confirmed-only rule as the on-screen commission report — see
+  // agents/commission/page.tsx.
+  const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
+  const groups = calcMonthlyCommissionReport(confirmedContracts, month, npwpByAgentCode);
   const grandTotal = groups.reduce((s, g) => s + g.subtotal, 0);
 
   const workbook = new ExcelJS.Workbook();

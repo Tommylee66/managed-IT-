@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
@@ -86,7 +87,8 @@ export function AgentAgreementDocument({ agent }: { agent: Agent }) {
       <div className="mt-10 grid grid-cols-2 gap-8 print:break-inside-avoid">
         <div>
           <p className="font-semibold">PT. Bumi Cerdas Teknologi</p>
-          <div className="mt-12 border-t pt-1 text-xs text-muted-foreground">
+          <Image src="/bct-signature.png" alt="" width={148} height={56} className="mt-2" />
+          <div className="mt-1 border-t pt-1 text-xs text-muted-foreground">
             <Bilingual id="Tanda Tangan yang Berwenang" ko="서명(권한자)" />
           </div>
         </div>

@@ -44,6 +44,7 @@ export default async function ContractsPage({
               <TableHead>{t("monthlyAmount")}</TableHead>
               <TableHead>{t("period")}</TableHead>
               <TableHead>{t("status")}</TableHead>
+              <TableHead>{t("confirmedColumn")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -65,11 +66,16 @@ export default async function ContractsPage({
                     {STATUS_LABEL[c.status]}
                   </Badge>
                 </TableCell>
+                <TableCell>
+                  <Badge variant={c.confirmed_at ? "default" : "outline"}>
+                    {c.confirmed_at ? t("confirmedBadge") : t("unconfirmedBadge")}
+                  </Badge>
+                </TableCell>
               </TableRow>
             ))}
             {contracts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={7} className="text-center text-muted-foreground">
                   {t("empty")}
                 </TableCell>
               </TableRow>

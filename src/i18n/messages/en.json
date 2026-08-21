@@ -318,7 +318,15 @@
     "quoteNotFoundError": "Quote not found.",
     "agentRequiredError": "A sales agent must be assigned to create a contract.",
     "agentNotFoundError": "Sales agent information not found.",
-    "customerNotFoundError": "Customer information not found."
+    "customerNotFoundError": "Customer information not found.",
+    "contractAlreadyExistsError": "This quote has already been converted to contract {no}.",
+    "confirmedBadge": "Confirmed",
+    "unconfirmedBadge": "Awaiting Confirmation",
+    "confirmedColumn": "Confirmation",
+    "confirmContract": "Confirm Contract",
+    "confirming": "Confirming...",
+    "confirmContractSuccess": "Contract confirmed.",
+    "confirmContractError": "Failed to confirm contract."
   },
   "assets": {
     "title": "Assets",
@@ -842,7 +850,7 @@
     "statActiveAgents": "Active Sales Agents",
     "statPendingActivation": "Pending Activation This Month",
     "chartMonthlyTitle": "Confirmed Contracts by Month",
-    "chartMonthlyCaption": "Last 6 months · by contract creation date",
+    "chartMonthlyCaption": "Last 6 months · by contract confirmation date",
     "chartMonthlyRevenueTitle": "New Revenue by Month",
     "chartMonthlyRevenueCaption": "Last 6 months · sum of contract monthly fees",
     "sectionCustomerSales": "① Customers & Sales",

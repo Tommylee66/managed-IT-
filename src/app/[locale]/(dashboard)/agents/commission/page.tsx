@@ -58,9 +58,13 @@ export default async function AgentCommissionPage({
       // otherwise NaN out the very numbers this page exists to show.
       listContracts(supabase, "master"),
     ]);
+    // Only contracts a master has explicitly confirmed count toward
+    // commission — otherwise a not-yet-confirmed (or duplicate/test)
+    // contract would show as real, payable commission here too.
+    const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
     const myAgent = myAgents[0] ?? null;
     const history = myAgent
-      ? calcAgentCommissionHistory(contracts, myAgent.code, month)
+      ? calcAgentCommissionHistory(confirmedContracts, myAgent.code, month)
       : [];
     const totalToDate = history.reduce((sum, h) => sum + h.totalToDate, 0);
     const activeCount = history.filter((h) => h.status !== "terminated").length;
@@ -187,8 +191,12 @@ export default async function AgentCommissionPage({
     listAgents(supabase, "master"),
   ]);
   const npwpByAgentCode = new Map(agents.map((a) => [a.code, a.npwp]));
+  // Same confirmed-only rule as the sales_agent view above — a master's
+  // payout report shouldn't include commission for contracts nobody has
+  // confirmed yet.
+  const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
 
-  const groups = calcMonthlyCommissionReport(contracts, month, npwpByAgentCode);
+  const groups = calcMonthlyCommissionReport(confirmedContracts, month, npwpByAgentCode);
   const grandTotal = groups.reduce((s, g) => s + g.subtotal, 0);
 
   return (

@@ -349,6 +349,13 @@ export interface Contract {
   quote_snapshot: Quote;
   status: ContractStatus;
   activation_date: string | null;
+  /** Set when a master explicitly confirms this contract is real, finalized
+   * business — null means "just created from a quote, not yet confirmed".
+   * Independent of `status` (see confirmContract() in data-access/contracts.ts);
+   * revenue-reporting reads (dashboard, commission reports) should filter on
+   * this, but the operational lifecycle (activation/invoicing/termination)
+   * intentionally does not. */
+  confirmed_at: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
