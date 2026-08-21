@@ -3,23 +3,25 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* A flat +1px bump per size tier (at the default 16px root) — text-xs/sm are
- * by far the most-used sizes in this app (labels, table cells), so this is
- * where the "too small to read" complaint concentrates. Deliberately only
- * the --text-* tokens change here, not --spacing/--radius/etc. — padding,
- * gaps, and container widths are untouched, so nothing grows the layout
- * footprint; text just renders bigger inside the same boxes. Line-heights
- * aren't overridden because Tailwind's defaults are unitless ratios (e.g.
- * calc(1.25 / 0.875)), which already scale proportionally with a larger
- * font-size on their own. */
+/* A flat +3px bump per size tier over Tailwind's stock defaults (at the
+ * default 16px root) — text-xs/sm are by far the most-used sizes in this app
+ * (labels, table cells), so this is where the "too small to read" complaint
+ * concentrates. A first +1px pass wasn't enough; this trades some one-line
+ * labels wrapping to two lines for text that's actually comfortable to read
+ * (confirmed acceptable). Deliberately only the --text-* tokens change here,
+ * not --spacing/--radius/etc. — padding, gaps, and container widths are
+ * untouched; text just renders bigger (and occasionally wraps) inside the
+ * same boxes. Line-heights aren't overridden because Tailwind's defaults are
+ * unitless ratios (e.g. calc(1.25 / 0.875)), which already scale
+ * proportionally with a larger font-size on their own. */
 @theme {
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
-  --text-lg: 1.1875rem;
-  --text-xl: 1.3125rem;
-  --text-2xl: 1.5625rem;
-  --text-3xl: 1.9375rem;
+  --text-xs: 0.9375rem;
+  --text-sm: 1.0625rem;
+  --text-base: 1.1875rem;
+  --text-lg: 1.3125rem;
+  --text-xl: 1.4375rem;
+  --text-2xl: 1.6875rem;
+  --text-3xl: 2.0625rem;
 }
 
 @theme inline {
