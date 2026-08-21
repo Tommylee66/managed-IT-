@@ -6,11 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { listContracts } from "@/lib/data-access/contracts";
 import { listAgents, listAgentsForSession } from "@/lib/data-access/agents";
+import { listInvoicesByContracts } from "@/lib/data-access/invoices";
+import { getRates } from "@/lib/data-access/rates";
 import {
   calcMonthlyCommissionReport,
   calcAgentCommissionHistory,
 } from "@/lib/calc/commission-report";
 import { formatRupiah } from "@/lib/utils/currency";
+import type { Rates } from "@/types/domain";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -41,6 +44,7 @@ export default async function AgentCommissionPage({
   const month = monthParam || currentMonthKey();
   const supabase = await createClient();
   const t = await getTranslations("agents");
+  const tInvoices = await getTranslations("invoices");
 
   if (session.role === "sales_agent") {
     const tContracts = await getTranslations("contracts");
@@ -50,21 +54,24 @@ export default async function AgentCommissionPage({
       terminated: tContracts("statusTerminated"),
     };
 
-    const [myAgents, contracts] = await Promise.all([
+    const [myAgents, contracts, rates] = await Promise.all([
       listAgentsForSession(supabase, session),
       // RLS already restricts these rows to this session's own agent_code
       // (see current_agent_code() policy) — passing 'master' here only
       // bypasses the client-side commission-field masking, which would
       // otherwise NaN out the very numbers this page exists to show.
       listContracts(supabase, "master"),
+      getRates(supabase, "master") as Promise<Rates>,
     ]);
     // Only contracts a master has explicitly confirmed count toward
     // commission — otherwise a not-yet-confirmed (or duplicate/test)
     // contract would show as real, payable commission here too.
     const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
     const myAgent = myAgents[0] ?? null;
+    const invoicesByKey = await listInvoicesByContracts(supabase, confirmedContracts.map((c) => c.no));
+    const commissionItems = rates.commission_items as unknown as Record<string, boolean>;
     const history = myAgent
-      ? calcAgentCommissionHistory(confirmedContracts, myAgent.code, month)
+      ? calcAgentCommissionHistory(confirmedContracts, myAgent.code, month, invoicesByKey, commissionItems)
       : [];
     const totalToDate = history.reduce((sum, h) => sum + h.totalToDate, 0);
     const activeCount = history.filter((h) => h.status !== "terminated").length;
@@ -139,12 +146,14 @@ export default async function AgentCommissionPage({
                         {h.startDate}
                       </div>
                       <div>
-                        <span className="text-muted-foreground">{t("commissionFullRate")}: </span>
-                        {formatRupiah(h.monthlyCommission, locale as Locale)}
+                        <span className="text-muted-foreground">{t("commissionRate")}: </span>
+                        {h.commissionRate}%
                       </div>
                       <div>
-                        <span className="text-muted-foreground">{t("commissionHalfRate")}: </span>
-                        {formatRupiah(h.halfMonthlyCommission, locale as Locale)}
+                        <span className="text-muted-foreground">{t("currentMonthCommission", { month })}: </span>
+                        {h.currentMonthCommission != null
+                          ? formatRupiah(h.currentMonthCommission, locale as Locale)
+                          : t("noInvoiceThisMonth")}
                       </div>
                       <div className="font-medium">
                         <span className="text-muted-foreground">{t("commissionTotalToDate")}: </span>
@@ -186,17 +195,20 @@ export default async function AgentCommissionPage({
     );
   }
 
-  const [contracts, agents] = await Promise.all([
+  const [contracts, agents, rates] = await Promise.all([
     listContracts(supabase, "master"),
     listAgents(supabase, "master"),
+    getRates(supabase, "master") as Promise<Rates>,
   ]);
   const npwpByAgentCode = new Map(agents.map((a) => [a.code, a.npwp]));
   // Same confirmed-only rule as the sales_agent view above — a master's
   // payout report shouldn't include commission for contracts nobody has
   // confirmed yet.
   const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
+  const invoicesByKey = await listInvoicesByContracts(supabase, confirmedContracts.map((c) => c.no));
+  const commissionItems = rates.commission_items as unknown as Record<string, boolean>;
 
-  const groups = calcMonthlyCommissionReport(confirmedContracts, month, npwpByAgentCode);
+  const groups = calcMonthlyCommissionReport(confirmedContracts, month, invoicesByKey, commissionItems, npwpByAgentCode);
   const grandTotal = groups.reduce((s, g) => s + g.subtotal, 0);
 
   return (
@@ -244,6 +256,7 @@ export default async function AgentCommissionPage({
                 <TableHead>{t("commissionContractNo")}</TableHead>
                 <TableHead>{t("commissionCustomerName")}</TableHead>
                 <TableHead className="text-right">{t("commissionAmount")}</TableHead>
+                <TableHead>{tInvoices("paymentStatus")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -261,17 +274,27 @@ export default async function AgentCommissionPage({
                       </TableCell>
                       <TableCell>{r.customerName}</TableCell>
                       <TableCell className="text-right">{formatRupiah(r.amount, locale as Locale)}</TableCell>
+                      <TableCell>
+                        <Badge variant={r.paidRatio >= 1 ? "default" : r.paidRatio > 0 ? "outline" : "secondary"}>
+                          {r.paidRatio >= 1
+                            ? tInvoices("paidBadge")
+                            : r.paidRatio > 0
+                              ? tInvoices("partiallyPaidBadge")
+                              : tInvoices("unpaidBadge")}
+                        </Badge>
+                      </TableCell>
                     </TableRow>
                   ))}
                   <TableRow className="bg-muted/40 font-semibold">
                     <TableCell colSpan={5}>{t("agentSubtotal", { name: g.agentName })}</TableCell>
                     <TableCell className="text-right">{formatRupiah(g.subtotal, locale as Locale)}</TableCell>
+                    <TableCell />
                   </TableRow>
                 </Fragment>
               ))}
               {groups.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
                     {t("noCommission")}
                   </TableCell>
                 </TableRow>

@@ -5,6 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getContract } from "@/lib/data-access/contracts";
 import { listAssetsByContract } from "@/lib/data-access/assets";
+import { getInvoiceByContractMonth } from "@/lib/data-access/invoices";
+import { getRates } from "@/lib/data-access/rates";
+import { calcContractCommissionForMonth } from "@/lib/calc/commission-report";
 import { formatRupiah } from "@/lib/utils/currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +15,12 @@ import { Button } from "@/components/ui/button";
 import { ConfirmContractButton } from "@/components/contracts/confirm-contract-button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Locale } from "@/config/constants";
+import type { Rates } from "@/types/domain";
+
+function currentMonthKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
 
 export default async function ContractDetailPage({
   params,
@@ -25,23 +34,32 @@ export default async function ContractDetailPage({
   const contract = await getContract(supabase, no, session!.role);
   if (!contract) notFound();
 
-  const [assets, t, tCommon, tAssets] = await Promise.all([
+  const thisMonth = currentMonthKey();
+  const [assets, t, tCommon, tAssets, thisMonthInvoice, rates] = await Promise.all([
     listAssetsByContract(supabase, no, session!.role),
     getTranslations("contracts"),
     getTranslations("common"),
     getTranslations("assets"),
+    getInvoiceByContractMonth(supabase, no, thisMonth),
+    getRates(supabase, "master") as Promise<Rates>,
   ]);
   const commissionHidden = Number.isNaN(contract.commission_rate);
-  // 50% commission continues indefinitely after the contract term ends for
-  // as long as the customer keeps using the service (see
-  // agent-agreement-clauses.ts clause 3.2) — there's no fixed total to show
-  // for that open-ended part, so this headline figure covers only the
-  // 100%-rate contract term itself (same value stored in total_commission).
-  const withinTermCommission = contract.monthly_commission * contract.months;
-  const contractTerm =
-    contract.months % 12 === 0
-      ? tCommon("years", { count: contract.months / 12 })
-      : tCommon("months", { count: contract.months });
+  // Commission is no longer a single fixed figure for the whole contract —
+  // it's computed live per invoiced month, from the actual billed amount and
+  // how much of that invoice was actually paid (see
+  // calcContractCommissionForMonth in commission-report.ts). null means no
+  // invoice has been issued yet for the current month.
+  const thisMonthCommission = thisMonthInvoice
+    ? calcContractCommissionForMonth(contract, thisMonth, thisMonthInvoice, rates.commission_items as unknown as Record<string, boolean>)
+    : null;
+  const thisMonthPaidAmount = thisMonthInvoice?.paid_amount ?? 0;
+  const thisMonthPaymentLabel = !thisMonthInvoice
+    ? null
+    : thisMonthPaidAmount <= 0
+      ? t("commissionUnpaid")
+      : thisMonthPaidAmount >= thisMonthInvoice.total
+        ? t("commissionPaidInFull")
+        : t("commissionPartiallyPaid");
 
   const STATUS_LABEL: Record<string, string> = {
     contracted: t("statusContracted"),
@@ -121,17 +139,19 @@ export default async function ContractDetailPage({
                 <p>{contract.commission_rate}%</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">{t("monthlyCommissionFull")}</p>
-                <p>{formatRupiah(contract.monthly_commission, locale as Locale)}</p>
+                <p className="text-xs text-muted-foreground">{t("thisMonthCommission", { month: thisMonth })}</p>
+                <p>
+                  {thisMonthCommission != null
+                    ? formatRupiah(thisMonthCommission, locale as Locale)
+                    : t("noInvoiceThisMonth")}
+                </p>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{t("monthlyCommissionHalf")}</p>
-                <p>{formatRupiah(contract.half_monthly_commission, locale as Locale)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">{t("totalCommission", { term: contractTerm })}</p>
-                <p>{formatRupiah(withinTermCommission, locale as Locale)}</p>
-              </div>
+              {thisMonthPaymentLabel && (
+                <div>
+                  <p className="text-xs text-muted-foreground">{t("commissionPaymentStatus")}</p>
+                  <p>{thisMonthPaymentLabel}</p>
+                </div>
+              )}
             </>
           )}
         </CardContent>

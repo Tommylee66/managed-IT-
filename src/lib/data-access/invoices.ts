@@ -50,6 +50,42 @@ export async function getInvoiceByContractMonth(
   return data as Invoice | null;
 }
 
+/** Bulk lookup for the commission report/history pages — one query instead
+ * of a get-per-contract-per-month loop. Keyed `` `${contract_no}:${month}` ``,
+ * matching commission-report.ts's InvoiceLookup type. */
+export async function listInvoicesByContracts(
+  supabase: SupabaseClient,
+  contractNos: string[]
+): Promise<Map<string, Invoice>> {
+  const map = new Map<string, Invoice>();
+  if (contractNos.length === 0) return map;
+  const { data, error } = await supabase.from('invoices').select('*').in('contract_no', contractNos);
+  if (error) throw error;
+  for (const invoice of data as Invoice[]) {
+    map.set(`${invoice.contract_no}:${invoice.month}`, invoice);
+  }
+  return map;
+}
+
+/** Records how much of an invoice has actually been collected — separate
+ * from sent_at (delivery only). Callable again to correct a mistake; there's
+ * no dedicated "undo," just re-submit with the corrected amount. */
+export async function recordInvoicePayment(
+  supabase: SupabaseClient,
+  no: string,
+  paidAmount: number,
+  paidAtISO: string
+): Promise<Invoice> {
+  const { data, error } = await supabase
+    .from('invoices')
+    .update({ paid_amount: paidAmount, paid_at: paidAtISO })
+    .eq('no', no)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Invoice;
+}
+
 export interface BillableRow {
   contract: Contract;
   customer: Customer;

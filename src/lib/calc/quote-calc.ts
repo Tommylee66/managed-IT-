@@ -3,6 +3,7 @@
 // they're hardcoded in the original pricing engine, not derived from rates.
 
 import type { Rates, QuoteInputs, QuoteRowRecord } from '@/types/domain';
+import { computeCommissionBase } from '@/lib/calc/commission-calc';
 
 export interface QuoteCalcResult {
   rows: QuoteRowRecord[];
@@ -145,8 +146,7 @@ export function calcQuoteForInputs(
   const amort = initCost / m;
   const totalCost = monthlyCost + amort;
   const margin = monthly ? ((monthly - totalCost) / monthly) * 100 : 0;
-  const ci = rates.commission_items as unknown as Record<string, boolean>;
-  const commissionBase = rows.reduce((s, x) => s + (ci[x.key] ? x.amount : 0), 0);
+  const commissionBase = computeCommissionBase(rows, rates.commission_items as unknown as Record<string, boolean>);
 
   return { rows, monthly, monthlyCost, initCost, amort, totalCost, margin, commissionBase };
 }

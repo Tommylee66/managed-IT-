@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { InvoiceLineItem } from "@/lib/calc/invoice-calc";
 import { renderInvoiceLineItemLabel } from "@/lib/calc/quote-row-labels";
+import { RecordPaymentDialog } from "@/components/invoices/record-payment-dialog";
 import type { Locale } from "@/config/constants";
 
 export default async function InvoiceDetailPage({
@@ -31,6 +32,13 @@ export default async function InvoiceDetailPage({
   ]);
 
   const items = invoice.items as unknown as InvoiceLineItem[];
+  const paidAmount = invoice.paid_amount ?? 0;
+  const paymentBadge =
+    paidAmount <= 0
+      ? { label: t("unpaidBadge"), variant: "secondary" as const }
+      : paidAmount >= invoice.total
+        ? { label: t("paidBadge"), variant: "default" as const }
+        : { label: t("partiallyPaidBadge"), variant: "outline" as const };
 
   return (
     <div className="flex flex-col gap-4">
@@ -42,10 +50,18 @@ export default async function InvoiceDetailPage({
           <Badge variant={invoice.sent_at ? "default" : "secondary"}>
             {invoice.sent_at ? t("sentBadge") : t("unsentBadge")}
           </Badge>
+          <Badge variant={paymentBadge.variant}>{paymentBadge.label}</Badge>
         </div>
-        <Button variant="outline" asChild>
-          <Link href={`/${locale}/invoices/${invoice.no}/print`}>{t("printView")}</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <RecordPaymentDialog
+            invoiceNo={invoice.no}
+            currentPaidAmount={invoice.paid_amount}
+            currentPaidAt={invoice.paid_at}
+          />
+          <Button variant="outline" asChild>
+            <Link href={`/${locale}/invoices/${invoice.no}/print`}>{t("printView")}</Link>
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -76,6 +92,14 @@ export default async function InvoiceDetailPage({
           <div>
             <p className="text-xs text-muted-foreground">{t("dueDate")}</p>
             <p>{invoice.due_date}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("paidAmount")}</p>
+            <p>{invoice.paid_amount != null ? formatRupiah(invoice.paid_amount, locale as Locale) : t("notRecorded")}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("paidDate")}</p>
+            <p>{invoice.paid_at ? invoice.paid_at.slice(0, 10) : t("notRecorded")}</p>
           </div>
         </CardContent>
       </Card>

@@ -7,7 +7,7 @@ import { getSessionContext } from '@/lib/auth/session';
 import { getRates } from '@/lib/data-access/rates';
 import { getContractRaw } from '@/lib/data-access/contracts';
 import { getCustomerRaw } from '@/lib/data-access/customers';
-import { upsertInvoice } from '@/lib/data-access/invoices';
+import { upsertInvoice, recordInvoicePayment, getInvoice } from '@/lib/data-access/invoices';
 import { nextServiceLogId } from '@/lib/numbering';
 import type { Rates } from '@/types/domain';
 
@@ -84,4 +84,29 @@ export async function markInvoicesSentAction(
   }
   revalidatePath('/invoices');
   return results;
+}
+
+export async function recordInvoicePaymentAction(no: string, paidAmount: number, paidAtISO: string) {
+  const session = await getSessionContext();
+  if (!session) throw new Error('Unauthorized');
+  const supabase = await createClient();
+  const t = await getTranslations('invoices');
+  const existing = await getInvoice(supabase, no, session.role);
+  if (!existing) throw new Error(t('invoiceNotFoundError', { no }));
+
+  const invoice = await recordInvoicePayment(supabase, no, paidAmount, paidAtISO);
+
+  await supabase.from('service_logs').insert({
+    id: nextServiceLogId(),
+    customer_code: invoice.customer_code,
+    date: paidAtISO.slice(0, 10),
+    type: '결제확인',
+    title: `${invoice.no} / ${invoice.month}`,
+    memo: t('serviceLogMemoPaid', { amount: paidAmount, total: invoice.total }),
+    saved_by: session.userId,
+  });
+
+  revalidatePath('/invoices');
+  revalidatePath(`/invoices/${no}`);
+  return invoice;
 }

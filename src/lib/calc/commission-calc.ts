@@ -15,6 +15,32 @@ export interface CommissionCalcResult {
   totalCommission: number;
 }
 
+/** Which rows in a given month's bill actually count toward commission.
+ * One-time fee rows never count — they're a single lump-sum charge, not
+ * part of the recurring bill (matching mergeServiceIntoCalc's own exclusion
+ * of `oneTime` rows from commissionBase). Equipment/service rows (dynamic
+ * catalog-item keys) otherwise always count, matching the unconditional
+ * behavior of mergeEquipmentIntoCalc/mergeServiceIntoCalc. The static
+ * config-driven rows (base/employee/cctv/term/visit/location/vpn/security/
+ * ap/hub) are gated by the admin-configurable commissionItems map — except
+ * 'discount', which is never toggleable: a temporary discount is a real
+ * reduction in what's actually billed, not an optional add-on whose
+ * commission-eligibility is a business choice, so it always applies (a
+ * negative-amount row being "excluded" would otherwise inflate the base
+ * instead of reducing it). Used both by quote-calc.ts (the quote-stage
+ * estimate) and commission-report.ts (the live per-invoice-month figure). */
+export function computeCommissionBase(
+  rows: QuoteRowRecord[],
+  commissionItems: Record<string, boolean>
+): number {
+  return rows.reduce((sum, row) => {
+    if (row.oneTime) return sum;
+    if (row.key === 'discount') return sum + row.amount;
+    if (row.key.startsWith('equipment') || row.key.startsWith('service')) return sum + row.amount;
+    return sum + (commissionItems[row.key] ? row.amount : 0);
+  }, 0);
+}
+
 /** Blends the agent's standard commission rate with any per-catalog-item
  * special rate (EquipmentCatalogItem/ServiceCatalogItem.commission_rate_override,
  * snapshotted onto the row as QuoteRowRecord.commissionRate) — a row with

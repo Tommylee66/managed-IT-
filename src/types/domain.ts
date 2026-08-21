@@ -138,6 +138,11 @@ export interface RatesInitFields {
   initSecurityDevice: number;
 }
 
+/** A temporary discount row is never listed here — unlike these optional
+ * add-on fees, a discount is a real reduction in what's actually billed, not
+ * a policy choice about whether an add-on earns commission, so it's always
+ * subtracted from the commission base (see computeCommissionBase in
+ * commission-calc.ts). */
 export interface RatesCommissionItems {
   base: boolean;
   term: boolean;
@@ -149,7 +154,6 @@ export interface RatesCommissionItems {
   location: boolean;
   vpn: boolean;
   security: boolean;
-  discount: boolean;
 }
 
 export interface Rates {
@@ -356,6 +360,15 @@ export interface Contract {
   end_date: string | null;
   months: number;
   monthly_fee: number;
+  /** commission_base/monthly_commission/half_monthly_commission/
+   * commission_full_end/commission_half_start/total_commission are a
+   * point-in-time estimate frozen at contract creation from the original
+   * quote — they are NOT the source of truth for actual commission payout.
+   * Actual payout is computed live, per invoiced month, from the real
+   * billed amount and the amount actually paid (see calcContractCommissionForMonth
+   * in commission-report.ts). Only commission_rate stays authoritative —
+   * an agent's rate is genuinely frozen at signing (see clause 4 of
+   * agent-agreement-clauses.ts). */
   commission_base: number;
   commission_rate: number;
   monthly_commission: number;
@@ -524,6 +537,12 @@ export interface Invoice {
   sent_at: string | null;
   sent_to: string | null;
   send_method: string | null;
+  /** How much of `total` the customer has actually paid so far — null means
+   * no payment has been recorded at all. Commission payout is gated on this,
+   * not on `sent_at` (which only tracks whether the invoice was emailed). */
+  paid_amount: number | null;
+  /** Date of the most recent recorded payment update. */
+  paid_at: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

@@ -1,4 +1,10 @@
-import type { Contract, ContractStatus } from '@/types/domain';
+import type { Contract, ContractStatus, Invoice } from '@/types/domain';
+import { getContractEndDate, commissionableRowsForMonth } from './invoice-calc';
+import { computeCommissionBase, calcBlendedMonthlyCommission } from './commission-calc';
+
+/** Looks up the invoice for one contract in one month — keyed
+ * `` `${contractNo}:${month}` ``, built by listInvoicesByContracts(). */
+export type InvoiceLookup = Map<string, Invoice>;
 
 export interface ContractCommissionRow {
   contractNo: string;
@@ -6,6 +12,9 @@ export interface ContractCommissionRow {
   agentCode: string;
   agentName: string;
   amount: number;
+  /** How much of that month's invoice was paid (0–1) — lets the payout
+   * report show which rows are still awaiting collection. */
+  paidRatio: number;
 }
 
 export interface AgentCommissionGroup {
@@ -37,32 +46,40 @@ function overlapDays(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): number
   return daysBetweenInclusive(start, end);
 }
 
-/** Prorates one contract's commission for a single calendar month.
+/** Computes one contract's commission for a single calendar month, live from
+ * that month's actual invoice — there is no longer a single fixed
+ * commission figure for a contract (see the doc comment on Contract's
+ * commission_base/monthly_commission/etc. fields in types/domain.ts).
  *
- * Contracts bill (and pay commission) on a month-end basis; any partial
- * period is prorated by calendar day — same rule used for mid-month fee
- * changes (see calc/proration.ts). Three things can make a month partial
- * for a given contract:
+ * Returns 0 if no invoice was issued for this contract+month — commission
+ * only accrues once a real invoice exists, matching the agent agreement's
+ * own clause 3 ("수수료는 고객이 실제로 납부한 청구액을 기준으로 산정"). The
+ * result is then scaled by how much of that invoice was actually paid
+ * (invoice.paid_amount / invoice.total), so a partially-paid invoice yields
+ * partial commission and an unpaid one yields none — commission is
+ * calculated from what was billed, but paid out based on what was collected.
+ *
+ * The 100%-to-50% post-term rate transition is a separate axis from "how
+ * much was billed" — contracts bill (and pay commission) on a month-end
+ * basis, so any partial period is prorated by calendar day, same rule used
+ * for mid-month fee changes (see calc/proration.ts). Three things can make a
+ * month partial for a given contract:
  *   - the contract started mid-month
  *   - the contract was terminated mid-month
- *   - the 100%-to-50% commission-rate transition (commission_full_end /
- *     commission_half_start, see calc/commission-calc.ts) falls mid-month
- * so this splits the month into "full-rate days" and "half-rate days"
- * within the contract's active window and prorates each independently,
- * rather than snapshotting a single rate for the whole month. The 50%-rate
- * window has no fixed end — it runs through `activeEnd` (which already
- * clamps to the termination date once a contract is terminated), so
- * commission at 50% continues for as long as the customer keeps using
- * the service. */
-export function calcContractCommissionForMonth(contract: Contract, monthKey: string): number {
-  if (
-    contract.monthly_commission == null ||
-    Number.isNaN(contract.monthly_commission) ||
-    !contract.commission_full_end ||
-    !contract.commission_half_start
-  ) {
-    return 0;
-  }
+ *   - the 100%-to-50% transition (the contract's own term end, from
+ *     getContractEndDate) falls mid-month
+ * The 50%-rate window has no fixed end — it runs through `activeEnd` (which
+ * already clamps to the termination date once a contract is terminated), so
+ * commission at 50% continues for as long as the customer keeps using the
+ * service and keeps paying for it. */
+export function calcContractCommissionForMonth(
+  contract: Contract,
+  monthKey: string,
+  invoice: Invoice | null,
+  commissionItems: Record<string, boolean>
+): number {
+  if (!invoice || invoice.total <= 0) return 0;
+  if (contract.commission_rate == null || Number.isNaN(contract.commission_rate)) return 0;
 
   const [year, month] = monthKey.split('-').map(Number);
   const monthStart = new Date(year, month - 1, 1);
@@ -74,16 +91,23 @@ export function calcContractCommissionForMonth(contract: Contract, monthKey: str
   const activeEnd = contractEnd < monthEnd ? contractEnd : monthEnd;
   if (activeEnd < monthStart || activeEnd < contractStart) return 0;
 
-  const fullEnd = new Date(contract.commission_full_end);
-  const halfStart = new Date(contract.commission_half_start);
+  const termEnd = new Date(getContractEndDate(contract));
+  const halfStart = new Date(termEnd.getFullYear(), termEnd.getMonth(), termEnd.getDate() + 1);
 
-  const fullDays = overlapDays(monthStart, activeEnd, contractStart, fullEnd);
+  const fullDays = overlapDays(monthStart, activeEnd, contractStart, termEnd);
   const halfDays = overlapDays(monthStart, activeEnd, halfStart, activeEnd);
 
-  const dailyFull = contract.monthly_commission / totalDaysInMonth;
-  const dailyHalf = contract.half_monthly_commission / totalDaysInMonth;
+  const monthRows = commissionableRowsForMonth(contract, monthKey);
+  const monthBase = computeCommissionBase(monthRows, commissionItems);
+  const monthlyCommission = calcBlendedMonthlyCommission(monthBase, monthRows, contract.commission_rate);
+  const halfMonthlyCommission = monthlyCommission * 0.5;
 
-  return Math.round(fullDays * dailyFull + halfDays * dailyHalf);
+  const dailyFull = monthlyCommission / totalDaysInMonth;
+  const dailyHalf = halfMonthlyCommission / totalDaysInMonth;
+  const rawCommission = fullDays * dailyFull + halfDays * dailyHalf;
+
+  const paidRatio = Math.min(1, Math.max(0, (invoice.paid_amount ?? 0) / invoice.total));
+  return Math.round(rawCommission * paidRatio);
 }
 
 /** Builds the full monthly report: one row per contract that earned any
@@ -96,19 +120,24 @@ export function calcContractCommissionForMonth(contract: Contract, monthKey: str
 export function calcMonthlyCommissionReport(
   contracts: Contract[],
   monthKey: string,
+  invoicesByKey: InvoiceLookup,
+  commissionItems: Record<string, boolean>,
   npwpByAgentCode: Map<string, string | null> = new Map()
 ): AgentCommissionGroup[] {
   const rows: ContractCommissionRow[] = [];
   for (const c of contracts) {
     if (!c.agent_code || !c.agent_name) continue;
-    const amount = calcContractCommissionForMonth(c, monthKey);
+    const invoice = invoicesByKey.get(`${c.no}:${monthKey}`) ?? null;
+    const amount = calcContractCommissionForMonth(c, monthKey, invoice, commissionItems);
     if (amount <= 0) continue;
+    const paidRatio = invoice && invoice.total > 0 ? Math.min(1, Math.max(0, (invoice.paid_amount ?? 0) / invoice.total)) : 0;
     rows.push({
       contractNo: c.no,
       customerName: c.customer_name,
       agentCode: c.agent_code,
       agentName: c.agent_name,
       amount,
+      paidRatio,
     });
   }
 
@@ -160,11 +189,12 @@ export interface ContractCommissionSummary {
   customerName: string;
   startDate: string;
   status: ContractStatus;
-  monthlyCommission: number;
-  halfMonthlyCommission: number;
-  commissionFullEnd: string | null;
-  commissionHalfStart: string | null;
-  commissionEnd: string | null;
+  commissionRate: number;
+  /** This contract's commission for `uptoMonthKey` specifically — null if no
+   * invoice has been issued for that month yet. There's no longer one fixed
+   * "full rate"/"half rate" figure for the whole contract, since the base
+   * now varies with the actual monthly bill (see calcContractCommissionForMonth). */
+  currentMonthCommission: number | null;
   /** Every month (from contract start through `uptoMonthKey`) that earned
    * a nonzero commission — the "history" a sales agent needs to see their
    * own full track record, not just the current month's snapshot. */
@@ -179,26 +209,32 @@ export interface ContractCommissionSummary {
 export function calcAgentCommissionHistory(
   contracts: Contract[],
   agentCode: string,
-  uptoMonthKey: string
+  uptoMonthKey: string,
+  invoicesByKey: InvoiceLookup,
+  commissionItems: Record<string, boolean>
 ): ContractCommissionSummary[] {
   return contracts
     .filter((c) => c.agent_code === agentCode)
     .map((c): ContractCommissionSummary => {
       const startMonthKey = c.start_date.slice(0, 7);
       const history = monthKeysBetween(startMonthKey, uptoMonthKey)
-        .map((month) => ({ month, amount: calcContractCommissionForMonth(c, month) }))
+        .map((month) => ({
+          month,
+          amount: calcContractCommissionForMonth(c, month, invoicesByKey.get(`${c.no}:${month}`) ?? null, commissionItems),
+        }))
         .filter((entry) => entry.amount > 0);
+      const currentMonthInvoice = invoicesByKey.get(`${c.no}:${uptoMonthKey}`) ?? null;
+      const currentMonthCommission = currentMonthInvoice
+        ? calcContractCommissionForMonth(c, uptoMonthKey, currentMonthInvoice, commissionItems)
+        : null;
       return {
         contractNo: c.no,
         customerCode: c.customer_code,
         customerName: c.customer_name,
         startDate: c.start_date,
         status: c.status,
-        monthlyCommission: c.monthly_commission,
-        halfMonthlyCommission: c.half_monthly_commission,
-        commissionFullEnd: c.commission_full_end,
-        commissionHalfStart: c.commission_half_start,
-        commissionEnd: c.commission_end,
+        commissionRate: c.commission_rate,
+        currentMonthCommission,
         history,
         totalToDate: history.reduce((sum, entry) => sum + entry.amount, 0),
       };

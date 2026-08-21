@@ -92,6 +92,41 @@ function isDiscountExpired(contract: Contract, month: string): boolean {
   return elapsed >= discountMonths;
 }
 
+/** The actual QuoteRowRecord list that determines this month's bill — shared
+ * by invoiceLineItems()/invoiceTotals() (which map it down to display-only
+ * fields) and the commission engine (commission-report.ts), which needs the
+ * full row — including key/commissionable/commissionRate — to compute that
+ * month's commissionable base. Exported as commissionableRowsForMonth since
+ * outside this file that's the only reason to call it. */
+function effectiveRowsForMonth(contract: Contract, month: string): QuoteRowRecord[] {
+  if (!isContractActiveInMonth(contract, month)) {
+    const postTermItems = postTermEquipmentRows(contract).map((r) => ({
+      ...r,
+      amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
+    }));
+    return [...postTermItems, ...postTermPrinterRows(contract)];
+  }
+
+  const rows: QuoteRowRecord[] = contract.quote_snapshot?.rows ?? [];
+  const effectiveRows = isDiscountExpired(contract, month)
+    ? rows.filter((r) => r.key !== 'discount')
+    : rows;
+  const nonZero = effectiveRows.filter((r) => Number(r.amount || 0) !== 0);
+  if (nonZero.length) return nonZero;
+  return [
+    {
+      key: 'base',
+      label: 'Managed IT Outsourcing Service',
+      amount: Number(contract.monthly_fee || 0),
+      cost: 0,
+      init: 0,
+      commissionable: true,
+    },
+  ];
+}
+
+export { effectiveRowsForMonth as commissionableRowsForMonth };
+
 export interface InvoiceLineItem {
   /** Korean fallback/print text — invoice-document.tsx (deliberately
    * Korean-only, unlike the bilingual quote/contract documents) renders this
@@ -114,43 +149,16 @@ export interface InvoiceLineItem {
 // time-aware cases: a time-limited discount that has expired (drop that
 // row), and post-term equipment-only billing at a reduced rate.
 export function invoiceLineItems(contract: Contract, month: string): InvoiceLineItem[] {
-  if (!isContractActiveInMonth(contract, month)) {
-    const postTermItems = postTermEquipmentRows(contract).map((r) => ({
-      label: r.label,
-      labelKey: r.labelKey,
-      labelId: r.labelId,
-      labelKo: r.labelKo,
-      params: r.params,
-      postTermExtension: true,
-      amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
-    }));
-    const printerItems = postTermPrinterRows(contract).map((r) => ({
-      label: r.label,
-      labelKey: r.labelKey,
-      labelId: r.labelId,
-      labelKo: r.labelKo,
-      params: r.params,
-      amount: r.amount,
-    }));
-    return [...postTermItems, ...printerItems];
-  }
-
-  const rows: QuoteRowRecord[] = contract.quote_snapshot?.rows ?? [];
-  const effectiveRows = isDiscountExpired(contract, month)
-    ? rows.filter((r) => r.key !== 'discount')
-    : rows;
-  const nonZero = effectiveRows.filter((r) => Number(r.amount || 0) !== 0);
-  if (nonZero.length) {
-    return nonZero.map((r) => ({
-      label: r.label,
-      labelKey: r.labelKey,
-      labelId: r.labelId,
-      labelKo: r.labelKo,
-      params: r.params,
-      amount: r.amount,
-    }));
-  }
-  return [{ label: 'Managed IT Outsourcing Service', amount: Number(contract.monthly_fee || 0) }];
+  const isPostTerm = !isContractActiveInMonth(contract, month);
+  return effectiveRowsForMonth(contract, month).map((r) => ({
+    label: r.label,
+    labelKey: r.labelKey,
+    labelId: r.labelId,
+    labelKo: r.labelKo,
+    params: r.params,
+    postTermExtension: isPostTerm && !isPrinterRow(contract, r) ? true : undefined,
+    amount: r.amount,
+  }));
 }
 
 export interface InvoiceTotals {
@@ -160,21 +168,7 @@ export interface InvoiceTotals {
 }
 
 export function invoiceTotals(contract: Contract, month: string, ppnRate: number): InvoiceTotals {
-  let subtotal: number;
-  if (!isContractActiveInMonth(contract, month)) {
-    const postTermSubtotal = postTermEquipmentRows(contract).reduce(
-      (sum, r) => sum + Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
-      0
-    );
-    const printerSubtotal = postTermPrinterRows(contract).reduce((sum, r) => sum + r.amount, 0);
-    subtotal = postTermSubtotal + printerSubtotal;
-  } else if (isDiscountExpired(contract, month)) {
-    const discountRow = (contract.quote_snapshot?.rows ?? []).find((r) => r.key === 'discount');
-    const discountAmount = discountRow ? Number(discountRow.amount || 0) : 0; // stored as a negative number
-    subtotal = Number(contract.monthly_fee || 0) - discountAmount;
-  } else {
-    subtotal = Number(contract.monthly_fee || 0);
-  }
+  const subtotal = effectiveRowsForMonth(contract, month).reduce((sum, r) => sum + r.amount, 0);
   const ppn = Math.round((subtotal * Number(ppnRate || 0)) / 100);
   return { subtotal, ppn, total: subtotal + ppn };
 }
