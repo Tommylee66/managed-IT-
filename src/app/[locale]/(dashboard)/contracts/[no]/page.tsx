@@ -31,6 +31,16 @@ export default async function ContractDetailPage({
     getTranslations("assets"),
   ]);
   const commissionHidden = Number.isNaN(contract.commission_rate);
+  // The stored total_commission covers the full 100%-rate contract term
+  // PLUS an equal-length 50%-rate period after it ends (see
+  // calculateCommission()'s 1.5x-duration rule) — the contract screen shows
+  // only the within-term portion instead, so it isn't read as "the total
+  // commission this contract will ever pay."
+  const withinTermCommission = contract.monthly_commission * contract.months;
+  const contractTerm =
+    contract.months % 12 === 0
+      ? tCommon("years", { count: contract.months / 12 })
+      : tCommon("months", { count: contract.months });
 
   const STATUS_LABEL: Record<string, string> = {
     contracted: t("statusContracted"),
@@ -110,8 +120,8 @@ export default async function ContractDetailPage({
                 <p>{formatRupiah(contract.half_monthly_commission, locale as Locale)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">{t("totalCommission")}</p>
-                <p>{formatRupiah(contract.total_commission, locale as Locale)}</p>
+                <p className="text-xs text-muted-foreground">{t("totalCommission", { term: contractTerm })}</p>
+                <p>{formatRupiah(withinTermCommission, locale as Locale)}</p>
               </div>
             </>
           )}

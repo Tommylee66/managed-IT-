@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
@@ -5,6 +6,7 @@ import { getSessionContext } from "@/lib/auth/session";
 import { getAgent } from "@/lib/data-access/agents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AgentDetailActions } from "@/components/agents/agent-detail-actions";
 import { EditAgentForm } from "@/components/agents/edit-agent-form";
@@ -28,11 +30,16 @@ export default async function AgentDetailPage({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-semibold">{agent.name}</h1>
-        <Badge variant={agent.active ? "default" : "secondary"}>
-          {agent.active ? tCommon("active") : tCommon("inactive")}
-        </Badge>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-semibold">{agent.name}</h1>
+          <Badge variant={agent.active ? "default" : "secondary"}>
+            {agent.active ? tCommon("active") : tCommon("inactive")}
+          </Badge>
+        </div>
+        <Button variant="outline" asChild>
+          <Link href={`/${locale}/agents/${agent.code}/agreement/print`}>{t("viewAgreement")}</Link>
+        </Button>
       </div>
 
       <Card>

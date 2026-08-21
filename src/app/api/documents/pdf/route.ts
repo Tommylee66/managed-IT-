@@ -8,7 +8,7 @@ export const maxDuration = 60;
 // Only these exact print-route shapes may be rendered to PDF, so the `path`
 // query param can't be used to make this endpoint fetch arbitrary URLs.
 const ALLOWED_PATH_PATTERN =
-  /^\/(ko|id|en)\/(quotes|contracts|invoices|termination)\/[^/?]+\/print(\?[^/]*)?$|^\/(ko|id|en)\/incident-logs\/report\/print(\?[^/]*)?$/;
+  /^\/(ko|id|en)\/(quotes|contracts|invoices|termination)\/[^/?]+\/print(\?[^/]*)?$|^\/(ko|id|en)\/incident-logs\/report\/print(\?[^/]*)?$|^\/(ko|id|en)\/agents\/[^/?]+\/agreement\/print(\?[^/]*)?$/;
 
 export async function GET(req: NextRequest) {
   const session = await getSessionContext();
