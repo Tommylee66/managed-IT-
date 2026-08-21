@@ -32,11 +32,11 @@ export default async function ContractDetailPage({
     getTranslations("assets"),
   ]);
   const commissionHidden = Number.isNaN(contract.commission_rate);
-  // The stored total_commission covers the full 100%-rate contract term
-  // PLUS an equal-length 50%-rate period after it ends (see
-  // calculateCommission()'s 1.5x-duration rule) — the contract screen shows
-  // only the within-term portion instead, so it isn't read as "the total
-  // commission this contract will ever pay."
+  // 50% commission continues indefinitely after the contract term ends for
+  // as long as the customer keeps using the service (see
+  // agent-agreement-clauses.ts clause 3.2) — there's no fixed total to show
+  // for that open-ended part, so this headline figure covers only the
+  // 100%-rate contract term itself (same value stored in total_commission).
   const withinTermCommission = contract.monthly_commission * contract.months;
   const contractTerm =
     contract.months % 12 === 0

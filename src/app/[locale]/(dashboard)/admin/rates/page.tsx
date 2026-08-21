@@ -62,6 +62,7 @@ export default async function AdminRatesPage({
                 <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
                 <TableHead className="text-right">{t("equipmentOverageRate")}</TableHead>
+                <TableHead className="text-right">{t("commissionRateOverride")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
                 <TableHead>{t("actions")}</TableHead>
               </TableRow>
@@ -85,6 +86,9 @@ export default async function AdminRatesPage({
                   <TableCell className="text-right">
                     {item.overage_rate != null ? formatRupiah(item.overage_rate, locale as Locale) : "-"}
                   </TableCell>
+                  <TableCell className="text-right">
+                    {item.commission_rate_override != null ? `${item.commission_rate_override}%` : "-"}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={item.is_active ? "default" : "secondary"}>
                       {item.is_active ? t("active") : t("inactive")}
@@ -99,7 +103,7 @@ export default async function AdminRatesPage({
               ))}
               {equipmentItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground">
                     {t("noEquipment")}
                   </TableCell>
                 </TableRow>
@@ -129,6 +133,7 @@ export default async function AdminRatesPage({
                 <TableHead className="text-right">{t("serviceOneTimeFee")}</TableHead>
                 <TableHead className="text-right">{t("serviceOneTimeCost")}</TableHead>
                 <TableHead>{t("serviceBillingMode")}</TableHead>
+                <TableHead className="text-right">{t("commissionRateOverride")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
                 <TableHead>{t("actions")}</TableHead>
               </TableRow>
@@ -159,6 +164,9 @@ export default async function AdminRatesPage({
                         : t("serviceBillingModeOneTime")
                       : "-"}
                   </TableCell>
+                  <TableCell className="text-right">
+                    {item.commission_rate_override != null ? `${item.commission_rate_override}%` : "-"}
+                  </TableCell>
                   <TableCell>
                     <Badge variant={item.is_active ? "default" : "secondary"}>
                       {item.is_active ? t("active") : t("inactive")}
@@ -173,7 +181,7 @@ export default async function AdminRatesPage({
               ))}
               {serviceItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center text-muted-foreground">
+                  <TableCell colSpan={12} className="text-center text-muted-foreground">
                     {t("noService")}
                   </TableCell>
                 </TableRow>

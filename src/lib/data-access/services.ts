@@ -14,7 +14,12 @@ export async function listServiceCatalog(
   if (error) throw error;
   const items = data as ServiceCatalogItem[];
   if (role === 'master') return items;
-  return items.map((item) => ({ ...item, monthly_cost: null, one_time_cost: null }));
+  return items.map((item) => ({
+    ...item,
+    monthly_cost: null,
+    one_time_cost: null,
+    commission_rate_override: null,
+  }));
 }
 
 interface ServiceFields {
@@ -27,6 +32,7 @@ interface ServiceFields {
   one_time_fee?: number | null;
   one_time_cost?: number | null;
   one_time_billing_mode?: 'one_time' | 'monthly';
+  commission_rate_override?: number | null;
 }
 
 export type CreateServiceInput = ServiceFields & { created_by: string };
@@ -48,6 +54,7 @@ export async function createServiceCatalogItem(
       one_time_fee: input.one_time_fee ?? null,
       one_time_cost: input.one_time_cost ?? null,
       one_time_billing_mode: input.one_time_billing_mode ?? 'one_time',
+      commission_rate_override: input.commission_rate_override ?? null,
       created_by: input.created_by,
     })
     .select('*')
@@ -76,6 +83,7 @@ export async function updateServiceCatalogItem(
       one_time_fee: input.one_time_fee ?? null,
       one_time_cost: input.one_time_cost ?? null,
       one_time_billing_mode: input.one_time_billing_mode ?? 'one_time',
+      commission_rate_override: input.commission_rate_override ?? null,
     })
     .eq('id', id)
     .select('*')

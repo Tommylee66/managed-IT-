@@ -835,7 +835,9 @@
     "serviceBillingMode": "Construction Fee Billing Mode",
     "serviceBillingModeOneTime": "Billed Once",
     "serviceBillingModeMonthly": "Split Monthly",
-    "serviceOneTimeFeeHint": "Billed Once shows as a separate line on the quote/contract, collected manually by staff. Split Monthly divides it evenly across the contract term and folds it automatically into the monthly bill."
+    "serviceOneTimeFeeHint": "Billed Once shows as a separate line on the quote/contract, collected manually by staff. Split Monthly divides it evenly across the contract term and folds it automatically into the monthly bill.",
+    "commissionRateOverride": "Special Commission Rate (%)",
+    "commissionRateOverrideHint": "Leave blank to use the sales agent's standard rate. If set, commission on this item is calculated at this rate instead of the agent's standard rate."
   },
   "documents": {
     "printSave": "Print / Save PDF",

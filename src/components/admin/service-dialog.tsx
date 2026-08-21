@@ -52,6 +52,7 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
     one_time_fee: z.string().optional(),
     one_time_cost: z.string().optional(),
     one_time_billing_mode: z.enum(["one_time", "monthly"]),
+    commission_rate_override: z.string().optional(),
   });
   type FormValues = z.infer<typeof schema>;
 
@@ -73,6 +74,7 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
       one_time_fee: item?.one_time_fee?.toString() ?? "",
       one_time_cost: item?.one_time_cost?.toString() ?? "",
       one_time_billing_mode: item?.one_time_billing_mode ?? "one_time",
+      commission_rate_override: item?.commission_rate_override?.toString() ?? "",
     },
   });
 
@@ -87,6 +89,7 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
       one_time_fee: values.one_time_fee ? Number(values.one_time_fee) : null,
       one_time_cost: values.one_time_cost ? Number(values.one_time_cost) : null,
       one_time_billing_mode: values.one_time_billing_mode,
+      commission_rate_override: values.commission_rate_override ? Number(values.commission_rate_override) : null,
     };
     try {
       if (isEdit) {
@@ -226,6 +229,18 @@ export function ServiceDialog({ item }: { item?: ServiceCatalogItem }) {
             />
           </div>
           <p className="text-xs text-muted-foreground">{t("serviceOneTimeFeeHint")}</p>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="commission_rate_override">{t("commissionRateOverride")}</Label>
+            <Input
+              id="commission_rate_override"
+              type="number"
+              step="0.1"
+              min="0"
+              max="100"
+              {...register("commission_rate_override")}
+            />
+            <p className="text-xs text-muted-foreground">{t("commissionRateOverrideHint")}</p>
+          </div>
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("creating") : isEdit ? tCommon("save") : t("create")}

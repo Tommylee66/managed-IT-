@@ -33,6 +33,7 @@ export function resolveEquipmentSelections(
         overageQty: r.overageQty ?? 0,
         overageRate: item.overage_rate,
         overageCost: item.overage_cost,
+        commissionRateOverride: item.commission_rate_override,
       };
     })
     .filter((s): s is EquipmentSelection => s !== null);
@@ -55,6 +56,7 @@ export function equipmentPricedRows(selections: EquipmentSelection[]): QuoteRowR
         cost: (s.monthlyCost ?? 0) * s.qty,
         init: 0,
         commissionable: true,
+        commissionRate: s.commissionRateOverride ?? null,
       });
     }
     if (s.overageQty > 0 && s.overageRate != null) {
@@ -72,6 +74,7 @@ export function equipmentPricedRows(selections: EquipmentSelection[]): QuoteRowR
         cost: (s.overageCost ?? 0) * s.overageQty,
         init: 0,
         commissionable: true,
+        commissionRate: s.commissionRateOverride ?? null,
       });
     }
   }

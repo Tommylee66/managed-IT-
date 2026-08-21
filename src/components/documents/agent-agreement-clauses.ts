@@ -56,8 +56,12 @@ export function agentAgreementClauses(agent: Agent): ClauseSection[] {
           ko: `대리점의 현재 수수료율은 대리점이 소개하여 BCT와 체결된 각 고객 계약의 수수료 산정 기준액(커미션 대상 월 서비스 요금)의 ${agent.rate}%이다.`,
         },
         {
-          id: 'Komisi dibayarkan sebesar 100% dari tarif selama masa kontrak pelanggan berjalan, kemudian 50% dari tarif untuk periode lanjutan yang sama panjangnya setelah masa kontrak berakhir (selama pelanggan tetap menggunakan layanan BCT), dan berhenti setelahnya.',
-          ko: '수수료는 고객 계약기간 동안 요율의 100%가 지급되며, 계약기간 종료 후 동일한 기간 동안(고객이 BCT 서비스를 계속 이용하는 경우) 요율의 50%가 추가 지급된 뒤 종료된다.',
+          id: 'Komisi dibayarkan sebesar 100% dari tarif selama masa kontrak pelanggan berjalan. Setelah masa kontrak berakhir, apabila Pelanggan tetap menggunakan layanan BCT, komisi sebesar 50% dari tarif akan terus dibayarkan tanpa batas waktu selama Pelanggan masih menggunakan layanan tersebut.',
+          ko: '수수료는 고객 계약기간 동안 요율의 100%가 지급된다. 계약기간이 종료된 이후에도 고객이 BCT 서비스를 계속 이용하는 경우, 그 사용 기간 내내 요율의 50%가 기한 없이 계속 지급된다.',
+        },
+        {
+          id: 'Tarif komisi Mitra pada umumnya mengikuti tarif standar yang disepakati, namun untuk layanan atau perangkat tertentu dapat berlaku tarif khusus yang berbeda dari tarif standar tersebut. Sebagai contoh, BCT dapat menetapkan perangkat tertentu untuk dikenakan tarif komisi khusus alih-alih tarif standar Mitra, sebagaimana ditentukan dalam katalog harga BCT.',
+          ko: '대리점의 영업수수료는 원칙적으로 합의된 표준 요율을 따르나, 특정 서비스나 장비에 대해서는 표준 요율과 다른 별도의 특별 요율이 적용될 수 있다. 예를 들어 BCT는 특정 장비를 지정하여 대리점의 표준 요율이 아닌 별도의 특별 요율을 정할 수 있으며, 이는 BCT의 가격 카탈로그에 반영된다.',
         },
         {
           id: 'Komisi dihitung dari tagihan yang benar-benar dibayar oleh Pelanggan — tidak ada komisi atas tagihan yang belum lunas, ditolak, atau dibatalkan.',
@@ -116,8 +120,8 @@ export function agentAgreementClauses(agent: Agent): ClauseSection[] {
           ko: '본 계약은 서명일로부터 효력이 발생하며, 어느 일방이 최소 30일 전 서면 통지로 해지하기 전까지 기한 없이 유지된다.',
         },
         {
-          id: 'Pengakhiran Perjanjian ini tidak menghapuskan hak Mitra atas komisi yang timbul dari kontrak pelanggan yang telah ditandatangani sebelum tanggal pengakhiran — komisi tersebut tetap dibayarkan sesuai skema pada Pasal 3 hingga masa berlakunya berakhir.',
-          ko: '본 계약이 해지되더라도, 해지일 이전에 체결된 고객 계약으로부터 발생하는 대리점의 수수료 청구권은 소멸하지 않으며, 제3조의 지급 방식에 따라 해당 수수료 지급기간이 끝날 때까지 계속 지급된다.',
+          id: 'Pengakhiran Perjanjian ini tidak menghapuskan hak Mitra atas komisi yang timbul dari kontrak pelanggan yang telah ditandatangani sebelum tanggal pengakhiran — komisi tersebut tetap dibayarkan sesuai skema pada Pasal 3 selama Pelanggan terkait masih menggunakan layanan BCT.',
+          ko: '본 계약이 해지되더라도, 해지일 이전에 체결된 고객 계약으로부터 발생하는 대리점의 수수료 청구권은 소멸하지 않으며, 해당 고객이 BCT 서비스를 계속 이용하는 동안 제3조의 지급 방식에 따라 계속 지급된다.',
         },
         {
           id: 'BCT dapat mengakhiri Perjanjian ini secara langsung apabila Mitra melanggar Pasal 2 atau Pasal 6, atau melakukan tindakan yang merugikan reputasi BCT.',

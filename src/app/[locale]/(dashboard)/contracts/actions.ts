@@ -28,10 +28,24 @@ export async function createContractFromQuoteAction(quoteNo: string) {
   const customer = await getCustomerRaw(supabase, quote.customer_code);
   if (!customer) throw new Error(t('customerNotFoundError'));
 
-  const contract = await createContractFromQuote(supabase, quote, agent, customer, session.userId);
-  revalidatePath('/contracts');
-  revalidatePath('/customers');
-  return contract;
+  try {
+    const contract = await createContractFromQuote(supabase, quote, agent, customer, session.userId);
+    revalidatePath('/contracts');
+    revalidatePath('/customers');
+    return contract;
+  } catch (e) {
+    // The check above has a narrow check-then-insert race window (two
+    // concurrent submissions, e.g. a double-click, can both pass it before
+    // either insert lands) — the database's unique constraint on quote_no
+    // (see contracts_quote_no_unique) is the real backstop. This turns
+    // that constraint violation (Postgres 23505) into the same friendly
+    // message instead of a raw database error.
+    if (typeof e === 'object' && e !== null && 'code' in e && (e as { code?: string }).code === '23505') {
+      const winner = await getContractByQuoteNo(supabase, quoteNo);
+      throw new Error(t('contractAlreadyExistsError', { no: winner?.no ?? quoteNo }));
+    }
+    throw e;
+  }
 }
 
 export async function confirmContractAction(contractNo: string) {

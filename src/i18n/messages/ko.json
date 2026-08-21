@@ -835,7 +835,9 @@
     "serviceBillingMode": "공사대금 청구방식",
     "serviceBillingModeOneTime": "1회 청구",
     "serviceBillingModeMonthly": "월 분할 청구",
-    "serviceOneTimeFeeHint": "1회 청구는 견적서/계약서에 별도 항목으로 표시되며 실제 청구는 직원이 수동으로 처리합니다. 월 분할 청구는 계약기간 동안 균등 분할되어 월 청구액에 자동으로 포함됩니다."
+    "serviceOneTimeFeeHint": "1회 청구는 견적서/계약서에 별도 항목으로 표시되며 실제 청구는 직원이 수동으로 처리합니다. 월 분할 청구는 계약기간 동안 균등 분할되어 월 청구액에 자동으로 포함됩니다.",
+    "commissionRateOverride": "특별 수수료율 (%)",
+    "commissionRateOverrideHint": "설정하지 않으면 영업 대리점의 기본 요율이 적용됩니다. 이 항목에 값을 입력하면 해당 항목에 한해 대리점의 기본 요율 대신 이 요율로 수수료가 계산됩니다."
   },
   "documents": {
     "printSave": "인쇄 / PDF 저장",

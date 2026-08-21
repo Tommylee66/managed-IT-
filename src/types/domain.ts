@@ -215,6 +215,10 @@ export interface EquipmentCatalogItem {
   overage_rate: number | null;
   /** Internal cost per extra unit, master-only. */
   overage_cost: number | null;
+  /** Special commission rate (%) for this item, overriding the agent's own
+   * rate for just this item's row(s) — null = use the agent's standard
+   * rate, same as before this field existed. */
+  commission_rate_override: number | null;
   is_active: boolean;
   created_by: string | null;
   created_at: string;
@@ -238,6 +242,9 @@ export interface EquipmentSelection {
   overageQty: number;
   overageRate: number | null;
   overageCost: number | null;
+  /** See EquipmentCatalogItem.commission_rate_override — snapshotted at
+   * selection time, same as monthlyRate. */
+  commissionRateOverride: number | null;
 }
 
 export interface ServiceCatalogItem {
@@ -257,6 +264,9 @@ export interface ServiceCatalogItem {
   /** How the one-time fee is collected: as a single lump sum, or spread
    * evenly across the contract's months. */
   one_time_billing_mode: 'one_time' | 'monthly';
+  /** See EquipmentCatalogItem.commission_rate_override — same meaning,
+   * applies to this service instead. */
+  commission_rate_override: number | null;
   is_active: boolean;
   created_by: string | null;
   created_at: string;
@@ -278,6 +288,9 @@ export interface ServiceSelection {
   oneTimeFee: number | null;
   oneTimeCost: number | null;
   oneTimeBillingMode: 'one_time' | 'monthly';
+  /** See ServiceCatalogItem.commission_rate_override — snapshotted at
+   * selection time, same as monthlyRate. */
+  commissionRateOverride: number | null;
 }
 
 export interface QuoteRowRecord {
@@ -300,6 +313,11 @@ export interface QuoteRowRecord {
    * quote/contract's recurring monthly/margin/commission figures, rendered
    * in its own section on the quote and contract documents instead. */
   oneTime?: boolean;
+  /** Special commission rate (%) for this row, snapshotted from an
+   * equipment/service catalog item's commission_rate_override — null/unset
+   * means this row earns commission at the agent's own rate, same as
+   * before this field existed (see calcBlendedMonthlyCommission). */
+  commissionRate?: number | null;
 }
 
 export interface Quote {

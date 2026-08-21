@@ -86,6 +86,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     monthly_cost: z.string().optional(),
     overage_rate: z.string().optional(),
     overage_cost: z.string().optional(),
+    commission_rate_override: z.string().optional(),
   });
   type FormValues = z.infer<typeof schema>;
 
@@ -109,6 +110,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       monthly_cost: item?.monthly_cost?.toString() ?? "",
       overage_rate: item?.overage_rate?.toString() ?? "",
       overage_cost: item?.overage_cost?.toString() ?? "",
+      commission_rate_override: item?.commission_rate_override?.toString() ?? "",
     },
   });
 
@@ -142,6 +144,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
       overage_rate: values.overage_rate ? Number(values.overage_rate) : null,
       overage_cost: values.overage_cost ? Number(values.overage_cost) : null,
+      commission_rate_override: values.commission_rate_override ? Number(values.commission_rate_override) : null,
     };
     try {
       if (isEdit) {
@@ -304,6 +307,18 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
             </div>
           </div>
           <p className="text-xs text-muted-foreground">{t("equipmentOverageHint")}</p>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="commission_rate_override">{t("commissionRateOverride")}</Label>
+            <Input
+              id="commission_rate_override"
+              type="number"
+              step="0.1"
+              min="0"
+              max="100"
+              {...register("commission_rate_override")}
+            />
+            <p className="text-xs text-muted-foreground">{t("commissionRateOverrideHint")}</p>
+          </div>
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t("creating") : isEdit ? tCommon("save") : t("create")}

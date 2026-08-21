@@ -30,6 +30,7 @@ export function resolveServiceSelections(
         oneTimeFee: item.one_time_fee,
         oneTimeCost: item.one_time_cost,
         oneTimeBillingMode: item.one_time_billing_mode,
+        commissionRateOverride: item.commission_rate_override,
       };
     })
     .filter((s): s is ServiceSelection => s !== null);
@@ -54,6 +55,7 @@ export function servicePricedRows(selections: ServiceSelection[], months: number
         cost: (s.monthlyCost ?? 0) * s.qty,
         init: 0,
         commissionable: true,
+        commissionRate: s.commissionRateOverride ?? null,
       });
     }
     if (s.oneTimeFee != null) {
@@ -69,6 +71,7 @@ export function servicePricedRows(selections: ServiceSelection[], months: number
           cost: ((s.oneTimeCost ?? 0) * s.qty) / months,
           init: 0,
           commissionable: true,
+          commissionRate: s.commissionRateOverride ?? null,
         });
       } else {
         const labelId = `${s.nameId} (Biaya Konstruksi — Tagihan 1x)`;

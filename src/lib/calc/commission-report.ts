@@ -49,14 +49,17 @@ function overlapDays(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): number
  *     commission_half_start, see calc/commission-calc.ts) falls mid-month
  * so this splits the month into "full-rate days" and "half-rate days"
  * within the contract's active window and prorates each independently,
- * rather than snapshotting a single rate for the whole month. */
+ * rather than snapshotting a single rate for the whole month. The 50%-rate
+ * window has no fixed end — it runs through `activeEnd` (which already
+ * clamps to the termination date once a contract is terminated), so
+ * commission at 50% continues for as long as the customer keeps using
+ * the service. */
 export function calcContractCommissionForMonth(contract: Contract, monthKey: string): number {
   if (
     contract.monthly_commission == null ||
     Number.isNaN(contract.monthly_commission) ||
     !contract.commission_full_end ||
-    !contract.commission_half_start ||
-    !contract.commission_end
+    !contract.commission_half_start
   ) {
     return 0;
   }
@@ -73,10 +76,9 @@ export function calcContractCommissionForMonth(contract: Contract, monthKey: str
 
   const fullEnd = new Date(contract.commission_full_end);
   const halfStart = new Date(contract.commission_half_start);
-  const halfEnd = new Date(contract.commission_end);
 
   const fullDays = overlapDays(monthStart, activeEnd, contractStart, fullEnd);
-  const halfDays = overlapDays(monthStart, activeEnd, halfStart, halfEnd);
+  const halfDays = overlapDays(monthStart, activeEnd, halfStart, activeEnd);
 
   const dailyFull = contract.monthly_commission / totalDaysInMonth;
   const dailyHalf = contract.half_monthly_commission / totalDaysInMonth;

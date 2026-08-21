@@ -835,7 +835,9 @@
     "serviceBillingMode": "Cara Penagihan Biaya Konstruksi",
     "serviceBillingModeOneTime": "Tagihan 1x",
     "serviceBillingModeMonthly": "Dicicil Bulanan",
-    "serviceOneTimeFeeHint": "Tagihan 1x akan tampil sebagai item terpisah pada penawaran/kontrak dan ditagihkan secara manual oleh staf. Dicicil bulanan akan dibagi rata selama masa kontrak dan otomatis masuk ke tagihan bulanan."
+    "serviceOneTimeFeeHint": "Tagihan 1x akan tampil sebagai item terpisah pada penawaran/kontrak dan ditagihkan secara manual oleh staf. Dicicil bulanan akan dibagi rata selama masa kontrak dan otomatis masuk ke tagihan bulanan.",
+    "commissionRateOverride": "Tarif Komisi Khusus (%)",
+    "commissionRateOverrideHint": "Jika dikosongkan, tarif standar agen penjualan akan digunakan. Jika diisi, komisi untuk item ini dihitung dengan tarif ini, bukan tarif standar agen."
   },
   "documents": {
     "printSave": "Cetak / Simpan PDF",

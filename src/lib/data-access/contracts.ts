@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Contract, Quote, Agent, Customer } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
-import { calculateCommission } from '@/lib/calc/commission-calc';
+import { calculateCommission, calcBlendedMonthlyCommission } from '@/lib/calc/commission-calc';
 import { nextContractNo } from '@/lib/numbering';
 
 // Commission figures are hidden entirely for staff (see hideCommission() in
@@ -67,14 +67,19 @@ export async function getContractRaw(
 /** Used to guard against converting the same quote into a contract more
  * than once — nothing previously stopped the "create contract" action from
  * being called repeatedly against one quote_no, which produced duplicate
- * contract rows (and duplicated MRR) for a single real deal. */
+ * contract rows (and duplicated MRR) for a single real deal. Uses
+ * limit(1) + array indexing rather than .maybeSingle(), which throws a
+ * hard Postgrest error the instant more than one row matches — exactly the
+ * state a duplicate-quote_no incident leaves behind, which would otherwise
+ * turn every future attempt to touch that quote into a crash instead of
+ * the intended friendly "already converted" message. */
 export async function getContractByQuoteNo(
   supabase: SupabaseClient,
   quoteNo: string
 ): Promise<Contract | null> {
-  const { data, error } = await supabase.from('contracts').select('*').eq('quote_no', quoteNo).maybeSingle();
+  const { data, error } = await supabase.from('contracts').select('*').eq('quote_no', quoteNo).limit(1);
   if (error) throw error;
-  return data as Contract | null;
+  return (data as Contract[])[0] ?? null;
 }
 
 /** Flips a contract from "just created from a quote" to "confirmed real
@@ -102,7 +107,12 @@ export async function createContractFromQuote(
   createdBy: string
 ): Promise<Contract> {
   const no = await nextContractNo(supabase);
-  const commission = calculateCommission(quote.commission_base, agent.rate, quote.start_date!, quote.months);
+  // Most rows earn commission at the agent's own rate; a row snapshotted
+  // from a catalog item with its own commission_rate_override earns
+  // commission at that rate instead (see calcBlendedMonthlyCommission) —
+  // with no overridden rows this is identical to commissionBase × agent.rate.
+  const monthlyCommission = calcBlendedMonthlyCommission(quote.commission_base, quote.rows, agent.rate);
+  const commission = calculateCommission(monthlyCommission, quote.start_date!, quote.months);
 
   const { data, error } = await supabase
     .from('contracts')
@@ -124,7 +134,6 @@ export async function createContractFromQuote(
       half_monthly_commission: commission.halfMonthlyCommission,
       commission_full_end: commission.commissionFullEnd,
       commission_half_start: commission.commissionHalfStart,
-      commission_end: commission.commissionEnd,
       total_commission: commission.totalCommission,
       quote_snapshot: quote,
       status: 'contracted',

@@ -1,0 +1,11 @@
+-- The app-level "does a contract already exist for this quote" check in
+-- createContractFromQuoteAction has a narrow check-then-insert race window:
+-- two concurrent submissions (e.g. a double-click) can both pass the check
+-- before either insert lands, producing two contracts for one quote_no —
+-- this happened in production. A unique constraint makes the database the
+-- real backstop: the second insert now fails cleanly (Postgres error
+-- 23505) instead of silently succeeding, and the action layer catches that
+-- specific error to show the same friendly "already converted" message.
+-- NULL quote_no values (a contract with no quote reference) are unaffected
+-- — Postgres unique constraints allow multiple NULLs.
+alter table contracts add constraint contracts_quote_no_unique unique (quote_no);
