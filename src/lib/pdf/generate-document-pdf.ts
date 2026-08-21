@@ -67,7 +67,7 @@ export async function generateDocumentPdf(url: string, cookies: DocumentPdfCooki
         '<div style="width:100%;font-family:Arial,sans-serif;padding:0 15mm;box-sizing:border-box;">' +
         '<div style="height:2px;width:100%;background:linear-gradient(135deg,#0f5f8f,#11a3b7);border-radius:2px;"></div>' +
         '<div style="margin-top:4px;font-size:8px;letter-spacing:0.05em;text-transform:uppercase;color:#64748b;text-align:right;">' +
-        "PT. Bumi Cerdas Teknology &middot; Managed IT Services</div></div>",
+        "PT. Bumi Cerdas Teknologi &middot; Managed IT Services</div></div>",
       footerTemplate:
         '<div style="width:100%;font-family:Arial,sans-serif;padding:0 15mm;box-sizing:border-box;text-align:center;">' +
         '<div style="height:1px;width:100%;background:#e2e8f0;margin-bottom:4px;"></div>' +

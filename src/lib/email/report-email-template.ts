@@ -45,7 +45,7 @@ export function buildReportEmailHtml(params: {
                     </td>
                     <td style="padding-left:16px;border-left:1px solid #e2e8f0;">
                       <div style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#64748b;">
-                        PT. Bumi Cerdas Teknology &middot; Managed IT Services
+                        PT. Bumi Cerdas Teknologi &middot; Managed IT Services
                       </div>
                       <div style="font-size:20px;font-weight:700;color:#0f172a;margin-top:2px;">
                         Laporan Layanan ${escapeHtml(monthLabel)}
@@ -75,7 +75,7 @@ export function buildReportEmailHtml(params: {
             </tr>
             <tr>
               <td style="padding:20px 32px;background-color:#f8fafc;border-top:1px solid #e2e8f0;text-align:center;font-size:11px;color:#94a3b8;">
-                PT. Bumi Cerdas Teknology — Managed IT Services
+                PT. Bumi Cerdas Teknologi — Managed IT Services
               </td>
             </tr>
           </table>

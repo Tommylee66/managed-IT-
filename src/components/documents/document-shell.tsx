@@ -24,7 +24,7 @@ export function DocumentShell({
           <BctWordmark size="lg" />
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-500">
-              PT. Bumi Cerdas Teknology &middot; Managed IT Services
+              PT. Bumi Cerdas Teknologi &middot; Managed IT Services
             </p>
             <h1 className="mt-0.5 text-2xl font-bold text-slate-900">{title}</h1>
             {subtitle && <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>}
@@ -40,7 +40,7 @@ export function DocumentShell({
       <div className="flex flex-col gap-6 text-sm leading-relaxed text-slate-800">{children}</div>
 
       <footer className="mt-4 border-t border-slate-200 pt-4 text-center text-[11px] text-slate-400">
-        PT. Bumi Cerdas Teknology — Managed IT Services
+        PT. Bumi Cerdas Teknologi — Managed IT Services
       </footer>
     </div>
   );

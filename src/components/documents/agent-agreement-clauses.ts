@@ -22,8 +22,8 @@ export function agentAgreementClauses(agent: Agent): ClauseSection[] {
       heading: { id: '1. Tujuan Perjanjian', ko: '1. 계약의 목적' },
       items: [
         {
-          id: 'Perjanjian ini dibuat agar PT. Bumi Cerdas Teknology ("BCT") menunjuk Mitra sebagai agen penjualan non-eksklusif untuk memperkenalkan dan mendukung calon pelanggan atas layanan Managed IT Outsourcing dan layanan terkait yang disediakan BCT.',
-          ko: '본 계약은 PT. Bumi Cerdas Teknology(이하 "BCT")가 대리점을 BCT의 Managed IT Outsourcing 및 관련 서비스에 대한 비독점적 영업 파트너로 지정하기 위해 체결한다.',
+          id: 'Perjanjian ini dibuat agar PT. Bumi Cerdas Teknologi ("BCT") menunjuk Mitra sebagai agen penjualan non-eksklusif untuk memperkenalkan dan mendukung calon pelanggan atas layanan Managed IT Outsourcing dan layanan terkait yang disediakan BCT.',
+          ko: '본 계약은 PT. Bumi Cerdas Teknologi(이하 "BCT")가 대리점을 BCT의 Managed IT Outsourcing 및 관련 서비스에 대한 비독점적 영업 파트너로 지정하기 위해 체결한다.',
         },
         {
           id: 'Hubungan ini bersifat non-eksklusif — Mitra dapat menjalankan usaha atau kemitraan lain, dan BCT dapat menunjuk agen penjualan lain, sepanjang tidak melanggar kewajiban kerahasiaan pada Pasal 6.',

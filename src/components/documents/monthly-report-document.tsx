@@ -24,7 +24,7 @@ export function MonthlyReportDocument({
       meta={
         <div className="flex flex-col gap-1">
           <p>
-            <b>PT. Bumi Cerdas Teknology</b>
+            <b>PT. Bumi Cerdas Teknologi</b>
           </p>
           <p>
             <Bilingual id="Pelanggan" ko="고객사" />: {customerName}

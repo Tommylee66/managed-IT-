@@ -41,7 +41,7 @@ export function QuoteDocument({
       meta={
         <div className="flex flex-col gap-1">
           <p>
-            <b>PT. Bumi Cerdas Teknology</b>
+            <b>PT. Bumi Cerdas Teknologi</b>
           </p>
           <p>Customer: {customerName}</p>
           <p>

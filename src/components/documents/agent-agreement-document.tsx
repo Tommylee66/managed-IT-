@@ -18,7 +18,7 @@ export function AgentAgreementDocument({ agent }: { agent: Agent }) {
       meta={
         <div className="flex flex-col gap-1">
           <p>
-            <b>PT. Bumi Cerdas Teknology</b>
+            <b>PT. Bumi Cerdas Teknologi</b>
           </p>
           <p>
             <b>Partner:</b> {agent.name}
@@ -85,7 +85,7 @@ export function AgentAgreementDocument({ agent }: { agent: Agent }) {
 
       <div className="mt-10 grid grid-cols-2 gap-8 print:break-inside-avoid">
         <div>
-          <p className="font-semibold">PT. Bumi Cerdas Teknology</p>
+          <p className="font-semibold">PT. Bumi Cerdas Teknologi</p>
           <div className="mt-12 border-t pt-1 text-xs text-muted-foreground">
             <Bilingual id="Tanda Tangan yang Berwenang" ko="서명(권한자)" />
           </div>

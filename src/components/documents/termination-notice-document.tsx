@@ -100,7 +100,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
       meta={
         <div className="flex flex-col gap-2">
           <p>
-            <b>PT. Bumi Cerdas Teknology</b>
+            <b>PT. Bumi Cerdas Teknologi</b>
           </p>
           <div className="flex gap-2">
             <Bilingual id="Nama Pelanggan" ko="고객사" className="w-32 shrink-0" />
@@ -370,7 +370,7 @@ export function TerminationNoticeDocument({ plan }: { plan: TerminationPlanView 
 
       <div className="mt-10 grid grid-cols-2 gap-8 print:break-inside-avoid">
         <div>
-          <p className="font-semibold">PT. Bumi Cerdas Teknology</p>
+          <p className="font-semibold">PT. Bumi Cerdas Teknologi</p>
           <div className="mt-12 border-t pt-1 text-xs text-muted-foreground">
             <Bilingual id="Tanda Tangan yang Berwenang" ko="서명(권한자)" />
           </div>
