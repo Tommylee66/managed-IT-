@@ -56,8 +56,7 @@ export default async function AdminRatesPage({
               <TableRow>
                 <TableHead>{t("equipmentCategory")}</TableHead>
                 <TableHead>{t("equipmentModelName")}</TableHead>
-                <TableHead>{t("equipmentSpecId")}</TableHead>
-                <TableHead>{t("equipmentSpecKo")}</TableHead>
+                <TableHead>{t("equipmentSpec")}</TableHead>
                 <TableHead className="text-right">{t("equipmentPurchasePrice")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
@@ -72,8 +71,7 @@ export default async function AdminRatesPage({
                 <TableRow key={item.id}>
                   <TableCell>{tCat(item.category)}</TableCell>
                   <TableCell>{item.model_name}</TableCell>
-                  <TableCell>{item.spec_id ?? "-"}</TableCell>
-                  <TableCell>{item.spec_ko ?? "-"}</TableCell>
+                  <TableCell>{item.spec ?? "-"}</TableCell>
                   <TableCell className="text-right">
                     {item.purchase_price != null ? formatRupiah(item.purchase_price, locale as Locale) : "-"}
                   </TableCell>
@@ -103,7 +101,7 @@ export default async function AdminRatesPage({
               ))}
               {equipmentItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={11} className="text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="text-center text-muted-foreground">
                     {t("noEquipment")}
                   </TableCell>
                 </TableRow>

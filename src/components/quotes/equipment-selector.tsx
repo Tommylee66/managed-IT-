@@ -60,11 +60,8 @@ export function EquipmentSelector({
                 {!item.is_active && (
                   <span className="text-destructive"> ({tQuotes("catalogItemInactive")})</span>
                 )}
-                {(locale === "ko" ? item.spec_ko : item.spec_id) && (
-                  <span className="text-muted-foreground">
-                    {" "}
-                    — {locale === "ko" ? item.spec_ko : item.spec_id}
-                  </span>
+                {item.spec && (
+                  <span className="text-muted-foreground"> — {item.spec}</span>
                 )}
                 {item.monthly_rate != null && (
                   <span className="text-muted-foreground">

@@ -27,8 +27,7 @@ export async function listEquipmentCatalog(
 interface EquipmentFields {
   category: AssetType;
   model_name: string;
-  spec_id?: string;
-  spec_ko?: string;
+  spec?: string;
   purchase_price?: number | null;
   monthly_rate?: number | null;
   monthly_cost?: number | null;
@@ -49,8 +48,7 @@ export async function createEquipmentCatalogItem(
     .insert({
       category: input.category,
       model_name: input.model_name,
-      spec_id: input.spec_id ?? null,
-      spec_ko: input.spec_ko ?? null,
+      spec: input.spec ?? null,
       purchase_price: input.purchase_price ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,
@@ -78,8 +76,7 @@ export async function updateEquipmentCatalogItem(
     .update({
       category: input.category,
       model_name: input.model_name,
-      spec_id: input.spec_id ?? null,
-      spec_ko: input.spec_ko ?? null,
+      spec: input.spec ?? null,
       purchase_price: input.purchase_price ?? null,
       monthly_rate: input.monthly_rate ?? null,
       monthly_cost: input.monthly_cost ?? null,

@@ -203,8 +203,7 @@ export interface EquipmentCatalogItem {
   id: string;
   category: AssetType;
   model_name: string;
-  spec_id: string | null;
-  spec_ko: string | null;
+  spec: string | null;
   /** One-time acquisition cost, master-only — used only to suggest
    * monthly_rate/monthly_cost in the admin UI, not stored anywhere else. */
   purchase_price: number | null;
@@ -235,8 +234,7 @@ export interface EquipmentSelection {
   catalogId: string;
   category: AssetType;
   modelName: string;
-  specId: string | null;
-  specKo: string | null;
+  spec: string | null;
   qty: number;
   /** Rate/cost snapshotted at selection time — see EquipmentCatalogItem. */
   monthlyRate: number | null;

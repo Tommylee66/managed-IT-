@@ -198,13 +198,7 @@ export function QuoteDocument({
                       <Bilingual id={cat.id} ko={cat.ko} />
                     </TableCell>
                     <TableCell>{eq.modelName}</TableCell>
-                    <TableCell>
-                      {eq.specId && eq.specKo ? (
-                        <Bilingual id={eq.specId} ko={eq.specKo} />
-                      ) : (
-                        eq.specId || eq.specKo || "-"
-                      )}
-                    </TableCell>
+                    <TableCell>{eq.spec || "-"}</TableCell>
                     <TableCell className="text-right">{eq.qty}</TableCell>
                   </TableRow>
                 );

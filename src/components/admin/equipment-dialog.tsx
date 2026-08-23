@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
 import type { Locale } from "@/config/constants";
@@ -79,8 +80,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
   const schema = z.object({
     category: z.enum(CATEGORIES as [AssetType, ...AssetType[]]),
     model_name: z.string().min(1, t("equipmentModelRequired")),
-    spec_id: z.string().optional(),
-    spec_ko: z.string().optional(),
+    spec: z.string().optional(),
     purchase_price: z.string().optional(),
     monthly_rate: z.string().optional(),
     monthly_cost: z.string().optional(),
@@ -103,8 +103,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     defaultValues: {
       category: item?.category ?? "ap",
       model_name: item?.model_name ?? "",
-      spec_id: item?.spec_id ?? "",
-      spec_ko: item?.spec_ko ?? "",
+      spec: item?.spec ?? "",
       purchase_price: item?.purchase_price?.toString() ?? "",
       monthly_rate: item?.monthly_rate?.toString() ?? "",
       monthly_cost: item?.monthly_cost?.toString() ?? "",
@@ -137,8 +136,7 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     const payload = {
       category: values.category,
       model_name: values.model_name,
-      spec_id: values.spec_id,
-      spec_ko: values.spec_ko,
+      spec: values.spec,
       purchase_price: values.purchase_price ? Number(values.purchase_price) : null,
       monthly_rate: values.monthly_rate ? Number(values.monthly_rate) : null,
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
@@ -204,12 +202,8 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="spec_id">{t("equipmentSpecId")}</Label>
-            <Input id="spec_id" {...register("spec_id")} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="spec_ko">{t("equipmentSpecKo")}</Label>
-            <Input id="spec_ko" {...register("spec_ko")} />
+            <Label htmlFor="spec">{t("equipmentSpec")}</Label>
+            <Textarea id="spec" rows={2} {...register("spec")} />
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="purchase_price">{t("equipmentPurchasePrice")}</Label>

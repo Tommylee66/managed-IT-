@@ -107,7 +107,7 @@ type LabelSource = Pick<QuoteRowRecord, 'label' | 'labelKey' | 'params' | 'label
  * (labelId/labelKo) win over a fixed QUOTE_ROW_LABELS entry, which in turn
  * wins over the stored (Korean) `label` for rows saved before either existed.
  * English has no separate catalog variant, so it falls back to the
- * Indonesian text — same convention as equipment_catalog's spec_id/spec_ko. */
+ * Indonesian text. */
 export function renderQuoteRowLabel(row: LabelSource, locale: Locale): string {
   if (row.labelId || row.labelKo) return (locale === 'ko' ? row.labelKo : row.labelId) ?? row.label;
   const entry = row.labelKey ? QUOTE_ROW_LABELS[row.labelKey] : undefined;
