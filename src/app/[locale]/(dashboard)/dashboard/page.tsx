@@ -202,10 +202,10 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.2fr_1fr_1fr]">
-        <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
-          <h3 className="text-sm font-semibold">{tHome("chartMonthlyTitle")}</h3>
-          <p className="mb-2 text-[11px] text-muted-foreground">{tHome("chartMonthlyCaption")}</p>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.2fr_1fr_1fr]">
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <h3 className="text-base font-semibold">{tHome("chartMonthlyTitle")}</h3>
+          <p className="mb-2 text-xs text-muted-foreground">{tHome("chartMonthlyCaption")}</p>
           <KpiStrip
             items={[
               { label: tHome("kpiMrr"), value: formatRupiah(thisMonthMrr, locale as Locale) },
@@ -216,19 +216,19 @@ export default async function DashboardPage({
           />
           <MiniBarChart data={revenueByMonth} color="green" formatValue={(v) => formatRupiah(v, locale as Locale)} />
         </div>
-        <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
-          <h3 className="text-sm font-semibold">{tHome("chartAnnualTitle")}</h3>
-          <p className="mb-1 text-[11px] text-muted-foreground">{tHome("chartAnnualCaption")}</p>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <h3 className="text-base font-semibold">{tHome("chartAnnualTitle")}</h3>
+          <p className="mb-1 text-xs text-muted-foreground">{tHome("chartAnnualCaption")}</p>
           <MiniBarChart data={revenueByYear} formatValue={(v) => formatRupiah(v, locale as Locale)} />
         </div>
-        <div className="rounded-2xl border border-border bg-card p-3.5 shadow-sm">
-          <h3 className="text-sm font-semibold">{tHome("chartSignupCancelTitle")}</h3>
-          <p className="mb-1 text-[11px] text-muted-foreground">{tHome("chartSignupCancelCaption")}</p>
+        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <h3 className="text-base font-semibold">{tHome("chartSignupCancelTitle")}</h3>
+          <p className="mb-1 text-xs text-muted-foreground">{tHome("chartSignupCancelCaption")}</p>
           <DualBarChart data={signupCancelByMonth} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-[repeat(auto-fit,minmax(300px,1fr))]">
         {menuSections.map((section) => (
           <MenuSection key={section.key} title={section.title}>
             {section.cards}
