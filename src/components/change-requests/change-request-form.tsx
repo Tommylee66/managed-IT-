@@ -80,7 +80,11 @@ export function ChangeRequestForm({
   const [equipmentQty, setEquipmentQty] = useState<Record<string, EquipmentSelectionState>>(() => {
     const initial: Record<string, EquipmentSelectionState> = {};
     (contract.quote_snapshot?.equipment_selections ?? []).forEach((s) => {
-      initial[s.catalogId] = { qty: s.qty, overageQty: s.overageQty };
+      initial[s.catalogId] = {
+        qty: s.qty,
+        overageQty: s.overageQty,
+        colorOverageQty: s.colorOverageQty ?? 0,
+      };
     });
     return initial;
   });

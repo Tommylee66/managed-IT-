@@ -20,6 +20,7 @@ export async function listEquipmentCatalog(
     monthly_cost: null,
     purchase_price: null,
     overage_cost: null,
+    color_overage_cost: null,
     commission_rate_override: null,
   }));
 }
@@ -33,6 +34,10 @@ interface EquipmentFields {
   monthly_cost?: number | null;
   overage_rate?: number | null;
   overage_cost?: number | null;
+  included_qty?: number | null;
+  color_included_qty?: number | null;
+  color_overage_rate?: number | null;
+  color_overage_cost?: number | null;
   commission_rate_override?: number | null;
 }
 
@@ -54,6 +59,10 @@ export async function createEquipmentCatalogItem(
       monthly_cost: input.monthly_cost ?? null,
       overage_rate: input.overage_rate ?? null,
       overage_cost: input.overage_cost ?? null,
+      included_qty: input.included_qty ?? null,
+      color_included_qty: input.color_included_qty ?? null,
+      color_overage_rate: input.color_overage_rate ?? null,
+      color_overage_cost: input.color_overage_cost ?? null,
       commission_rate_override: input.commission_rate_override ?? null,
       created_by: input.created_by,
     })
@@ -82,6 +91,10 @@ export async function updateEquipmentCatalogItem(
       monthly_cost: input.monthly_cost ?? null,
       overage_rate: input.overage_rate ?? null,
       overage_cost: input.overage_cost ?? null,
+      included_qty: input.included_qty ?? null,
+      color_included_qty: input.color_included_qty ?? null,
+      color_overage_rate: input.color_overage_rate ?? null,
+      color_overage_cost: input.color_overage_cost ?? null,
       commission_rate_override: input.commission_rate_override ?? null,
     })
     .eq('id', id)

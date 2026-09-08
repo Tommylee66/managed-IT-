@@ -61,6 +61,7 @@ export default async function AdminRatesPage({
                 <TableHead className="text-right">{t("equipmentMonthlyRate")}</TableHead>
                 <TableHead className="text-right">{t("equipmentMonthlyCost")}</TableHead>
                 <TableHead className="text-right">{t("equipmentOverageRate")}</TableHead>
+                <TableHead className="text-right">{t("equipmentIncludedQtyColumn")}</TableHead>
                 <TableHead className="text-right">{t("commissionRateOverride")}</TableHead>
                 <TableHead>{t("status")}</TableHead>
                 <TableHead>{t("actions")}</TableHead>
@@ -83,6 +84,19 @@ export default async function AdminRatesPage({
                   </TableCell>
                   <TableCell className="text-right">
                     {item.overage_rate != null ? formatRupiah(item.overage_rate, locale as Locale) : "-"}
+                    {item.color_overage_rate != null && (
+                      <span className="block text-xs text-muted-foreground">
+                        {t("equipmentColorOverageRate")}: {formatRupiah(item.color_overage_rate, locale as Locale)}
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {item.included_qty != null ? item.included_qty.toLocaleString() : "-"}
+                    {item.color_included_qty != null && (
+                      <span className="block text-xs text-muted-foreground">
+                        {t("equipmentColorIncludedQty")}: {item.color_included_qty.toLocaleString()}
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     {item.commission_rate_override != null ? `${item.commission_rate_override}%` : "-"}
@@ -101,7 +115,7 @@ export default async function AdminRatesPage({
               ))}
               {equipmentItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center text-muted-foreground">
+                  <TableCell colSpan={11} className="text-center text-muted-foreground">
                     {t("noEquipment")}
                   </TableCell>
                 </TableRow>

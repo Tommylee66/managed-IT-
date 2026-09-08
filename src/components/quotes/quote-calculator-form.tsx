@@ -120,7 +120,11 @@ export function QuoteCalculatorForm({
   const [equipmentQty, setEquipmentQty] = useState<Record<string, EquipmentSelectionState>>(() => {
     const initial: Record<string, EquipmentSelectionState> = {};
     initialValues?.equipment_selections.forEach((s) => {
-      initial[s.catalogId] = { qty: s.qty, overageQty: s.overageQty };
+      initial[s.catalogId] = {
+        qty: s.qty,
+        overageQty: s.overageQty,
+        colorOverageQty: s.colorOverageQty ?? 0,
+      };
     });
     return initial;
   });

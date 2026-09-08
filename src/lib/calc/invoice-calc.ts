@@ -2,7 +2,8 @@ import { addDays, addMonths, differenceInCalendarMonths, format } from 'date-fns
 import type { Contract, QuoteRowRecord } from '@/types/domain';
 
 // Kept in sync with the frozen quote_snapshot.rows key convention (see
-// equipment-pricing.ts's `equipment:${catalogId}` / `equipment-overage:...`).
+// equipment-pricing.ts's `equipment:${catalogId}`, `equipment-overage:...`
+// and `equipment-overage-color:...`).
 const EQUIPMENT_ROW_PREFIX = 'equipment';
 
 // Equipment left with the customer after the contract's own term ends (no
@@ -41,7 +42,13 @@ export function isContractActiveInMonth(contract: Contract, month: string): bool
  * billing at their full, unchanged rental rate indefinitely (unlike other
  * equipment, which drops to POST_TERM_EQUIPMENT_RATE after the term ends). */
 function isPrinterRow(contract: Contract, row: QuoteRowRecord): boolean {
-  const catalogId = row.key?.slice(EQUIPMENT_ROW_PREFIX.length + 1);
+  // The id is whatever follows the first ':', not a fixed offset past
+  // EQUIPMENT_ROW_PREFIX: the prefix carries a tier suffix on usage rows
+  // ('equipment-overage', 'equipment-overage-color'), so slicing by the bare
+  // prefix length read 'overage:<id>' as the id and never matched a
+  // selection — which quietly gave printer per-page rows the non-printer
+  // post-term discount below, contradicting this function's whole purpose.
+  const catalogId = row.key?.slice(row.key.indexOf(':') + 1);
   const selection = (contract.quote_snapshot?.equipment_selections ?? []).find(
     (e) => e.catalogId === catalogId
   );
