@@ -31,6 +31,9 @@ export default async function IncidentLogsPage({
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
         <CardAction className="flex gap-2">
+          <Link href={`/${locale}/incident-logs/meter`}>
+            <Button variant="outline">{t("meterReadingsLink")}</Button>
+          </Link>
           <Link href={`/${locale}/incident-logs/report`}>
             <Button variant="outline">{t("monthlyReportTitle")}</Button>
           </Link>

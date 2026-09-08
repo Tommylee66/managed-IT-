@@ -1,5 +1,6 @@
 import type { Contract, ContractStatus, Invoice } from '@/types/domain';
 import { getContractEndDate, commissionableRowsForMonth } from './invoice-calc';
+import type { MeteredUsage } from '@/lib/calc/equipment-pricing';
 import { computeCommissionBase, calcBlendedMonthlyCommission } from './commission-calc';
 
 /** Looks up the invoice for one contract in one month — keyed
@@ -72,11 +73,20 @@ function overlapDays(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): number
  * already clamps to the termination date once a contract is terminated), so
  * commission at 50% continues for as long as the customer keeps using the
  * service and keeps paying for it. */
+/** Actual meter readings keyed `${contractNo}:${month}`, then by catalog
+ * id. Commission has to be computed from the same rows the month was billed
+ * on: once a month's usage rows come from a real reading rather than the
+ * quoted estimate, a commission still computed off the estimate would pay
+ * against an amount that was never invoiced. Empty for callers with no
+ * readings to supply, which reproduces the pre-metering behavior exactly. */
+export type MeterUsageLookup = Map<string, Map<string, MeteredUsage>>;
+
 export function calcContractCommissionForMonth(
   contract: Contract,
   monthKey: string,
   invoice: Invoice | null,
-  commissionItems: Record<string, boolean>
+  commissionItems: Record<string, boolean>,
+  usageLookup: MeterUsageLookup = new Map()
 ): number {
   if (!invoice || invoice.total <= 0) return 0;
   if (contract.commission_rate == null || Number.isNaN(contract.commission_rate)) return 0;
@@ -97,7 +107,11 @@ export function calcContractCommissionForMonth(
   const fullDays = overlapDays(monthStart, activeEnd, contractStart, termEnd);
   const halfDays = overlapDays(monthStart, activeEnd, halfStart, activeEnd);
 
-  const monthRows = commissionableRowsForMonth(contract, monthKey);
+  const monthRows = commissionableRowsForMonth(
+    contract,
+    monthKey,
+    usageLookup.get(`${contract.no}:${monthKey}`)
+  );
   const monthBase = computeCommissionBase(monthRows, commissionItems);
   const monthlyCommission = calcBlendedMonthlyCommission(monthBase, monthRows, contract.commission_rate);
   const halfMonthlyCommission = monthlyCommission * 0.5;
@@ -122,13 +136,14 @@ export function calcMonthlyCommissionReport(
   monthKey: string,
   invoicesByKey: InvoiceLookup,
   commissionItems: Record<string, boolean>,
-  npwpByAgentCode: Map<string, string | null> = new Map()
+  npwpByAgentCode: Map<string, string | null> = new Map(),
+  usageLookup: MeterUsageLookup = new Map()
 ): AgentCommissionGroup[] {
   const rows: ContractCommissionRow[] = [];
   for (const c of contracts) {
     if (!c.agent_code || !c.agent_name) continue;
     const invoice = invoicesByKey.get(`${c.no}:${monthKey}`) ?? null;
-    const amount = calcContractCommissionForMonth(c, monthKey, invoice, commissionItems);
+    const amount = calcContractCommissionForMonth(c, monthKey, invoice, commissionItems, usageLookup);
     if (amount <= 0) continue;
     const paidRatio = invoice && invoice.total > 0 ? Math.min(1, Math.max(0, (invoice.paid_amount ?? 0) / invoice.total)) : 0;
     rows.push({
@@ -211,7 +226,8 @@ export function calcAgentCommissionHistory(
   agentCode: string,
   uptoMonthKey: string,
   invoicesByKey: InvoiceLookup,
-  commissionItems: Record<string, boolean>
+  commissionItems: Record<string, boolean>,
+  usageLookup: MeterUsageLookup = new Map()
 ): ContractCommissionSummary[] {
   return contracts
     .filter((c) => c.agent_code === agentCode)
@@ -220,12 +236,18 @@ export function calcAgentCommissionHistory(
       const history = monthKeysBetween(startMonthKey, uptoMonthKey)
         .map((month) => ({
           month,
-          amount: calcContractCommissionForMonth(c, month, invoicesByKey.get(`${c.no}:${month}`) ?? null, commissionItems),
+          amount: calcContractCommissionForMonth(
+            c,
+            month,
+            invoicesByKey.get(`${c.no}:${month}`) ?? null,
+            commissionItems,
+            usageLookup
+          ),
         }))
         .filter((entry) => entry.amount > 0);
       const currentMonthInvoice = invoicesByKey.get(`${c.no}:${uptoMonthKey}`) ?? null;
       const currentMonthCommission = currentMonthInvoice
-        ? calcContractCommissionForMonth(c, uptoMonthKey, currentMonthInvoice, commissionItems)
+        ? calcContractCommissionForMonth(c, uptoMonthKey, currentMonthInvoice, commissionItems, usageLookup)
         : null;
       return {
         contractNo: c.no,

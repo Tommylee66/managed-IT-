@@ -7,6 +7,7 @@ import {
   EquipmentDetailSection,
   PrinterUsageSection,
 } from "@/components/documents/equipment-detail-table";
+import type { MeteredUsage } from "@/lib/calc/equipment-pricing";
 import type { EquipmentSelection, IncidentLog } from "@/types/domain";
 
 /** equipmentSelections is what the customer had under contract during this
@@ -18,11 +19,15 @@ export function MonthlyReportDocument({
   month,
   records,
   equipmentSelections = [],
+  usageByCatalogId,
 }: {
   customerName: string;
   month: string;
   records: IncidentLog[];
   equipmentSelections?: EquipmentSelection[];
+  /** This month's actual meter readings, so the report shows what the
+   * customer really printed rather than the contracted estimate. */
+  usageByCatalogId?: Map<string, MeteredUsage>;
 }) {
   const incidentCount = records.filter((r) => r.type === "incident").length;
   const inspectionCount = records.filter((r) => r.type === "inspection").length;
@@ -50,7 +55,10 @@ export function MonthlyReportDocument({
     >
       <EquipmentDetailSection selections={equipmentSelections} />
 
-      <PrinterUsageSection selections={equipmentSelections} />
+      <PrinterUsageSection
+        selections={equipmentSelections}
+        usageByCatalogId={usageByCatalogId}
+      />
 
       <div>
         <h3 className="mb-1 font-semibold">

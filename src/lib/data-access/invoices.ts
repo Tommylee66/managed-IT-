@@ -4,6 +4,11 @@ import type { StaffRole } from '@/lib/masking/staff-masking';
 import { maskEmail } from '@/lib/masking/staff-masking';
 import { nextInvoiceNo } from '@/lib/numbering';
 import { isContractBillableInMonth, invoiceLineItems, invoiceTotals } from '@/lib/calc/invoice-calc';
+import {
+  listMeterReadingsByContractMonth,
+  listMeterReadingsForContracts,
+  usageByCatalogId,
+} from '@/lib/data-access/meter-readings';
 import { listContracts } from '@/lib/data-access/contracts';
 
 function applyInvoiceMasking(invoice: Invoice, role: StaffRole): Invoice {
@@ -131,13 +136,22 @@ export async function listBillableContracts(
   if (invError) throw invError;
   const invoices = invoicesData as Invoice[];
 
+  // One round trip for the whole month's readings rather than one per
+  // contract — this list can be every active contract in the business.
+  const readings = await listMeterReadingsForContracts(
+    supabase,
+    billable.map((c) => c.no),
+    month
+  );
+
   return billable.map((contract) => {
     const customer = customers.find((c) => c.code === contract.customer_code)!;
     const invoice = invoices.find((i) => i.contract_no === contract.no) ?? null;
+    const usage = usageByCatalogId(readings.filter((r) => r.contract_no === contract.no));
     return {
       contract,
       customer,
-      totals: invoiceTotals(contract, month, ppnRate),
+      totals: invoiceTotals(contract, month, ppnRate, usage),
       invoice,
       recipientEmail: (customer.invoice_email || customer.email || '').trim(),
     };
@@ -164,9 +178,16 @@ export async function upsertInvoice(
   options: UpsertInvoiceOptions = {}
 ): Promise<Invoice> {
   const existing = await getInvoiceByContractMonth(supabase, contract.no, month);
-  const totals = invoiceTotals(contract, month, ppnRate);
+  // Bills the month's actual meter readings where an engineer recorded
+  // them, and the quoted estimate for anything not read (see
+  // withMeterReadings). Re-saving an invoice after a late reading is
+  // entered therefore corrects that month's total.
+  const usage = usageByCatalogId(
+    await listMeterReadingsByContractMonth(supabase, contract.no, month)
+  );
+  const totals = invoiceTotals(contract, month, ppnRate, usage);
   const recipientEmail = (customer.invoice_email || customer.email || '').trim();
-  const items = invoiceLineItems(contract, month);
+  const items = invoiceLineItems(contract, month, usage);
   const memo =
     'Managed IT Outsourcing 월 서비스 이용료입니다. Starlink 인터넷 서비스는 고객 명의 직접 가입/직접 납부 기준이며 BCT 청구 항목에 포함되지 않습니다.';
 
