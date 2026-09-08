@@ -8,6 +8,7 @@ import { listAssetsByContract } from "@/lib/data-access/assets";
 import { getInvoiceByContractMonth } from "@/lib/data-access/invoices";
 import { getRates } from "@/lib/data-access/rates";
 import { calcContractCommissionForMonth } from "@/lib/calc/commission-report";
+import { meterUsageLookupForContracts } from "@/lib/data-access/meter-readings";
 import { formatRupiah } from "@/lib/utils/currency";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,8 +50,17 @@ export default async function ContractDetailPage({
   // how much of that invoice was actually paid (see
   // calcContractCommissionForMonth in commission-report.ts). null means no
   // invoice has been issued yet for the current month.
+  const usageLookup = thisMonthInvoice
+    ? await meterUsageLookupForContracts(supabase, [contract.no])
+    : new Map();
   const thisMonthCommission = thisMonthInvoice
-    ? calcContractCommissionForMonth(contract, thisMonth, thisMonthInvoice, rates.commission_items as unknown as Record<string, boolean>)
+    ? calcContractCommissionForMonth(
+        contract,
+        thisMonth,
+        thisMonthInvoice,
+        rates.commission_items as unknown as Record<string, boolean>,
+        usageLookup
+      )
     : null;
   const thisMonthPaidAmount = thisMonthInvoice?.paid_amount ?? 0;
   const thisMonthPaymentLabel = !thisMonthInvoice

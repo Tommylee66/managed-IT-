@@ -7,6 +7,7 @@ import { getSessionContext } from "@/lib/auth/session";
 import { listContracts } from "@/lib/data-access/contracts";
 import { listAgents, listAgentsForSession } from "@/lib/data-access/agents";
 import { listInvoicesByContracts } from "@/lib/data-access/invoices";
+import { meterUsageLookupForContracts } from "@/lib/data-access/meter-readings";
 import { getRates } from "@/lib/data-access/rates";
 import {
   calcMonthlyCommissionReport,
@@ -68,10 +69,23 @@ export default async function AgentCommissionPage({
     // contract would show as real, payable commission here too.
     const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
     const myAgent = myAgents[0] ?? null;
-    const invoicesByKey = await listInvoicesByContracts(supabase, confirmedContracts.map((c) => c.no));
+    const contractNos = confirmedContracts.map((c) => c.no);
+    const [invoicesByKey, usageLookup] = await Promise.all([
+      listInvoicesByContracts(supabase, contractNos),
+      // Commission follows what was actually billed, so months billed from
+      // a real meter reading must be recomputed on those same rows.
+      meterUsageLookupForContracts(supabase, contractNos),
+    ]);
     const commissionItems = rates.commission_items as unknown as Record<string, boolean>;
     const history = myAgent
-      ? calcAgentCommissionHistory(confirmedContracts, myAgent.code, month, invoicesByKey, commissionItems)
+      ? calcAgentCommissionHistory(
+          confirmedContracts,
+          myAgent.code,
+          month,
+          invoicesByKey,
+          commissionItems,
+          usageLookup
+        )
       : [];
     const totalToDate = history.reduce((sum, h) => sum + h.totalToDate, 0);
     const activeCount = history.filter((h) => h.status !== "terminated").length;
@@ -205,10 +219,21 @@ export default async function AgentCommissionPage({
   // payout report shouldn't include commission for contracts nobody has
   // confirmed yet.
   const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
-  const invoicesByKey = await listInvoicesByContracts(supabase, confirmedContracts.map((c) => c.no));
+  const contractNos = confirmedContracts.map((c) => c.no);
+  const [invoicesByKey, usageLookup] = await Promise.all([
+    listInvoicesByContracts(supabase, contractNos),
+    meterUsageLookupForContracts(supabase, contractNos),
+  ]);
   const commissionItems = rates.commission_items as unknown as Record<string, boolean>;
 
-  const groups = calcMonthlyCommissionReport(confirmedContracts, month, invoicesByKey, commissionItems, npwpByAgentCode);
+  const groups = calcMonthlyCommissionReport(
+    confirmedContracts,
+    month,
+    invoicesByKey,
+    commissionItems,
+    npwpByAgentCode,
+    usageLookup
+  );
   const grandTotal = groups.reduce((s, g) => s + g.subtotal, 0);
 
   return (

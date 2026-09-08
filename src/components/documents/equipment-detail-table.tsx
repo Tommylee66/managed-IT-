@@ -8,6 +8,7 @@ import {
   overageTermItemLabel,
   OVERAGE_ESTIMATE_NOTE,
 } from "@/lib/calc/equipment-overage-terms";
+import type { MeteredUsage } from "@/lib/calc/equipment-pricing";
 import type { EquipmentSelection } from "@/types/domain";
 
 /** The quote, contract and monthly report are permanently bilingual
@@ -127,21 +128,29 @@ export function EquipmentDetailSection({
  * stays inside its allowance produces no priced line anywhere, so this is
  * the only place its allowance and per-page rate appear at all.
  *
- * The usage figures are the *contracted* ones frozen on the quote snapshot,
- * not a meter read for the document's month — this system has no per-month
- * meter input (see OVERAGE_ESTIMATE_NOTE), so the usage column is labelled
- * "contracted basis" rather than presented as an actual reading. */
+ * Each usage figure is labelled with where it came from: an engineer's
+ * actual meter reading for the month, or the estimate frozen on the quote
+ * for a month nobody read. The two must stay visibly distinct — a document
+ * that presented a contracted estimate as a real reading would be making a
+ * claim the data does not support. */
 export function PrinterUsageTable({
   selections,
+  usageByCatalogId,
   lang = "bilingual",
   showNote = true,
 }: {
   selections: EquipmentSelection[];
+  /** A month's actual meter readings. Documents issued before any month is
+   * billed (quote, contract) pass none and show the quoted estimate. */
+  usageByCatalogId?: Map<string, MeteredUsage>;
   lang?: DocLang;
   showNote?: boolean;
 }) {
-  const terms = equipmentOverageTerms(selections);
+  const terms = equipmentOverageTerms(selections, usageByCatalogId);
   if (terms.length === 0) return null;
+  // The estimate caveat only speaks to rows still priced off the estimate;
+  // repeating it under a table of real readings would undercut them.
+  const anyEstimated = terms.some((t) => !t.metered);
 
   return (
     <>
@@ -153,7 +162,7 @@ export function PrinterUsageTable({
                 <Label id="Item" ko="항목" lang={lang} />
               </TableHead>
               <TableHead className="text-right">
-                <Label id="Pemakaian (Dasar Kontrak)" ko="사용 장수 (계약 기준)" lang={lang} />
+                <Label id="Pemakaian" ko="사용 장수" lang={lang} />
               </TableHead>
               <TableHead className="text-right">
                 <Label id="Kuota Gratis" ko="무상 제공" lang={lang} />
@@ -177,7 +186,16 @@ export function PrinterUsageTable({
                   <TableCell>
                     <Label id={label.id} ko={label.ko} lang={lang} />
                   </TableCell>
-                  <TableCell className="text-right">{t.usedQty.toLocaleString("id-ID")}</TableCell>
+                  <TableCell className="text-right">
+                    {t.usedQty.toLocaleString("id-ID")}
+                    <span className="block text-xs text-muted-foreground">
+                      {t.metered ? (
+                        <Label id="pembacaan meter" ko="실제 검침" lang={lang} />
+                      ) : (
+                        <Label id="dasar kontrak" ko="계약 기준" lang={lang} />
+                      )}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-right">
                     {t.includedQty > 0 ? (
                       <>
@@ -204,8 +222,12 @@ export function PrinterUsageTable({
       {showNote && (
         <p className="mt-1 text-xs text-muted-foreground">
           <Label
-            id={`Kuota gratis direset setiap bulan dan tidak diakumulasikan ke bulan berikutnya. ${OVERAGE_ESTIMATE_NOTE.id}`}
-            ko={`무상 제공분은 매월 초기화되며 다음 달로 이월되지 않습니다. ${OVERAGE_ESTIMATE_NOTE.ko}`}
+            id={`Kuota gratis direset setiap bulan dan tidak diakumulasikan ke bulan berikutnya.${
+              anyEstimated ? ` ${OVERAGE_ESTIMATE_NOTE.id}` : ""
+            }`}
+            ko={`무상 제공분은 매월 초기화되며 다음 달로 이월되지 않습니다.${
+              anyEstimated ? ` ${OVERAGE_ESTIMATE_NOTE.ko}` : ""
+            }`}
             lang={lang}
           />
         </p>
@@ -219,14 +241,16 @@ export function PrinterUsageTable({
  * gets no empty print-pricing section. */
 export function PrinterUsageSection({
   selections,
+  usageByCatalogId,
   lang = "bilingual",
   showNote = true,
 }: {
   selections: EquipmentSelection[];
+  usageByCatalogId?: Map<string, MeteredUsage>;
   lang?: DocLang;
   showNote?: boolean;
 }) {
-  if (equipmentOverageTerms(selections).length === 0) return null;
+  if (equipmentOverageTerms(selections, usageByCatalogId).length === 0) return null;
   return (
     <div>
       <h3 className="mb-1 font-semibold">
@@ -236,7 +260,12 @@ export function PrinterUsageSection({
           lang={lang}
         />
       </h3>
-      <PrinterUsageTable selections={selections} lang={lang} showNote={showNote} />
+      <PrinterUsageTable
+        selections={selections}
+        usageByCatalogId={usageByCatalogId}
+        lang={lang}
+        showNote={showNote}
+      />
     </div>
   );
 }

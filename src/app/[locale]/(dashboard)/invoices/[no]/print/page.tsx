@@ -4,6 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getInvoice } from "@/lib/data-access/invoices";
 import { getContract } from "@/lib/data-access/contracts";
+import {
+  listMeterReadingsByContractMonth,
+  usageByCatalogId,
+} from "@/lib/data-access/meter-readings";
 import { InvoiceDocument } from "@/components/documents/invoice-document";
 
 export default async function InvoicePrintPage({
@@ -24,11 +28,17 @@ export default async function InvoicePrintPage({
   const contract = invoice.contract_no
     ? await getContract(supabase, invoice.contract_no, session!.role)
     : null;
+  const usage = invoice.contract_no
+    ? usageByCatalogId(
+        await listMeterReadingsByContractMonth(supabase, invoice.contract_no, invoice.month)
+      )
+    : new Map();
 
   return (
     <InvoiceDocument
       invoice={invoice}
       equipmentSelections={contract?.quote_snapshot?.equipment_selections ?? []}
+      usageByCatalogId={usage}
     />
   );
 }
