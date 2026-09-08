@@ -4,12 +4,10 @@ import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
-import { EQUIPMENT_CATEGORY_LABEL } from "@/lib/calc/equipment-category-labels";
 import {
-  equipmentOverageTerms,
-  overageTermItemLabel,
-  OVERAGE_ESTIMATE_NOTE,
-} from "@/lib/calc/equipment-overage-terms";
+  EquipmentDetailSection,
+  PrinterUsageSection,
+} from "@/components/documents/equipment-detail-table";
 import type { Quote } from "@/types/domain";
 
 export function QuoteDocument({
@@ -38,10 +36,7 @@ export function QuoteDocument({
     (e) => e.category === "cctv" && e.monthlyRate != null
   );
   const hasRentedEquipment = quote.equipment_selections.some((e) => e.monthlyRate != null);
-  // Stated whether or not a usage row was priced: an estimate that stays
-  // inside the allowance produces no row, but the customer is still
-  // agreeing to the allowance and the rate beyond it.
-  const overageTerms = equipmentOverageTerms(quote.equipment_selections);
+
 
   return (
     <DocumentShell
@@ -175,106 +170,9 @@ export function QuoteDocument({
         />
       </div>
 
-      {quote.equipment_selections.length > 0 && (
-        <div>
-          <h3 className="mb-1 font-semibold">
-            <Bilingual id="Spesifikasi Perangkat yang Disediakan" ko="제공 장비 사양" />
-          </h3>
-          <DocTable>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>
-                  <Bilingual id="Kategori" ko="분류" />
-                </TableHead>
-                <TableHead>
-                  <Bilingual id="Model" ko="모델명" />
-                </TableHead>
-                <TableHead>
-                  <Bilingual id="Spesifikasi" ko="스펙" />
-                </TableHead>
-                <TableHead className="text-right">
-                  <Bilingual id="Jumlah" ko="수량" />
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {quote.equipment_selections.map((eq, i) => {
-                const cat = EQUIPMENT_CATEGORY_LABEL[eq.category];
-                return (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <Bilingual id={cat.id} ko={cat.ko} />
-                    </TableCell>
-                    <TableCell>{eq.modelName}</TableCell>
-                    <TableCell>{eq.spec || "-"}</TableCell>
-                    <TableCell className="text-right">{eq.qty}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </DocTable>
-        </div>
-      )}
+      <EquipmentDetailSection selections={quote.equipment_selections} />
 
-      {overageTerms.length > 0 && (
-        <div>
-          <h3 className="mb-1 font-semibold">
-            <Bilingual id="Biaya Cetak: Kuota Dasar dan Kelebihan" ko="인쇄 요금: 기본 제공 및 초과분" />
-          </h3>
-          <DocTable>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>
-                  <Bilingual id="Item" ko="항목" />
-                </TableHead>
-                <TableHead className="text-right">
-                  <Bilingual id="Kuota Termasuk Sewa / Bulan" ko="월 무상 제공 (임대료 포함)" />
-                </TableHead>
-                <TableHead className="text-right">
-                  <Bilingual id="Tarif Kelebihan / Lembar" ko="초과분 장당 요금" />
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {overageTerms.map((t, i) => {
-                const label = overageTermItemLabel(t);
-                return (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <Bilingual id={label.id} ko={label.ko} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {t.includedQty > 0 ? (
-                        <>
-                          {t.includedQty.toLocaleString("id-ID")}
-                          {t.qty > 1 && (
-                            <span className="block text-xs text-muted-foreground">
-                              {t.includedPerUnit.toLocaleString("id-ID")} x {t.qty}
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">{formatRupiah(t.rate, "id")}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </DocTable>
-          <p className="mt-1 text-xs text-muted-foreground">
-            <Bilingual
-              id={`Kuota gratis direset setiap bulan dan tidak diakumulasikan ke bulan berikutnya. ${OVERAGE_ESTIMATE_NOTE.id}`}
-              ko={`무상 제공분은 매월 초기화되며 다음 달로 이월되지 않습니다. ${OVERAGE_ESTIMATE_NOTE.ko}`}
-            />
-          </p>
-        </div>
-      )}
+      <PrinterUsageSection selections={quote.equipment_selections} />
 
       <div>
         <h3 className="mb-1 font-semibold">

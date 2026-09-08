@@ -5,6 +5,10 @@ import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { contractClauses } from "@/components/documents/contract-clauses";
+import {
+  EquipmentDetailSection,
+  PrinterUsageSection,
+} from "@/components/documents/equipment-detail-table";
 import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
 import type { Contract } from "@/types/domain";
 
@@ -27,6 +31,7 @@ export function ContractDocument({
   const ppn = Math.round((contract.monthly_fee * ppnRate) / 100);
   const total = contract.monthly_fee + ppn;
   const oneTimeRows = (contract.quote_snapshot?.rows ?? []).filter((r) => r.oneTime);
+  const equipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
   const oneTimeSubtotal = oneTimeRows.reduce((sum, r) => sum + r.amount, 0);
   const oneTimePpn = Math.round((oneTimeSubtotal * ppnRate) / 100);
   const oneTimeTotal = oneTimeSubtotal + oneTimePpn;
@@ -144,6 +149,10 @@ export function ContractDocument({
           </DocTable>
         </div>
       )}
+
+      <EquipmentDetailSection selections={equipmentSelections} />
+
+      <PrinterUsageSection selections={equipmentSelections} />
 
       <div className="flex flex-col gap-4">
         {sections.map((section) => (

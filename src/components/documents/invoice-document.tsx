@@ -2,9 +2,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatRupiah } from "@/lib/utils/currency";
 import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
-import type { Invoice } from "@/types/domain";
+import {
+  EquipmentDetailSection,
+  PrinterUsageSection,
+} from "@/components/documents/equipment-detail-table";
+import type { EquipmentSelection, Invoice } from "@/types/domain";
 
-export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
+/** equipmentSelections comes from the invoiced contract's quote snapshot,
+ * fetched by the print page — the invoice row itself only stores priced
+ * line items, so without it the customer sees charges for rented equipment
+ * with no statement of what equipment that is. Defaults to empty so an
+ * invoice with no linked contract still renders. */
+export function InvoiceDocument({
+  invoice,
+  equipmentSelections = [],
+}: {
+  invoice: Invoice;
+  equipmentSelections?: EquipmentSelection[];
+}) {
   return (
     <DocumentShell
       title="청구서 / Invoice"
@@ -63,6 +78,10 @@ export function InvoiceDocument({ invoice }: { invoice: Invoice }) {
         </TableBody>
       </Table>
       </DocTable>
+
+      <EquipmentDetailSection selections={equipmentSelections} lang="ko" />
+
+      <PrinterUsageSection selections={equipmentSelections} lang="ko" />
 
       <p className="text-muted-foreground">{invoice.memo}</p>
     </DocumentShell>

@@ -1,4 +1,10 @@
-import { includedAllowance, isColorTiered, overageTierLabel, type OverageTier } from '@/lib/calc/equipment-pricing';
+import {
+  billableOverage,
+  includedAllowance,
+  isColorTiered,
+  overageTierLabel,
+  type OverageTier,
+} from '@/lib/calc/equipment-pricing';
 import { formatRupiah } from '@/lib/utils/currency';
 import type { EquipmentSelection } from '@/types/domain';
 
@@ -27,6 +33,16 @@ export interface OverageTermRow {
   qty: number;
   /** Customer price per unit beyond the allowance. */
   rate: number;
+  /** Usage this tier is priced at, as entered on the quote — the raw
+   * figure, before the allowance is deducted. Note this is the *contracted*
+   * usage: monthly invoices are generated from the frozen quote snapshot,
+   * not from a meter read each month (see OVERAGE_ESTIMATE_NOTE), so a
+   * document must not present it as that month's actual reading. */
+  usedQty: number;
+  /** What actually bills: max(0, usedQty - includedQty). */
+  billableQty: number;
+  /** billableQty x rate. */
+  amount: number;
 }
 
 /** Model name qualified by tier, for a table's item column. */
@@ -41,8 +57,10 @@ function termRow(
   s: EquipmentSelection,
   tier: OverageTier,
   rate: number,
-  includedPerUnit: number
+  includedPerUnit: number,
+  usedQty: number
 ): OverageTermRow {
+  const billableQty = billableOverage(usedQty, includedPerUnit, s.qty);
   return {
     modelName: s.modelName,
     tier,
@@ -51,6 +69,9 @@ function termRow(
     includedPerUnit,
     qty: s.qty,
     rate,
+    usedQty: usedQty ?? 0,
+    billableQty,
+    amount: billableQty * rate,
   };
 }
 
@@ -61,10 +82,14 @@ export function equipmentOverageTerms(selections: EquipmentSelection[]): Overage
   for (const s of selections) {
     const colorTiered = isColorTiered(s.colorOverageRate, s.colorIncludedQty);
     if (s.overageRate != null) {
-      rows.push(termRow(s, colorTiered ? 'mono' : null, s.overageRate, s.includedQty ?? 0));
+      rows.push(
+        termRow(s, colorTiered ? 'mono' : null, s.overageRate, s.includedQty ?? 0, s.overageQty ?? 0)
+      );
     }
     if (colorTiered && s.colorOverageRate != null) {
-      rows.push(termRow(s, 'color', s.colorOverageRate, s.colorIncludedQty ?? 0));
+      rows.push(
+        termRow(s, 'color', s.colorOverageRate, s.colorIncludedQty ?? 0, s.colorOverageQty ?? 0)
+      );
     }
   }
   return rows;

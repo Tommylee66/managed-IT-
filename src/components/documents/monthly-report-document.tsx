@@ -3,16 +3,26 @@ import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { bilingualMonthLabel } from "@/lib/utils/date";
-import type { IncidentLog } from "@/types/domain";
+import {
+  EquipmentDetailSection,
+  PrinterUsageSection,
+} from "@/components/documents/equipment-detail-table";
+import type { EquipmentSelection, IncidentLog } from "@/types/domain";
 
+/** equipmentSelections is what the customer had under contract during this
+ * month, aggregated by the print page from every contract whose term covers
+ * it. Defaults to empty so a report for a customer with no contract (or
+ * before this data existed) still renders its incident log. */
 export function MonthlyReportDocument({
   customerName,
   month,
   records,
+  equipmentSelections = [],
 }: {
   customerName: string;
   month: string;
   records: IncidentLog[];
+  equipmentSelections?: EquipmentSelection[];
 }) {
   const incidentCount = records.filter((r) => r.type === "incident").length;
   const inspectionCount = records.filter((r) => r.type === "inspection").length;
@@ -38,6 +48,14 @@ export function MonthlyReportDocument({
         </div>
       }
     >
+      <EquipmentDetailSection selections={equipmentSelections} />
+
+      <PrinterUsageSection selections={equipmentSelections} />
+
+      <div>
+        <h3 className="mb-1 font-semibold">
+          <Bilingual id="Riwayat Dukungan Bulan Ini" ko="당월 지원 내역" />
+        </h3>
       <DocTable>
         <Table>
           <TableHeader>
@@ -92,6 +110,7 @@ export function MonthlyReportDocument({
           </TableBody>
         </Table>
       </DocTable>
+      </div>
     </DocumentShell>
   );
 }
