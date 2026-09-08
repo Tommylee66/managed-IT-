@@ -5,6 +5,7 @@
 // Korean legal source — for real customer contracts, a native Indonesian
 // speaker or legal reviewer should sanity-check it before it ships.
 
+import { equipmentOverageClauses } from '@/lib/calc/equipment-overage-terms';
 import type { Contract } from '@/types/domain';
 
 export interface BilingualText {
@@ -18,9 +19,13 @@ export interface ClauseSection {
 }
 
 export function contractClauses(contract: Contract): ClauseSection[] {
-  const hasRentedEquipment = (contract.quote_snapshot?.equipment_selections ?? []).some(
-    (e) => e.monthlyRate != null
-  );
+  const equipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
+  const hasRentedEquipment = equipmentSelections.some((e) => e.monthlyRate != null);
+  // Usage-priced equipment (printers) bills a per-page rate on top of the
+  // flat rental, so the allowance and that rate have to appear in the
+  // contract's own fee clause — the monthly figure below is a single total
+  // and this document has no line-item table to infer them from.
+  const overageClauses = equipmentOverageClauses(equipmentSelections);
   return [
     {
       heading: { id: '1. Tujuan Perjanjian dan Sifat Layanan', ko: '1. 계약 목적 및 서비스 성격' },
@@ -170,6 +175,7 @@ export function contractClauses(contract: Contract): ClauseSection[] {
           id: 'Biaya Starlink dibayarkan langsung oleh Pelanggan kepada Starlink dan tidak termasuk dalam biaya layanan bulanan BCT.',
           ko: 'Starlink 요금은 고객이 직접 Starlink에 납부하며 BCT 월 서비스 요금에 포함되지 않는다.',
         },
+        ...overageClauses,
       ],
     },
     {

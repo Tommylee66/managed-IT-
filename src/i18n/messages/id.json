@@ -277,6 +277,7 @@
     "saveChanges": "Simpan Perubahan",
     "updateSuccess": "Penawaran berhasil diperbarui",
     "updateError": "Gagal memperbarui penawaran",
+    "updateBlockedByContract": "Penawaran ini tidak dapat diubah: kontraknya sudah dikonfirmasi atau diaktifkan. Ajukan permintaan perubahan layanan untuk mengubah kontrak.",
     "equipmentUsageLabel": "Pemakaian (tarif {rate}/unit)",
     "equipmentMonoUsageLabel": "Pemakaian hitam putih (tarif {rate}/lembar)",
     "equipmentColorUsageLabel": "Pemakaian warna (tarif {rate}/lembar)",

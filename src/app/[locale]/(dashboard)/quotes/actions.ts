@@ -4,6 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { getSessionContext } from '@/lib/auth/session';
 import { getRates } from '@/lib/data-access/rates';
+import {
+  applyQuoteToContract,
+  contractAcceptsQuoteEdit,
+  getContractByQuoteNo,
+  CONTRACT_LOCKED_FOR_QUOTE_EDIT,
+} from '@/lib/data-access/contracts';
 import { createQuote, updateQuote } from '@/lib/data-access/quotes';
 import { listEquipmentCatalog } from '@/lib/data-access/equipment';
 import { listServiceCatalog } from '@/lib/data-access/services';
@@ -136,12 +142,27 @@ export async function updateQuoteAction(no: string, input: CreateQuoteFormInput)
   const serviceCatalog = await listServiceCatalog(supabase, { role: 'master' });
   const resolved = resolveEquipmentSelections(input.equipment_selections ?? [], catalog);
   const resolvedServices = resolveServiceSelections(input.service_selections ?? [], serviceCatalog);
+  // A quote already converted to a contract has to carry its edit through,
+  // or the contract — and every document and invoice built from its frozen
+  // snapshot — silently keeps the superseded figures. Checked before the
+  // quote is written so a refusal leaves nothing half-applied.
+  const contract = await getContractByQuoteNo(supabase, no);
+  if (contract && !contractAcceptsQuoteEdit(contract)) {
+    throw new Error(CONTRACT_LOCKED_FOR_QUOTE_EDIT);
+  }
+
   const quote = await updateQuote(supabase, rates, no, {
     ...input,
     equipment_selections: resolved,
     service_selections: resolvedServices,
   });
+  if (contract) await applyQuoteToContract(supabase, contract, quote);
+
   revalidatePath('/quotes');
   revalidatePath(`/quotes/${no}`);
+  if (contract) {
+    revalidatePath('/contracts');
+    revalidatePath(`/contracts/${contract.no}`);
+  }
   return quote;
 }

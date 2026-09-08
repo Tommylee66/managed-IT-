@@ -277,6 +277,7 @@
     "saveChanges": "수정 사항 저장",
     "updateSuccess": "견적이 수정되었습니다",
     "updateError": "견적 수정에 실패했습니다",
+    "updateBlockedByContract": "이미 확정/개통된 계약이 있는 견적은 수정할 수 없습니다. 계약 내용을 바꾸려면 변경요청을 등록하세요.",
     "equipmentUsageLabel": "사용량 (장당 {rate})",
     "equipmentMonoUsageLabel": "흑백 사용량 (장당 {rate})",
     "equipmentColorUsageLabel": "컬러 사용량 (장당 {rate})",

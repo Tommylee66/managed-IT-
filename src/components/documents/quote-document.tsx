@@ -4,7 +4,10 @@ import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
-import { EQUIPMENT_CATEGORY_LABEL } from "@/lib/calc/equipment-category-labels";
+import {
+  EquipmentDetailSection,
+  PrinterUsageSection,
+} from "@/components/documents/equipment-detail-table";
 import type { Quote } from "@/types/domain";
 
 export function QuoteDocument({
@@ -33,6 +36,7 @@ export function QuoteDocument({
     (e) => e.category === "cctv" && e.monthlyRate != null
   );
   const hasRentedEquipment = quote.equipment_selections.some((e) => e.monthlyRate != null);
+
 
   return (
     <DocumentShell
@@ -166,48 +170,9 @@ export function QuoteDocument({
         />
       </div>
 
-      {quote.equipment_selections.length > 0 && (
-        <div>
-          <h3 className="mb-1 font-semibold">
-            <Bilingual id="Spesifikasi Perangkat yang Disediakan" ko="제공 장비 사양" />
-          </h3>
-          <DocTable>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>
-                  <Bilingual id="Kategori" ko="분류" />
-                </TableHead>
-                <TableHead>
-                  <Bilingual id="Model" ko="모델명" />
-                </TableHead>
-                <TableHead>
-                  <Bilingual id="Spesifikasi" ko="스펙" />
-                </TableHead>
-                <TableHead className="text-right">
-                  <Bilingual id="Jumlah" ko="수량" />
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {quote.equipment_selections.map((eq, i) => {
-                const cat = EQUIPMENT_CATEGORY_LABEL[eq.category];
-                return (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <Bilingual id={cat.id} ko={cat.ko} />
-                    </TableCell>
-                    <TableCell>{eq.modelName}</TableCell>
-                    <TableCell>{eq.spec || "-"}</TableCell>
-                    <TableCell className="text-right">{eq.qty}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-          </DocTable>
-        </div>
-      )}
+      <EquipmentDetailSection selections={quote.equipment_selections} />
+
+      <PrinterUsageSection selections={quote.equipment_selections} />
 
       <div>
         <h3 className="mb-1 font-semibold">

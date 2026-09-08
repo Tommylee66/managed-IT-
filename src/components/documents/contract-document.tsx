@@ -5,6 +5,10 @@ import { DocumentShell } from "@/components/documents/document-shell";
 import { DocTable } from "@/components/documents/doc-table";
 import { Bilingual } from "@/components/documents/bilingual-block";
 import { contractClauses } from "@/components/documents/contract-clauses";
+import {
+  EquipmentDetailSection,
+  PrinterUsageSection,
+} from "@/components/documents/equipment-detail-table";
 import { renderBilingualQuoteRowLabel } from "@/lib/calc/quote-row-labels";
 import type { Contract } from "@/types/domain";
 
@@ -26,7 +30,13 @@ export function ContractDocument({
   const sections = contractClauses(contract);
   const ppn = Math.round((contract.monthly_fee * ppnRate) / 100);
   const total = contract.monthly_fee + ppn;
-  const oneTimeRows = (contract.quote_snapshot?.rows ?? []).filter((r) => r.oneTime);
+  const snapshotRows = contract.quote_snapshot?.rows ?? [];
+  // The itemised monthly breakdown: the summary table above states only a
+  // single monthly total, so without this the contract never says which
+  // services that total is made of.
+  const recurringRows = snapshotRows.filter((r) => !r.oneTime && r.amount !== 0);
+  const oneTimeRows = snapshotRows.filter((r) => r.oneTime);
+  const equipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
   const oneTimeSubtotal = oneTimeRows.reduce((sum, r) => sum + r.amount, 0);
   const oneTimePpn = Math.round((oneTimeSubtotal * ppnRate) / 100);
   const oneTimeTotal = oneTimeSubtotal + oneTimePpn;
@@ -90,6 +100,49 @@ export function ContractDocument({
       </Table>
       </DocTable>
 
+      {recurringRows.length > 0 && (
+        <div>
+          <h3 className="mb-1 font-semibold">
+            <Bilingual id="Rincian Layanan Bulanan" ko="사용 중인 서비스 내역 (월)" />
+          </h3>
+          <DocTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <Bilingual id="Layanan" ko="서비스" />
+                </TableHead>
+                <TableHead className="text-right">
+                  <Bilingual id="Jumlah/Bulan" ko="월 금액" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recurringRows.map((r, i) => {
+                const label = renderBilingualQuoteRowLabel(r);
+                return (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Bilingual id={label.id} ko={label.ko} />
+                    </TableCell>
+                    <TableCell className="text-right">{formatRupiah(r.amount, "id")}</TableCell>
+                  </TableRow>
+                );
+              })}
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <Bilingual id="Subtotal Tagihan Bulanan" ko="월 청구액 소계" />
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatRupiah(contract.monthly_fee, "id")}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          </DocTable>
+        </div>
+      )}
+
       {oneTimeRows.length > 0 && (
         <div>
           <h3 className="mb-1 font-semibold">
@@ -144,6 +197,10 @@ export function ContractDocument({
           </DocTable>
         </div>
       )}
+
+      <EquipmentDetailSection selections={equipmentSelections} />
+
+      <PrinterUsageSection selections={equipmentSelections} />
 
       <div className="flex flex-col gap-4">
         {sections.map((section) => (

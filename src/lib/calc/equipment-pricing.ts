@@ -74,6 +74,20 @@ export function billableOverage(
   return Math.max(0, (usedQty ?? 0) - includedAllowance(includedQty, qty));
 }
 
+/** Which metered tier a usage figure belongs to. `null` is a mono-only item
+ * (or a non-printer item with a plain overage rate), where there is no
+ * second tier to distinguish and naming one would be noise. */
+export type OverageTier = 'mono' | 'color' | null;
+
+/** Bilingual name of an overage tier — shared with the quote document's
+ * pricing-terms table and the contract's pricing clause so a tier is never
+ * worded one way on the invoice line and another way in the terms. */
+export function overageTierLabel(tier: OverageTier): { id: string; ko: string } {
+  if (tier === 'mono') return { id: 'Hitam Putih', ko: '흑백' };
+  if (tier === 'color') return { id: 'Warna', ko: '컬러' };
+  return { id: '', ko: '' };
+}
+
 /** modelName is a product model name (not itself locale-specific), so only
  * the usage wording needs a bilingual pair — same pattern as
  * service-pricing.ts's labelId/labelKo rows. The allowance breakdown is
@@ -86,10 +100,11 @@ function overageLabels(
   s: EquipmentSelection,
   billable: number,
   allowance: number,
-  tier: 'mono' | 'color' | null
+  tier: OverageTier
 ): { labelKo: string; labelId: string } {
-  const tierKo = tier === 'mono' ? ' 흑백' : tier === 'color' ? ' 컬러' : '';
-  const tierId = tier === 'mono' ? ' Hitam Putih' : tier === 'color' ? ' Warna' : '';
+  const tierName = overageTierLabel(tier);
+  const tierKo = tierName.ko ? ` ${tierName.ko}` : '';
+  const tierId = tierName.id ? ` ${tierName.id}` : '';
   const usedQty = tier === 'color' ? (s.colorOverageQty ?? 0) : s.overageQty;
   const breakdownKo = allowance > 0 ? ` (사용 ${usedQty} − 무상 ${allowance})` : '';
   const breakdownId = allowance > 0 ? ` (pakai ${usedQty} − gratis ${allowance})` : '';
