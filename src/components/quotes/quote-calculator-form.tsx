@@ -258,8 +258,16 @@ export function QuoteCalculatorForm({
         toast.success(t("saveSuccess"));
         router.push(`/${locale}/quotes/${quote.no}`);
       }
-    } catch {
-      toast.error(initialValues ? tQuotes("updateError") : t("saveError"));
+    } catch (e) {
+      // A refused edit needs its reason: the generic "update failed" gives
+      // staff nothing to act on, when the fix is to file a change request
+      // against the contract instead.
+      const reason = e instanceof Error ? e.message : String(e);
+      if (reason.includes("CONTRACT_LOCKED_FOR_QUOTE_EDIT")) {
+        toast.error(tQuotes("updateBlockedByContract"));
+      } else {
+        toast.error(initialValues ? tQuotes("updateError") : t("saveError"));
+      }
     } finally {
       setIsSaving(false);
     }

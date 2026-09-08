@@ -277,6 +277,7 @@
     "saveChanges": "Save Changes",
     "updateSuccess": "Quote updated successfully",
     "updateError": "Failed to update quote",
+    "updateBlockedByContract": "This quote cannot be edited: its contract is already confirmed or activated. File a change request to alter the contract instead.",
     "equipmentUsageLabel": "Usage (@ {rate}/unit)",
     "equipmentMonoUsageLabel": "Mono usage (@ {rate}/page)",
     "equipmentColorUsageLabel": "Color usage (@ {rate}/page)",

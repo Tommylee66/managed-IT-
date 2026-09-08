@@ -82,6 +82,76 @@ export async function getContractByQuoteNo(
   return (data as Contract[])[0] ?? null;
 }
 
+/** Thrown when a quote is edited after its contract has been confirmed or
+ * activated. Surfaced to staff by updateQuoteAction — rewriting a contract
+ * at that point would silently restate signed/live terms, which is what
+ * change requests exist for. */
+export const CONTRACT_LOCKED_FOR_QUOTE_EDIT = 'CONTRACT_LOCKED_FOR_QUOTE_EDIT';
+
+/** Whether an edit to this contract's quote may be carried through to it.
+ * A still-provisional contract ('contracted', not yet confirmed) may be;
+ * a confirmed or activated one may not, because rewriting it would
+ * silently restate terms already signed or already being billed — which is
+ * what change requests exist for.
+ *
+ * Checked BEFORE the quote itself is written, never after: throwing partway
+ * through would leave the quote revised and the contract stale, producing
+ * exactly the divergence this guard exists to prevent. */
+export function contractAcceptsQuoteEdit(contract: Contract): boolean {
+  return !contract.confirmed_at && contract.status === 'contracted';
+}
+
+/** Re-copies an edited quote onto the contract created from it.
+ *
+ * A contract snapshots its quote at creation (see createContractFromQuote)
+ * so later catalog rate changes never restate an issued price. That freeze
+ * was also silently swallowing edits to the quote *itself*: staff would
+ * revise a quote's amount and the contract — and every document and invoice
+ * generated from its snapshot — kept the superseded figures with nothing
+ * anywhere saying they had diverged.
+ *
+ * Callers must have already cleared contractAcceptsQuoteEdit for this
+ * contract.
+ *
+ * commission_rate is deliberately NOT re-read from the agent: their rate is
+ * frozen at signing (clause 4 of the sales agency agreement), so the
+ * recomputed commission uses the rate already on the contract even if the
+ * agent's current rate has since changed. */
+export async function applyQuoteToContract(
+  supabase: SupabaseClient,
+  contract: Contract,
+  quote: Quote
+): Promise<Contract> {
+  const monthlyCommission = calcBlendedMonthlyCommission(
+    quote.commission_base,
+    quote.rows,
+    contract.commission_rate
+  );
+  const commission = calculateCommission(monthlyCommission, quote.start_date!, quote.months);
+
+  const { data, error } = await supabase
+    .from('contracts')
+    .update({
+      start_date: quote.start_date,
+      billing_date: quote.billing_date,
+      end_date: commission.commissionFullEnd,
+      months: quote.months,
+      monthly_fee: quote.monthly,
+      commission_base: quote.commission_base,
+      monthly_commission: commission.monthlyCommission,
+      half_monthly_commission: commission.halfMonthlyCommission,
+      commission_full_end: commission.commissionFullEnd,
+      commission_half_start: commission.commissionHalfStart,
+      total_commission: commission.totalCommission,
+      quote_snapshot: quote,
+    })
+    .eq('no', contract.no)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Contract;
+}
+
 /** Flips a contract from "just created from a quote" to "confirmed real
  * business" — see the `confirmed_at` doc comment on the Contract type for
  * what this does and does not gate. */

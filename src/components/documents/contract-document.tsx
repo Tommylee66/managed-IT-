@@ -30,7 +30,12 @@ export function ContractDocument({
   const sections = contractClauses(contract);
   const ppn = Math.round((contract.monthly_fee * ppnRate) / 100);
   const total = contract.monthly_fee + ppn;
-  const oneTimeRows = (contract.quote_snapshot?.rows ?? []).filter((r) => r.oneTime);
+  const snapshotRows = contract.quote_snapshot?.rows ?? [];
+  // The itemised monthly breakdown: the summary table above states only a
+  // single monthly total, so without this the contract never says which
+  // services that total is made of.
+  const recurringRows = snapshotRows.filter((r) => !r.oneTime && r.amount !== 0);
+  const oneTimeRows = snapshotRows.filter((r) => r.oneTime);
   const equipmentSelections = contract.quote_snapshot?.equipment_selections ?? [];
   const oneTimeSubtotal = oneTimeRows.reduce((sum, r) => sum + r.amount, 0);
   const oneTimePpn = Math.round((oneTimeSubtotal * ppnRate) / 100);
@@ -94,6 +99,49 @@ export function ContractDocument({
         </TableBody>
       </Table>
       </DocTable>
+
+      {recurringRows.length > 0 && (
+        <div>
+          <h3 className="mb-1 font-semibold">
+            <Bilingual id="Rincian Layanan Bulanan" ko="사용 중인 서비스 내역 (월)" />
+          </h3>
+          <DocTable>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>
+                  <Bilingual id="Layanan" ko="서비스" />
+                </TableHead>
+                <TableHead className="text-right">
+                  <Bilingual id="Jumlah/Bulan" ko="월 금액" />
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recurringRows.map((r, i) => {
+                const label = renderBilingualQuoteRowLabel(r);
+                return (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Bilingual id={label.id} ko={label.ko} />
+                    </TableCell>
+                    <TableCell className="text-right">{formatRupiah(r.amount, "id")}</TableCell>
+                  </TableRow>
+                );
+              })}
+              <TableRow>
+                <TableCell className="font-semibold">
+                  <Bilingual id="Subtotal Tagihan Bulanan" ko="월 청구액 소계" />
+                </TableCell>
+                <TableCell className="text-right font-semibold">
+                  {formatRupiah(contract.monthly_fee, "id")}
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          </DocTable>
+        </div>
+      )}
 
       {oneTimeRows.length > 0 && (
         <div>
