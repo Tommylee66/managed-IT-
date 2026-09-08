@@ -24,12 +24,12 @@ export function MenuCard({
     <Link
       href={href}
       title={description}
-      className="grid grid-cols-[30px_1fr] items-center gap-2.5 rounded-xl px-2.5 py-2 transition hover:-translate-y-0.5 hover:shadow-md hover:bg-muted/60"
+      className="grid grid-cols-[36px_1fr] items-center gap-3 rounded-xl px-3 py-2.5 transition hover:-translate-y-0.5 hover:shadow-md hover:bg-muted/60"
     >
-      <div className={`flex h-[30px] w-[30px] items-center justify-center rounded-[10px] text-base ${ICON_BG[color]}`}>
+      <div className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg ${ICON_BG[color]}`}>
         {icon}
       </div>
-      <h4 className="text-[13.5px] font-semibold leading-tight">{title}</h4>
+      <h4 className="text-sm font-semibold leading-tight">{title}</h4>
     </Link>
   );
 }

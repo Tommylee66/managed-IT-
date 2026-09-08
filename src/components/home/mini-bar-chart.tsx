@@ -12,9 +12,14 @@ export function MiniBarChart({
 
   return (
     <div>
-      <div className="flex h-28 items-end gap-2 border-b border-border pt-2">
+      <div className="flex h-36 items-end gap-2 border-b border-border pt-2">
         {data.map((d) => (
           <div key={d.label} className="relative flex h-full flex-1 flex-col items-center justify-end gap-1">
+            {/* Stays at 10px against the rest of this screen's type scale: six bars
+                share one grid track, so a full "Rp 93,400,000" — which has no
+                break opportunity inside the number — pushes the whole chart row
+                past its track and clips the neighbouring card at any larger
+                size. The axis labels below carry the readable text here. */}
             <span className="rounded-full border border-border bg-card/90 px-1.5 py-0.5 text-[10px] font-bold text-foreground/80">
               {formatValue ? formatValue(d.value) : d.value}
             </span>
@@ -25,7 +30,7 @@ export function MiniBarChart({
           </div>
         ))}
       </div>
-      <div className="mt-1 grid grid-cols-6 gap-2 text-center text-[10px] text-muted-foreground">
+      <div className="mt-1.5 grid grid-cols-6 gap-2 text-center text-xs text-muted-foreground">
         {data.map((d) => (
           <span key={d.label}>{d.label}</span>
         ))}

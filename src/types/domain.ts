@@ -214,10 +214,24 @@ export interface EquipmentCatalogItem {
   /** Internal monthly cost, master-only — null if not tracked. */
   monthly_cost: number | null;
   /** Usage-based overage: customer price per extra unit beyond the flat
-   * monthly rate (e.g. per extra printed page). Null = no overage tier. */
+   * monthly rate (e.g. per extra printed page). Null = no overage tier.
+   * On a color printer (see color_overage_rate) this is the mono tier. */
   overage_rate: number | null;
   /** Internal cost per extra unit, master-only. */
   overage_cost: number | null;
+  /** Units the flat monthly rate already covers before overage_rate starts
+   * applying (e.g. pages included in a printer's rental). Null = nothing
+   * included, every used unit is billable — the behavior before this field
+   * existed. Counted per rented unit, so a qty-3 selection gets 3x this. */
+  included_qty: number | null;
+  /** Color printers meter color pages separately from mono, each tier with
+   * its own allowance and per-page price. A non-null color_overage_rate is
+   * what makes an item "a color printer" — there is no separate flag — and
+   * it reframes the fields above as that item's mono tier. */
+  color_included_qty: number | null;
+  color_overage_rate: number | null;
+  /** Internal cost per extra color unit, master-only. */
+  color_overage_cost: number | null;
   /** Special commission rate (%) for this item, overriding the agent's own
    * rate for just this item's row(s) — null = use the agent's standard
    * rate, same as before this field existed. */
@@ -239,11 +253,23 @@ export interface EquipmentSelection {
   /** Rate/cost snapshotted at selection time — see EquipmentCatalogItem. */
   monthlyRate: number | null;
   monthlyCost: number | null;
-  /** Extra units used this period (e.g. pages printed beyond the base
-   * rental) and the per-unit rate/cost snapshotted at selection time. */
+  /** Units used this period (e.g. pages printed) and the per-unit
+   * rate/cost snapshotted at selection time. Billable units are
+   * `max(0, overageQty - includedQty * qty)` — before includedQty existed
+   * there was no allowance to subtract, so snapshots written back then hold
+   * an already-net figure here and still price identically.
+   * On a color printer this is the mono tier; see colorOverageQty. */
   overageQty: number;
   overageRate: number | null;
   overageCost: number | null;
+  /** Allowance/color-tier fields snapshotted the same way. Optional
+   * because selections stored before this feature shipped have no such
+   * keys at all — read them as 0/null rather than assuming they exist. */
+  includedQty?: number;
+  colorOverageQty?: number;
+  colorIncludedQty?: number;
+  colorOverageRate?: number | null;
+  colorOverageCost?: number | null;
   /** See EquipmentCatalogItem.commission_rate_override — snapshotted at
    * selection time, same as monthlyRate. */
   commissionRateOverride: number | null;

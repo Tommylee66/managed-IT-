@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ import {
   createEquipmentCatalogItemAction,
   updateEquipmentCatalogItemAction,
 } from "@/app/[locale]/(dashboard)/admin/rates/actions";
+import { isColorTiered } from "@/lib/calc/equipment-pricing";
 import type { AssetType, EquipmentCatalogItem } from "@/types/domain";
 
 const CATEGORIES: AssetType[] = [
@@ -76,6 +78,12 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
   const isEdit = !!item;
   const [rateTouched, setRateTouched] = useState(!!item?.monthly_rate);
   const [costTouched, setCostTouched] = useState(!!item?.monthly_cost);
+  // Not a stored column: an item "is a color printer" precisely when it has
+  // a color tier configured (see isColorTiered), so the toggle is derived on
+  // open and clearing it nulls those fields back out on save.
+  const [isColor, setIsColor] = useState(
+    isColorTiered(item?.color_overage_rate, item?.color_included_qty)
+  );
 
   const schema = z.object({
     category: z.enum(CATEGORIES as [AssetType, ...AssetType[]]),
@@ -86,6 +94,10 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
     monthly_cost: z.string().optional(),
     overage_rate: z.string().optional(),
     overage_cost: z.string().optional(),
+    included_qty: z.string().optional(),
+    color_included_qty: z.string().optional(),
+    color_overage_rate: z.string().optional(),
+    color_overage_cost: z.string().optional(),
     commission_rate_override: z.string().optional(),
   });
   type FormValues = z.infer<typeof schema>;
@@ -109,6 +121,10 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       monthly_cost: item?.monthly_cost?.toString() ?? "",
       overage_rate: item?.overage_rate?.toString() ?? "",
       overage_cost: item?.overage_cost?.toString() ?? "",
+      included_qty: item?.included_qty?.toString() ?? "",
+      color_included_qty: item?.color_included_qty?.toString() ?? "",
+      color_overage_rate: item?.color_overage_rate?.toString() ?? "",
+      color_overage_cost: item?.color_overage_cost?.toString() ?? "",
       commission_rate_override: item?.commission_rate_override?.toString() ?? "",
     },
   });
@@ -142,6 +158,12 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
       monthly_cost: values.monthly_cost ? Number(values.monthly_cost) : null,
       overage_rate: values.overage_rate ? Number(values.overage_rate) : null,
       overage_cost: values.overage_cost ? Number(values.overage_cost) : null,
+      included_qty: values.included_qty ? Number(values.included_qty) : null,
+      // Untoggling "color printer" has to clear the color tier, otherwise a
+      // hidden leftover rate would keep billing color pages separately.
+      color_included_qty: isColor && values.color_included_qty ? Number(values.color_included_qty) : null,
+      color_overage_rate: isColor && values.color_overage_rate ? Number(values.color_overage_rate) : null,
+      color_overage_cost: isColor && values.color_overage_cost ? Number(values.color_overage_cost) : null,
       commission_rate_override: values.commission_rate_override ? Number(values.commission_rate_override) : null,
     };
     try {
@@ -268,7 +290,9 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
           <p className="text-xs text-muted-foreground">{t("equipmentRateHint")}</p>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="overage_rate">{t("equipmentOverageRate")}</Label>
+              <Label htmlFor="overage_rate">
+                {isColor ? t("equipmentMonoOverageRate") : t("equipmentOverageRate")}
+              </Label>
               <Controller
                 control={control}
                 name="overage_rate"
@@ -284,7 +308,9 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="overage_cost">{t("equipmentOverageCost")}</Label>
+              <Label htmlFor="overage_cost">
+                {isColor ? t("equipmentMonoOverageCost") : t("equipmentOverageCost")}
+              </Label>
               <Controller
                 control={control}
                 name="overage_cost"
@@ -300,7 +326,69 @@ export function EquipmentDialog({ item }: { item?: EquipmentCatalogItem }) {
               />
             </div>
           </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="included_qty">
+              {isColor ? t("equipmentMonoIncludedQty") : t("equipmentIncludedQty")}
+            </Label>
+            <Input id="included_qty" type="number" min="0" step="1" {...register("included_qty")} />
+            <p className="text-xs text-muted-foreground">{t("equipmentIncludedQtyHint")}</p>
+          </div>
           <p className="text-xs text-muted-foreground">{t("equipmentOverageHint")}</p>
+          <div className="flex flex-col gap-2 rounded-md border p-3">
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <Checkbox checked={isColor} onCheckedChange={(v) => setIsColor(v === true)} />
+              {t("equipmentIsColor")}
+            </label>
+            {isColor && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="color_overage_rate">{t("equipmentColorOverageRate")}</Label>
+                    <Controller
+                      control={control}
+                      name="color_overage_rate"
+                      render={({ field }) => (
+                        <CurrencyInput
+                          id="color_overage_rate"
+                          locale={locale}
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                        />
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="color_overage_cost">{t("equipmentColorOverageCost")}</Label>
+                    <Controller
+                      control={control}
+                      name="color_overage_cost"
+                      render={({ field }) => (
+                        <CurrencyInput
+                          id="color_overage_cost"
+                          locale={locale}
+                          value={field.value ?? ""}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="color_included_qty">{t("equipmentColorIncludedQty")}</Label>
+                  <Input
+                    id="color_included_qty"
+                    type="number"
+                    min="0"
+                    step="1"
+                    {...register("color_included_qty")}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">{t("equipmentColorHint")}</p>
+              </>
+            )}
+          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="commission_rate_override">{t("commissionRateOverride")}</Label>
             <Input
