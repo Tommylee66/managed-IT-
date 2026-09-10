@@ -429,8 +429,21 @@ export interface Activation {
   status: ActivationStatus;
   notes: string | null;
   asset_summary: string | null;
+  service_selections: ActivationServiceSelection[];
   saved_by: string | null;
   saved_at: string;
+}
+
+/** Services actually configured during activation. Catalog text is
+ * snapshotted so the activation record remains readable after a catalog
+ * item is renamed; `detail` records the site-specific work performed. */
+export interface ActivationServiceSelection {
+  catalogId: string;
+  nameId: string;
+  nameKo: string;
+  descriptionId: string | null;
+  descriptionKo: string | null;
+  detail: string;
 }
 
 export interface Asset {

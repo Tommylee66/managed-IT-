@@ -1,5 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Quote, ServiceCatalogItem, ServiceSelection } from '@/types/domain';
+import type {
+  ActivationServiceSelection,
+  Quote,
+  ServiceCatalogItem,
+  ServiceSelection,
+} from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 
 /** Staff can see the customer-facing monthly rate (they need it to explain
@@ -37,6 +42,38 @@ interface ServiceFields {
 
 export type CreateServiceInput = ServiceFields & { created_by: string };
 export type UpdateServiceInput = ServiceFields;
+
+export interface ActivationServiceSelectionRequest {
+  catalogId: string;
+  detail?: string;
+}
+
+/** Resolve the small client request against server-fetched catalog rows. The
+ * browser never gets to choose the snapshotted service name or description. */
+export function resolveActivationServiceSelections(
+  requests: ActivationServiceSelectionRequest[],
+  catalog: ServiceCatalogItem[]
+): ActivationServiceSelection[] {
+  const seen = new Set<string>();
+  const selections: ActivationServiceSelection[] = [];
+
+  for (const request of requests) {
+    if (seen.has(request.catalogId)) continue;
+    const item = catalog.find((candidate) => candidate.id === request.catalogId && candidate.is_active);
+    if (!item) continue;
+    seen.add(item.id);
+    selections.push({
+      catalogId: item.id,
+      nameId: item.name_id,
+      nameKo: item.name_ko,
+      descriptionId: item.description_id,
+      descriptionKo: item.description_ko,
+      detail: request.detail?.trim() ?? '',
+    });
+  }
+
+  return selections;
+}
 
 export async function createServiceCatalogItem(
   supabase: SupabaseClient,
@@ -108,18 +145,20 @@ export async function setServiceCatalogActive(
 }
 
 /** service_catalog rows aren't referenced by foreign key — quotes/contracts/
- * change-requests snapshot the selected service's name/rate/cost into their
- * own JSONB columns, so "is this catalog item in use" means scanning those
+ * change-requests/activations snapshot the selected service into their own
+ * JSONB columns, so "is this catalog item in use" means scanning those
  * snapshots for a matching catalogId, not a DB-level referential check. */
 export async function listUsedServiceCatalogIds(supabase: SupabaseClient): Promise<Set<string>> {
-  const [quotes, contracts, changeRequests] = await Promise.all([
+  const [quotes, contracts, changeRequests, activations] = await Promise.all([
     supabase.from('quotes').select('service_selections'),
     supabase.from('contracts').select('quote_snapshot'),
     supabase.from('change_requests').select('old_service_selections, new_service_selections'),
+    supabase.from('activations').select('service_selections'),
   ]);
   if (quotes.error) throw quotes.error;
   if (contracts.error) throw contracts.error;
   if (changeRequests.error) throw changeRequests.error;
+  if (activations.error) throw activations.error;
 
   const ids = new Set<string>();
   for (const row of quotes.data ?? []) {
@@ -133,6 +172,11 @@ export async function listUsedServiceCatalogIds(supabase: SupabaseClient): Promi
     const oldSels = (row.old_service_selections ?? []) as ServiceSelection[];
     const newSels = (row.new_service_selections ?? []) as ServiceSelection[];
     for (const sel of [...oldSels, ...newSels]) ids.add(sel.catalogId);
+  }
+  for (const row of activations.data ?? []) {
+    for (const sel of (row.service_selections ?? []) as ActivationServiceSelection[]) {
+      ids.add(sel.catalogId);
+    }
   }
   return ids;
 }

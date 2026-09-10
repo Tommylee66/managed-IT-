@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getActivation } from "@/lib/data-access/activations";
-import { listAssetsByContract } from "@/lib/data-access/assets";
+import { listAssetsByActivationSnapshot } from "@/lib/data-access/assets";
 import { getContractRaw } from "@/lib/data-access/contracts";
 import { listIpPhoneExtensionsByCustomer } from "@/lib/data-access/ip-phone-extensions";
 import { listServiceCredentialsByCustomer } from "@/lib/data-access/service-credentials";
@@ -29,7 +29,7 @@ export default async function ActivationDetailPage({
   if (!contract) notFound();
 
   const [assets, ipPhoneExtensions, serviceCredentials, t, tContracts, tCommon, tAssets] = await Promise.all([
-    listAssetsByContract(supabase, activation.contract_no, session!.role),
+    listAssetsByActivationSnapshot(supabase, activation.id, session!.role),
     listIpPhoneExtensionsByCustomer(supabase, contract.customer_code),
     listServiceCredentialsByCustomer(supabase, contract.customer_code),
     getTranslations("activations"),
@@ -137,6 +137,41 @@ export default async function ActivationDetailPage({
                 <TableRow>
                   <TableCell colSpan={8} className="text-center text-muted-foreground">
                     {tAssets("empty")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("selectedServicesTitle")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("serviceName")}</TableHead>
+                <TableHead>{t("catalogDescription")}</TableHead>
+                <TableHead>{t("serviceDetailLabel")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {(activation.service_selections ?? []).map((service) => (
+                <TableRow key={service.catalogId}>
+                  <TableCell>{locale === "ko" ? service.nameKo : service.nameId}</TableCell>
+                  <TableCell className="whitespace-pre-wrap">
+                    {(locale === "ko" ? service.descriptionKo : service.descriptionId) || "-"}
+                  </TableCell>
+                  <TableCell className="whitespace-pre-wrap">{service.detail || "-"}</TableCell>
+                </TableRow>
+              ))}
+              {(activation.service_selections ?? []).length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center text-muted-foreground">
+                    {t("noSelectedServices")}
                   </TableCell>
                 </TableRow>
               )}

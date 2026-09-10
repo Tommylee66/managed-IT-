@@ -2,7 +2,6 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Asset } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { maskSerial } from '@/lib/masking/staff-masking';
-import { nextAssetId } from '@/lib/numbering';
 
 function applyAssetMasking(asset: Asset, role: StaffRole): Asset {
   if (role === 'master') return asset;
@@ -37,6 +36,22 @@ export async function listAssetsByContract(
   return (data as Asset[]).map((a) => applyAssetMasking(a, role));
 }
 
+export async function listAssetsByActivationSnapshot(
+  supabase: SupabaseClient,
+  activationId: string,
+  role: StaffRole
+): Promise<Asset[]> {
+  const { data, error } = await supabase
+    .from('asset_history')
+    .select('items')
+    .eq('activation_id', activationId)
+    .order('saved_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return ((data?.items ?? []) as Asset[]).map((asset) => applyAssetMasking(asset, role));
+}
+
 export async function listAllAssets(supabase: SupabaseClient, role: StaffRole): Promise<Asset[]> {
   const { data, error } = await supabase
     .from('assets')
@@ -46,67 +61,61 @@ export async function listAllAssets(supabase: SupabaseClient, role: StaffRole): 
   return (data as Asset[]).map((a) => applyAssetMasking(a, role));
 }
 
-export interface AssetRowInput {
-  type: Asset['type'];
-  owner: Asset['owner'];
-  name: string;
-  model?: string;
-  serial?: string;
-  qty: number;
-  location?: string;
-  condition: Asset['condition'];
-  warranty?: string;
-  notes?: string;
+/** Resolve and validate IDs received from the activation form. An unassigned
+ * asset can be claimed by the contract; an already-associated asset must
+ * belong to this exact customer and contract. */
+export async function resolveAssetsForActivation(
+  supabase: SupabaseClient,
+  assetIds: string[],
+  contractNo: string,
+  customerCode: string
+): Promise<Asset[]> {
+  const uniqueIds = [...new Set(assetIds)];
+  if (uniqueIds.length !== assetIds.length) throw new Error('INVALID_ASSET_SELECTION');
+
+  const { data, error } = await supabase.from('assets').select('*').in('id', uniqueIds);
+  if (error) throw error;
+  const assets = data as Asset[];
+  if (assets.length !== uniqueIds.length) throw new Error('INVALID_ASSET_SELECTION');
+
+  const invalid = assets.some(
+    (asset) =>
+      (asset.contract_no != null && asset.contract_no !== contractNo) ||
+      (asset.customer_code != null && asset.customer_code !== customerCode)
+  );
+  if (invalid) throw new Error('INVALID_ASSET_SELECTION');
+
+  const byId = new Map(assets.map((asset) => [asset.id, asset]));
+  return uniqueIds.map((id) => byId.get(id)!);
 }
 
-/** Replaces all previously activation-sourced assets for this contract with
- * the new set — matches the source app's saveActivation(), which treats
- * each activation submission as the current authoritative asset list for
- * that contract (re-submitting corrects/replaces the prior registration). */
-export async function replaceActivationAssets(
+/** Link existing inventory rows to the new activation instead of deleting
+ * and recreating assets from free-text form input. */
+export async function assignAssetsToActivation(
   supabase: SupabaseClient,
+  assets: Asset[],
   contractNo: string,
   customerCode: string,
   customerName: string,
-  activationId: string,
-  rows: AssetRowInput[],
-  registeredBy: string
+  activationId: string
 ): Promise<Asset[]> {
-  const { error: deleteError } = await supabase
+  const assetIds = assets.map((asset) => asset.id);
+  const { data, error } = await supabase
     .from('assets')
-    .delete()
-    .eq('contract_no', contractNo)
-    .eq('source', 'activation');
-  if (deleteError) throw deleteError;
-
-  const assetsToInsert = [];
-  for (const row of rows) {
-    const assetId = await nextAssetId(supabase);
-    assetsToInsert.push({
-      asset_id: assetId,
+    .update({
       activation_id: activationId,
       contract_no: contractNo,
       customer_code: customerCode,
       customer_name: customerName,
-      type: row.type,
-      owner: row.owner,
-      name: row.name,
-      model: row.model ?? null,
-      serial: row.serial ?? null,
-      qty: row.qty,
-      location: row.location ?? null,
-      condition: row.condition,
-      warranty: row.warranty ?? null,
-      notes: row.notes ?? null,
-      source: 'activation',
-      status: 'active',
-      registered_by: registeredBy,
-    });
-  }
-
-  const { data, error } = await supabase.from('assets').insert(assetsToInsert).select('*');
+    })
+    .in('id', assetIds)
+    .select('*');
   if (error) throw error;
-  return data as Asset[];
+  const assigned = data as Asset[];
+  if (assigned.length !== assetIds.length) throw new Error('INVALID_ASSET_SELECTION');
+
+  const byId = new Map(assigned.map((asset) => [asset.id, asset]));
+  return assetIds.map((id) => byId.get(id)!);
 }
 
 const TYPE_LABEL: Record<Asset['type'], string> = {
@@ -128,7 +137,7 @@ const TYPE_LABEL: Record<Asset['type'], string> = {
  * whichever locale is active for the staff member creating the record —
  * see the caller in activations.ts. */
 export function assetSummaryText(
-  rows: AssetRowInput[],
+  rows: Array<Pick<Asset, 'type' | 'owner' | 'qty'>>,
   ownerLabels: { bct: string; customer: string },
   emptyLabel: string
 ): string {

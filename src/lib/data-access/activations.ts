@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Activation, Contract } from '@/types/domain';
+import type { Activation, ActivationServiceSelection, Asset, Contract } from '@/types/domain';
 import { nextActivationId, nextAssetHistoryId, nextServiceLogId } from '@/lib/numbering';
-import { replaceActivationAssets, assetSummaryText, type AssetRowInput } from '@/lib/data-access/assets';
+import { assignAssetsToActivation, assetSummaryText } from '@/lib/data-access/assets';
 
 export async function listActivations(supabase: SupabaseClient): Promise<Activation[]> {
   const { data, error } = await supabase
@@ -32,13 +32,13 @@ export interface CreateActivationInput {
   security_summary?: string;
   status: Activation['status'];
   notes?: string;
-  assets: AssetRowInput[];
+  assets: Asset[];
+  service_selections: ActivationServiceSelection[];
   saved_by: string;
 }
 
-/** Ported 1:1 from the source app's saveActivation() (final version, line
- * 389 of the source): registers the activation, replaces the contract's
- * activation-sourced assets, snapshots asset_history, writes a service log,
+/** Registers the activation, links the selected existing assets, snapshots
+ * asset_history, records the selected service details, writes a service log,
  * and — only when the activation's own status is 'activated' — flips the
  * contract and customer to 'activated' with billing_date/activation_date set.
  * (The source sometimes copies non-'activated' statuses like 'pending'/
@@ -60,6 +60,9 @@ export async function createActivation(
     billingDateLabel: string;
     engineerLabel: string;
     assetsLabel: string;
+    servicesLabel: string;
+    noServices: string;
+    locale: string;
   }
 ): Promise<Activation> {
   const activationId = nextActivationId();
@@ -84,20 +87,20 @@ export async function createActivation(
       status: input.status,
       notes: input.notes ?? null,
       asset_summary: summary,
+      service_selections: input.service_selections,
       saved_by: input.saved_by,
     })
     .select('*')
     .single();
   if (error) throw error;
 
-  const assets = await replaceActivationAssets(
+  const assets = await assignAssetsToActivation(
     supabase,
+    input.assets,
     input.contract_no,
     contract.customer_code,
     contract.customer_name,
-    activationId,
-    input.assets,
-    input.saved_by
+    activationId
   );
 
   const { error: historyError } = await supabase.from('asset_history').insert({
@@ -113,6 +116,15 @@ export async function createActivation(
   });
   if (historyError) throw historyError;
 
+  const serviceSummary = input.service_selections.length
+    ? input.service_selections
+        .map((service) => {
+          const name = labels.locale === 'ko' ? service.nameKo : service.nameId;
+          return service.detail ? `${name}: ${service.detail}` : name;
+        })
+        .join('\n')
+    : labels.noServices;
+
   // See change-requests.ts's createChangeRequest for the write-time-locale
   // caveat this shares with every service_logs insert in this codebase.
   const { error: logError } = await supabase.from('service_logs').insert({
@@ -121,7 +133,7 @@ export async function createActivation(
     date: input.date,
     type: labels.serviceLogType,
     title: `${labels.billingDateLabel} ${input.billing_date}`,
-    memo: `${labels.engineerLabel} ${input.engineer ?? ''}\n${labels.assetsLabel} ${summary}\n${input.notes ?? ''}`,
+    memo: `${labels.engineerLabel} ${input.engineer ?? ''}\n${labels.assetsLabel} ${summary}\n${labels.servicesLabel}\n${serviceSummary}\n${input.notes ?? ''}`,
     saved_by: input.saved_by,
   });
   if (logError) throw logError;

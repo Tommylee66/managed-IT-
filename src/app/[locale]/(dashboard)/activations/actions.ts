@@ -1,35 +1,92 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { createClient } from '@/lib/supabase/server';
 import { getSessionContext } from '@/lib/auth/session';
 import { getContractRaw } from '@/lib/data-access/contracts';
-import { createActivation, type CreateActivationInput } from '@/lib/data-access/activations';
+import { createActivation } from '@/lib/data-access/activations';
+import { resolveAssetsForActivation } from '@/lib/data-access/assets';
+import {
+  listServiceCatalog,
+  resolveActivationServiceSelections,
+  type ActivationServiceSelectionRequest,
+} from '@/lib/data-access/services';
+import type { Activation } from '@/types/domain';
 
-export async function createActivationAction(
-  input: Omit<CreateActivationInput, 'saved_by'>
-) {
+interface CreateActivationActionInput {
+  contract_no: string;
+  date: string;
+  billing_date: string;
+  engineer?: string;
+  site?: string;
+  customer_pic?: string;
+  confirm_type?: string;
+  security_summary?: string;
+  status: Activation['status'];
+  notes?: string;
+  asset_ids: string[];
+  services: ActivationServiceSelectionRequest[];
+}
+
+export async function createActivationAction(input: CreateActivationActionInput) {
   const session = await getSessionContext();
   if (!session) throw new Error('Unauthorized');
-  const [t, tContracts, tCommon] = await Promise.all([
+  const [t, tContracts, tCommon, locale] = await Promise.all([
     getTranslations('activations'),
     getTranslations('contracts'),
     getTranslations('common'),
+    getLocale(),
   ]);
-  if (!input.assets.length) throw new Error(t('assetsRequiredError'));
-  const bad = input.assets.find((a) => !a.name || !a.qty || a.qty < 1);
-  if (bad) throw new Error(t('assetRowInvalidError'));
+  const assetIds = Array.isArray(input.asset_ids) ? input.asset_ids : [];
+  const serviceRequests = Array.isArray(input.services) ? input.services : [];
+  if (!assetIds.length) throw new Error(t('assetsRequiredError'));
+  if (
+    serviceRequests.some(
+      (service) =>
+        !service ||
+        typeof service.catalogId !== 'string' ||
+        (service.detail != null &&
+          (typeof service.detail !== 'string' || service.detail.length > 4000))
+    )
+  ) {
+    throw new Error(t('serviceSelectionInvalidError'));
+  }
 
   const supabase = await createClient();
-  const contract = await getContractRaw(supabase, input.contract_no);
+  const [contract, serviceCatalog] = await Promise.all([
+    getContractRaw(supabase, input.contract_no),
+    listServiceCatalog(supabase, { activeOnly: true, role: 'master' }),
+  ]);
   if (!contract) throw new Error(tContracts('notFoundError'));
+
+  let assets;
+  try {
+    assets = await resolveAssetsForActivation(
+      supabase,
+      assetIds,
+      contract.no,
+      contract.customer_code
+    );
+  } catch (error) {
+    if (error instanceof Error && error.message === 'INVALID_ASSET_SELECTION') {
+      throw new Error(t('assetSelectionInvalidError'));
+    }
+    throw error;
+  }
+
+  const serviceSelections = resolveActivationServiceSelections(serviceRequests, serviceCatalog);
+  if (serviceSelections.length !== serviceRequests.length) {
+    throw new Error(t('serviceSelectionInvalidError'));
+  }
 
   const activation = await createActivation(
     supabase,
     contract,
     {
       ...input,
+      assets,
+      service_selections: serviceSelections,
       saved_by: session.userId,
     },
     {
@@ -41,6 +98,9 @@ export async function createActivationAction(
       billingDateLabel: t('serviceLogBillingDateLabel'),
       engineerLabel: t('serviceLogEngineerLabel'),
       assetsLabel: t('serviceLogAssetsLabel'),
+      servicesLabel: t('serviceLogServicesLabel'),
+      noServices: t('serviceSummaryEmpty'),
+      locale,
     }
   );
 
