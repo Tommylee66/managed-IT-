@@ -8,17 +8,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AuditLogPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ target_table?: string; target_id?: string }>;
 }) {
   const { locale } = await params;
+  const filters = await searchParams;
   setRequestLocale(locale);
   const session = await getSessionContext();
   if (!session || session.role !== "master") redirect("/dashboard");
 
   const supabase = await createClient();
+  let auditQuery = supabase
+    .from("audit_log")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (filters.target_table) auditQuery = auditQuery.eq("target_table", filters.target_table);
+  if (filters.target_id) auditQuery = auditQuery.eq("target_id", filters.target_id);
+
   const [{ data, error }, t] = await Promise.all([
-    supabase.from("audit_log").select("*").order("created_at", { ascending: false }).limit(200),
+    auditQuery,
     getTranslations("admin"),
   ]);
   if (error) throw error;
@@ -51,8 +62,15 @@ export default async function AuditLogPage({
                   {log.target_id ? ` / ${log.target_id}` : ""}
                 </TableCell>
                 <TableCell>{log.actor_role ?? "-"}</TableCell>
-                <TableCell className="max-w-xs truncate text-xs text-muted-foreground">
-                  {JSON.stringify(log.details)}
+                <TableCell className="max-w-xl text-xs text-muted-foreground">
+                  <details>
+                    <summary className="cursor-pointer font-medium text-foreground">
+                      {t("viewDetails")}
+                    </summary>
+                    <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap rounded-lg bg-muted p-3">
+                      {JSON.stringify(log.details, null, 2)}
+                    </pre>
+                  </details>
                 </TableCell>
               </TableRow>
             ))}

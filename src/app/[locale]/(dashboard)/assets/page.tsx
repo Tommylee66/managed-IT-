@@ -3,8 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { listAllAssets } from "@/lib/data-access/assets";
+import { listCustomers } from "@/lib/data-access/customers";
+import { listContracts } from "@/lib/data-access/contracts";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AssetDialog } from "@/components/assets/asset-dialog";
 
 export default async function AssetsPage({
   params,
@@ -15,17 +19,36 @@ export default async function AssetsPage({
   setRequestLocale(locale);
   const session = await getSessionContext();
   const supabase = await createClient();
-  const [assets, t, tContracts, tCommon] = await Promise.all([
+  const isMaster = session!.role === "master";
+  const [assets, customers, contracts, t, tContracts, tCommon, tCategory] = await Promise.all([
     listAllAssets(supabase, session!.role),
+    isMaster ? listCustomers(supabase, session!.role) : Promise.resolve([]),
+    isMaster ? listContracts(supabase, session!.role) : Promise.resolve([]),
     getTranslations("assets"),
     getTranslations("contracts"),
     getTranslations("common"),
+    getTranslations("equipmentCategory"),
   ]);
+  const customerOptions = customers.map(({ code, name }) => ({ code, name }));
+  const contractOptions = contracts.map(({ no, customer_code, customer_name }) => ({
+    no,
+    customer_code,
+    customer_name,
+  }));
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
+        {isMaster && <CardDescription>{t("masterDescription")}</CardDescription>}
+        {isMaster && (
+          <CardAction className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link href={`/${locale}/admin/audit-log?target_table=assets`}>{t("allHistory")}</Link>
+            </Button>
+            <AssetDialog customers={customerOptions} contracts={contractOptions} />
+          </CardAction>
+        )}
       </CardHeader>
       <CardContent>
         <Table>
@@ -39,6 +62,7 @@ export default async function AssetsPage({
               <TableHead>{t("equipmentModel")}</TableHead>
               <TableHead>{t("qty")}</TableHead>
               <TableHead>{t("condition")}</TableHead>
+              {isMaster && <TableHead className="text-right">{t("actions")}</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,19 +87,31 @@ export default async function AssetsPage({
                     "-"
                   )}
                 </TableCell>
-                <TableCell>{a.type}</TableCell>
+                <TableCell>{tCategory(a.type)}</TableCell>
                 <TableCell>{a.owner === "bct" ? tCommon("ownerBct") : tCommon("ownerCustomer")}</TableCell>
                 <TableCell>
                   {a.name}
                   {a.model ? ` / ${a.model}` : ""}
                 </TableCell>
                 <TableCell>{a.qty}</TableCell>
-                <TableCell>{a.condition}</TableCell>
+                <TableCell>{t(`condition_${a.condition}`)}</TableCell>
+                {isMaster && (
+                  <TableCell>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link href={`/${locale}/admin/audit-log?target_table=assets&target_id=${a.asset_id}`}>
+                          {t("history")}
+                        </Link>
+                      </Button>
+                      <AssetDialog asset={a} customers={customerOptions} contracts={contractOptions} />
+                    </div>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
             {assets.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground">
+                <TableCell colSpan={isMaster ? 9 : 8} className="text-center text-muted-foreground">
                   {t("empty")}
                 </TableCell>
               </TableRow>

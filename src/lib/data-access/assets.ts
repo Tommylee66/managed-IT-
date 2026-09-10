@@ -2,6 +2,24 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Asset } from '@/types/domain';
 import type { StaffRole } from '@/lib/masking/staff-masking';
 import { maskSerial } from '@/lib/masking/staff-masking';
+import { nextAssetId } from '@/lib/numbering';
+
+export interface AssetMutationInput {
+  contract_no: string | null;
+  customer_code: string | null;
+  customer_name: string | null;
+  type: Asset['type'];
+  owner: Asset['owner'];
+  name: string;
+  model: string | null;
+  serial: string | null;
+  qty: number;
+  location: string | null;
+  condition: Asset['condition'];
+  warranty: string | null;
+  notes: string | null;
+  status: string;
+}
 
 function applyAssetMasking(asset: Asset, role: StaffRole): Asset {
   if (role === 'master') return asset;
@@ -59,6 +77,41 @@ export async function listAllAssets(supabase: SupabaseClient, role: StaffRole): 
     .order('registered_at', { ascending: false });
   if (error) throw error;
   return (data as Asset[]).map((a) => applyAssetMasking(a, role));
+}
+
+export async function createAsset(
+  supabase: SupabaseClient,
+  input: AssetMutationInput,
+  registeredBy: string
+): Promise<Asset> {
+  const assetId = await nextAssetId(supabase);
+  const { data, error } = await supabase
+    .from('assets')
+    .insert({
+      ...input,
+      asset_id: assetId,
+      source: 'manual',
+      registered_by: registeredBy,
+    })
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Asset;
+}
+
+export async function updateAsset(
+  supabase: SupabaseClient,
+  id: string,
+  input: AssetMutationInput
+): Promise<Asset> {
+  const { data, error } = await supabase
+    .from('assets')
+    .update(input)
+    .eq('id', id)
+    .select('*')
+    .single();
+  if (error) throw error;
+  return data as Asset;
 }
 
 /** Resolve and validate IDs received from the activation form. An unassigned
