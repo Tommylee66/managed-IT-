@@ -358,6 +358,8 @@
     "editTitle": "자산 정보 수정",
     "noCustomer": "고객 미지정",
     "noContract": "계약 미지정",
+    "noModel": "모델 미지정",
+    "catalogSelectionNotice": "자산명과 모델은 장비 카탈로그 및 기존 자산 목록에서 선택합니다.",
     "nameRequired": "자산명을 입력해주세요.",
     "qtyInvalid": "수량은 1 이상이어야 합니다.",
     "saving": "저장 중...",

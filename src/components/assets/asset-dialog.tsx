@@ -29,10 +29,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   ASSET_CONDITIONS,
+  ASSET_DEFAULT_NAMES,
   ASSET_OWNERS,
   ASSET_STATUSES,
   ASSET_TYPES,
   type AssetEditorInput,
+  type AssetOptionMap,
 } from "@/lib/assets/constants";
 import type { Asset } from "@/types/domain";
 
@@ -66,10 +68,14 @@ export function AssetDialog({
   asset,
   customers,
   contracts,
+  nameOptions,
+  modelOptions,
 }: {
   asset?: Asset;
   customers: CustomerOption[];
   contracts: ContractOption[];
+  nameOptions: AssetOptionMap;
+  modelOptions: AssetOptionMap;
 }) {
   const t = useTranslations("assets");
   const tCommon = useTranslations("common");
@@ -83,7 +89,7 @@ export function AssetDialog({
     contract_no: asset?.contract_no ?? "",
     type: asset?.type ?? "router",
     owner: asset?.owner ?? "bct",
-    name: asset?.name ?? "",
+    name: asset?.name ?? ASSET_DEFAULT_NAMES.router,
     model: asset?.model ?? "",
     serial: asset?.serial ?? "",
     qty: asset?.qty ?? 1,
@@ -108,6 +114,9 @@ export function AssetDialog({
 
   const selectedCustomerCode = useWatch({ control, name: "customer_code" });
   const selectedContractNo = useWatch({ control, name: "contract_no" });
+  const selectedType = useWatch({ control, name: "type" });
+  const selectedName = useWatch({ control, name: "name" });
+  const selectedModel = useWatch({ control, name: "model" });
   const availableContracts = useMemo(
     () =>
       selectedCustomerCode
@@ -129,6 +138,16 @@ export function AssetDialog({
     const contract = contracts.find((candidate) => candidate.no === contractNo);
     if (contract) {
       setValue("customer_code", contract.customer_code, { shouldValidate: true });
+    }
+  }
+
+  function changeType(type: FormValues["type"]) {
+    setValue("type", type, { shouldValidate: true });
+    if (!nameOptions[type].includes(selectedName)) {
+      setValue("name", ASSET_DEFAULT_NAMES[type], { shouldValidate: true });
+    }
+    if (selectedModel && !modelOptions[type].includes(selectedModel)) {
+      setValue("model", "", { shouldValidate: true });
     }
   }
 
@@ -258,7 +277,7 @@ export function AssetDialog({
                 control={control}
                 name="type"
                 render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select value={field.value} onValueChange={(value) => changeType(value as FormValues["type"])}>
                     <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {ASSET_TYPES.map((type) => (
@@ -292,15 +311,49 @@ export function AssetDialog({
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2">
-              <Label htmlFor={`asset-name-${asset?.id ?? "new"}`}>{t("name")}</Label>
-              <Input id={`asset-name-${asset?.id ?? "new"}`} {...register("name")} />
+              <Label>{t("name")}</Label>
+              <Controller
+                control={control}
+                name="name"
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {nameOptions[selectedType].map((name) => (
+                        <SelectItem key={name} value={name}>
+                          {name === ASSET_DEFAULT_NAMES[selectedType] ? tCategory(selectedType) : name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.name && <p className="text-sm text-destructive">{t("nameRequired")}</p>}
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor={`asset-model-${asset?.id ?? "new"}`}>{t("model")}</Label>
-              <Input id={`asset-model-${asset?.id ?? "new"}`} {...register("model")} />
+              <Label>{t("model")}</Label>
+              <Controller
+                control={control}
+                name="model"
+                render={({ field }) => (
+                  <Select
+                    value={field.value || NONE}
+                    onValueChange={(value) => field.onChange(value === NONE ? "" : value)}
+                  >
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE}>{t("noModel")}</SelectItem>
+                      {modelOptions[selectedType].map((model) => (
+                        <SelectItem key={model} value={model}>{model}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
           </div>
+
+          <p className="-mt-2 text-xs text-muted-foreground">{t("catalogSelectionNotice")}</p>
 
           <div className="flex flex-col gap-2">
             <Label htmlFor={`asset-serial-${asset?.id ?? "new"}`}>{t("serial")}</Label>

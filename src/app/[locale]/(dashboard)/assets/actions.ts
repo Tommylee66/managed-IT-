@@ -9,6 +9,7 @@ import { getCustomerRaw } from '@/lib/data-access/customers';
 import { getContractRaw } from '@/lib/data-access/contracts';
 import {
   ASSET_CONDITIONS,
+  ASSET_DEFAULT_NAMES,
   ASSET_OWNERS,
   ASSET_STATUSES,
   ASSET_TYPES,
@@ -37,6 +38,45 @@ const assetInputSchema = z.object({
 });
 
 type ParsedAssetInput = z.infer<typeof assetInputSchema>;
+
+async function validateExistingAssetChoices(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  input: ParsedAssetInput
+) {
+  if (input.name !== ASSET_DEFAULT_NAMES[input.type]) {
+    const { data: matchingNames, error: nameError } = await supabase
+      .from('assets')
+      .select('id')
+      .eq('type', input.type)
+      .eq('name', input.name)
+      .limit(1);
+    if (nameError) throw nameError;
+    if (!matchingNames.length) throw new Error('ASSET_NAME_NOT_IN_LIST');
+  }
+
+  if (!input.model) return;
+
+  const [existingAssetModel, catalogModel] = await Promise.all([
+    supabase
+      .from('assets')
+      .select('id')
+      .eq('type', input.type)
+      .eq('model', input.model)
+      .limit(1),
+    supabase
+      .from('equipment_catalog')
+      .select('id')
+      .eq('category', input.type)
+      .eq('model_name', input.model)
+      .eq('is_active', true)
+      .limit(1),
+  ]);
+  if (existingAssetModel.error) throw existingAssetModel.error;
+  if (catalogModel.error) throw catalogModel.error;
+  if (!existingAssetModel.data.length && !catalogModel.data.length) {
+    throw new Error('ASSET_MODEL_NOT_IN_LIST');
+  }
+}
 
 async function canonicalizeAssociation(
   supabase: Awaited<ReturnType<typeof createClient>>,
@@ -86,6 +126,7 @@ export async function createAssetAction(input: unknown) {
   const session = await requireMaster();
   const parsed = assetInputSchema.parse(input);
   const supabase = await createClient();
+  await validateExistingAssetChoices(supabase, parsed);
   const asset = await createAsset(
     supabase,
     await canonicalizeAssociation(supabase, parsed),
@@ -100,6 +141,7 @@ export async function updateAssetAction(id: string, input: unknown) {
   const assetId = z.string().uuid().parse(id);
   const parsed = assetInputSchema.parse(input);
   const supabase = await createClient();
+  await validateExistingAssetChoices(supabase, parsed);
   const asset = await updateAsset(supabase, assetId, await canonicalizeAssociation(supabase, parsed));
   revalidateAssetViews();
   return { id: asset.id, asset_id: asset.asset_id };

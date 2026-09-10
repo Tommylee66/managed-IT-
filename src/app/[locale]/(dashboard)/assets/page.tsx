@@ -5,6 +5,8 @@ import { getSessionContext } from "@/lib/auth/session";
 import { listAllAssets } from "@/lib/data-access/assets";
 import { listCustomers } from "@/lib/data-access/customers";
 import { listContracts } from "@/lib/data-access/contracts";
+import { listEquipmentCatalog } from "@/lib/data-access/equipment";
+import { ASSET_DEFAULT_NAMES, ASSET_TYPES, type AssetOptionMap } from "@/lib/assets/constants";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,10 +22,11 @@ export default async function AssetsPage({
   const session = await getSessionContext();
   const supabase = await createClient();
   const isMaster = session!.role === "master";
-  const [assets, customers, contracts, t, tContracts, tCommon, tCategory] = await Promise.all([
+  const [assets, customers, contracts, equipment, t, tContracts, tCommon, tCategory] = await Promise.all([
     listAllAssets(supabase, session!.role),
     isMaster ? listCustomers(supabase, session!.role) : Promise.resolve([]),
     isMaster ? listContracts(supabase, session!.role) : Promise.resolve([]),
+    isMaster ? listEquipmentCatalog(supabase, { activeOnly: true, role: "master" }) : Promise.resolve([]),
     getTranslations("assets"),
     getTranslations("contracts"),
     getTranslations("common"),
@@ -35,6 +38,30 @@ export default async function AssetsPage({
     customer_code,
     customer_name,
   }));
+  const nameOptions = Object.fromEntries(
+    ASSET_TYPES.map((type) => [
+      type,
+      [...new Set([
+        ASSET_DEFAULT_NAMES[type],
+        ...assets
+          .filter((asset) => asset.type === type)
+          .map((asset) => asset.name)
+          .filter((name): name is string => Boolean(name)),
+      ])].sort((a, b) => a.localeCompare(b)),
+    ])
+  ) as AssetOptionMap;
+  const modelOptions = Object.fromEntries(
+    ASSET_TYPES.map((type) => [
+      type,
+      [...new Set([
+        ...equipment.filter((item) => item.category === type).map((item) => item.model_name),
+        ...assets
+          .filter((asset) => asset.type === type)
+          .map((asset) => asset.model)
+          .filter((model): model is string => Boolean(model)),
+      ])].sort((a, b) => a.localeCompare(b)),
+    ])
+  ) as AssetOptionMap;
 
   return (
     <Card>
@@ -46,7 +73,12 @@ export default async function AssetsPage({
             <Button variant="outline" asChild>
               <Link href={`/${locale}/admin/audit-log?target_table=assets`}>{t("allHistory")}</Link>
             </Button>
-            <AssetDialog customers={customerOptions} contracts={contractOptions} />
+            <AssetDialog
+              customers={customerOptions}
+              contracts={contractOptions}
+              nameOptions={nameOptions}
+              modelOptions={modelOptions}
+            />
           </CardAction>
         )}
       </CardHeader>
@@ -103,7 +135,13 @@ export default async function AssetsPage({
                           {t("history")}
                         </Link>
                       </Button>
-                      <AssetDialog asset={a} customers={customerOptions} contracts={contractOptions} />
+                      <AssetDialog
+                        asset={a}
+                        customers={customerOptions}
+                        contracts={contractOptions}
+                        nameOptions={nameOptions}
+                        modelOptions={modelOptions}
+                      />
                     </div>
                   </TableCell>
                 )}

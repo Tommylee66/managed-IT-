@@ -358,6 +358,8 @@
     "editTitle": "Ubah Aset",
     "noCustomer": "Tanpa pelanggan",
     "noContract": "Tanpa kontrak",
+    "noModel": "Tanpa model",
+    "catalogSelectionNotice": "Nama dan model aset dipilih dari katalog perangkat dan aset yang sudah ada.",
     "nameRequired": "Masukkan nama aset.",
     "qtyInvalid": "Jumlah minimal 1.",
     "saving": "Menyimpan...",

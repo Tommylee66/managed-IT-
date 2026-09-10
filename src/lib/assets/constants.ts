@@ -30,6 +30,22 @@ export const ASSET_STATUSES = ['active', 'inactive'] as const;
 
 export type AssetStatus = (typeof ASSET_STATUSES)[number];
 
+export const ASSET_DEFAULT_NAMES: Record<AssetType, string> = {
+  router: 'Router',
+  ap: 'AP',
+  hub_switch: 'Hub/Switch',
+  cctv: 'CCTV',
+  security: 'Security Device',
+  vpn_config: 'VPN Configuration',
+  starlink: 'Starlink',
+  pc_server: 'PC/Server',
+  printer: 'Printer',
+  ip_pbx: 'IP PBX',
+  other: 'Other',
+};
+
+export type AssetOptionMap = Record<AssetType, string[]>;
+
 export interface AssetEditorInput {
   customer_code: string | null;
   contract_no: string | null;

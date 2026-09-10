@@ -358,6 +358,8 @@
     "editTitle": "Edit Asset",
     "noCustomer": "No customer",
     "noContract": "No contract",
+    "noModel": "No model",
+    "catalogSelectionNotice": "Asset names and models are selected from the equipment catalog and existing assets.",
     "nameRequired": "Enter an asset name.",
     "qtyInvalid": "Quantity must be at least 1.",
     "saving": "Saving...",
