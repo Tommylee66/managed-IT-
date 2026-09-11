@@ -21,6 +21,21 @@ export async function getActivation(
   return data as Activation | null;
 }
 
+export async function getLatestActivationByContract(
+  supabase: SupabaseClient,
+  contractNo: string
+): Promise<Activation | null> {
+  const { data, error } = await supabase
+    .from('activations')
+    .select('*')
+    .eq('contract_no', contractNo)
+    .order('saved_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data as Activation | null;
+}
+
 export interface CreateActivationInput {
   contract_no: string;
   date: string;

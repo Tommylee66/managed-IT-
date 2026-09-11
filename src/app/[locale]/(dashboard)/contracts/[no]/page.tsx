@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { getContract } from "@/lib/data-access/contracts";
 import { listAssetsByContract } from "@/lib/data-access/assets";
+import { getLatestActivationByContract } from "@/lib/data-access/activations";
 import { getInvoiceByContractMonth } from "@/lib/data-access/invoices";
 import { getRates } from "@/lib/data-access/rates";
 import { calcContractCommissionForMonth } from "@/lib/calc/commission-report";
@@ -35,8 +36,9 @@ export default async function ContractDetailPage({
   if (!contract) notFound();
 
   const thisMonth = currentMonthKey();
-  const [assets, t, tCommon, tAssets, thisMonthInvoice, rates] = await Promise.all([
+  const [assets, latestActivation, t, tCommon, tAssets, thisMonthInvoice, rates] = await Promise.all([
     listAssetsByContract(supabase, no, session!.role),
+    getLatestActivationByContract(supabase, no),
     getTranslations("contracts"),
     getTranslations("common"),
     getTranslations("assets"),
@@ -60,6 +62,61 @@ export default async function ContractDetailPage({
       : thisMonthPaidAmount >= thisMonthInvoice.total
         ? t("commissionPaidInFull")
         : t("commissionPartiallyPaid");
+
+  const quoteInputs = contract.quote_snapshot?.inputs;
+  const pcCount = Math.max(0, Number(quoteInputs?.emp ?? 0));
+  const cctvCount = Math.max(0, Number(quoteInputs?.cctv ?? 0));
+  const activationServices = latestActivation?.service_selections ?? [];
+  const activationServiceById = new Map(
+    activationServices.map((service) => [service.catalogId, service])
+  );
+  const recurringContractServices = (contract.quote_snapshot?.service_selections ?? []).filter(
+    (service) => service.monthlyRate != null
+  );
+  const recurringContractServiceIds = new Set(
+    recurringContractServices.map((service) => service.catalogId)
+  );
+  const monthlyServiceRows = [
+    {
+      key: "managed-it-base",
+      name: t("managedItBaseService"),
+      usage: t("inUse"),
+      detail: t("managedItBaseServiceDetail"),
+    },
+    {
+      key: "pc-maintenance",
+      name: t("pcMaintenance"),
+      usage: tAssets("qtyUnit", { count: pcCount }),
+      detail: t("managedCoverage"),
+    },
+    {
+      key: "cctv-maintenance",
+      name: t("cctvMaintenance"),
+      usage: tAssets("qtyUnit", { count: cctvCount }),
+      detail: t("managedCoverage"),
+    },
+    ...recurringContractServices.map((service) => {
+      const activatedService = activationServiceById.get(service.catalogId);
+      const description = locale === "ko" ? service.descriptionKo : service.descriptionId;
+      return {
+        key: `contract-service-${service.catalogId}`,
+        name: locale === "ko" ? service.nameKo : service.nameId,
+        usage: t("serviceQuantity", { count: service.qty }),
+        detail: activatedService?.detail || description || "-",
+      };
+    }),
+    ...activationServices
+      .filter((service) => !recurringContractServiceIds.has(service.catalogId))
+      .map((service) => {
+        const description = locale === "ko" ? service.descriptionKo : service.descriptionId;
+        return {
+          key: `activation-service-${service.catalogId}`,
+          name: locale === "ko" ? service.nameKo : service.nameId,
+          usage: t("inUse"),
+          detail: service.detail || description || "-",
+        };
+      }),
+  ];
 
   const STATUS_LABEL: Record<string, string> = {
     contracted: t("statusContracted"),
@@ -197,6 +254,32 @@ export default async function ContractDetailPage({
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("monthlyServices")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t("serviceName")}</TableHead>
+                <TableHead>{t("serviceUsage")}</TableHead>
+                <TableHead>{t("serviceDetail")}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {monthlyServiceRows.map((service) => (
+                <TableRow key={service.key}>
+                  <TableCell className="font-medium">{service.name}</TableCell>
+                  <TableCell>{service.usage}</TableCell>
+                  <TableCell className="whitespace-pre-wrap">{service.detail}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
