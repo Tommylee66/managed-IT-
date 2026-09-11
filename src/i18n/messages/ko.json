@@ -648,7 +648,20 @@
     "recordPayment": "결제 처리",
     "recording": "처리 중...",
     "recordPaymentSuccess": "결제 정보를 저장했습니다.",
-    "recordPaymentError": "결제 정보 저장에 실패했습니다."
+    "recordPaymentError": "결제 정보 저장에 실패했습니다.",
+    "customerHistoryTitle": "고객사별 청구내역",
+    "customerHistoryDescription": "고객사를 선택하면 발행된 청구서를 확인하고 전체 내역을 엑셀로 받을 수 있습니다.",
+    "selectCustomer": "고객사를 선택하세요",
+    "chooseCustomerFirst": "청구내역을 확인할 고객사를 선택하세요.",
+    "downloadExcel": "청구내역 엑셀 다운로드",
+    "invoiceCount": "청구서 수",
+    "billedTotal": "누적 청구액",
+    "paidTotal": "누적 결제액",
+    "outstandingAmount": "미결제 잔액",
+    "invoiceNo": "청구서번호",
+    "content": "내용",
+    "viewContent": "내용 확인",
+    "noCustomerInvoices": "선택한 고객사의 발행된 청구서가 없습니다."
   },
   "applications": {
     "title": "신청",

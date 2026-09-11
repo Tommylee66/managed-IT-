@@ -648,7 +648,20 @@
     "recordPayment": "Record Payment",
     "recording": "Saving...",
     "recordPaymentSuccess": "Payment information saved.",
-    "recordPaymentError": "Failed to save payment information."
+    "recordPaymentError": "Failed to save payment information.",
+    "customerHistoryTitle": "Billing History by Customer",
+    "customerHistoryDescription": "Select a customer to review issued invoices and download the full history as Excel.",
+    "selectCustomer": "Select a customer",
+    "chooseCustomerFirst": "Select a customer to view billing history.",
+    "downloadExcel": "Download Billing History",
+    "invoiceCount": "Invoices",
+    "billedTotal": "Total Billed",
+    "paidTotal": "Total Paid",
+    "outstandingAmount": "Outstanding Balance",
+    "invoiceNo": "Invoice No.",
+    "content": "Details",
+    "viewContent": "View Details",
+    "noCustomerInvoices": "No issued invoices found for this customer."
   },
   "applications": {
     "title": "Applications",

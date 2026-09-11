@@ -648,7 +648,20 @@
     "recordPayment": "Catat Pembayaran",
     "recording": "Memproses...",
     "recordPaymentSuccess": "Informasi pembayaran berhasil disimpan.",
-    "recordPaymentError": "Gagal menyimpan informasi pembayaran."
+    "recordPaymentError": "Gagal menyimpan informasi pembayaran.",
+    "customerHistoryTitle": "Riwayat Tagihan per Pelanggan",
+    "customerHistoryDescription": "Pilih pelanggan untuk melihat faktur yang telah diterbitkan dan mengunduh seluruh riwayat dalam Excel.",
+    "selectCustomer": "Pilih pelanggan",
+    "chooseCustomerFirst": "Pilih pelanggan untuk melihat riwayat tagihan.",
+    "downloadExcel": "Unduh Riwayat Excel",
+    "invoiceCount": "Jumlah Faktur",
+    "billedTotal": "Total Ditagihkan",
+    "paidTotal": "Total Dibayar",
+    "outstandingAmount": "Sisa Tagihan",
+    "invoiceNo": "No. Faktur",
+    "content": "Isi",
+    "viewContent": "Lihat Isi",
+    "noCustomerInvoices": "Belum ada faktur yang diterbitkan untuk pelanggan ini."
   },
   "applications": {
     "title": "Pengajuan",

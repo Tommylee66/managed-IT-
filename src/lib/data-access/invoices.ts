@@ -24,6 +24,21 @@ export async function listInvoices(supabase: SupabaseClient, role: StaffRole): P
   return (data as Invoice[]).map((i) => applyInvoiceMasking(i, role));
 }
 
+export async function listInvoicesByCustomer(
+  supabase: SupabaseClient,
+  customerCode: string,
+  role: StaffRole
+): Promise<Invoice[]> {
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*')
+    .eq('customer_code', customerCode)
+    .order('month', { ascending: false })
+    .order('date', { ascending: false });
+  if (error) throw error;
+  return (data as Invoice[]).map((invoice) => applyInvoiceMasking(invoice, role));
+}
+
 export async function getInvoice(
   supabase: SupabaseClient,
   no: string,
