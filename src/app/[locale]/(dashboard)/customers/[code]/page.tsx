@@ -15,6 +15,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EditCustomerForm } from "@/components/customers/edit-customer-form";
+import { ErasureActions } from "@/components/privacy/erasure-actions";
+import { anonymizeCustomerAction } from "@/app/[locale]/(dashboard)/customers/actions";
 import type { Locale } from "@/config/constants";
 
 export default async function CustomerDetailPage({
@@ -341,6 +343,14 @@ export default async function CustomerDetailPage({
       </Card>
 
       {session!.role === "master" && <EditCustomerForm customer={customer} />}
+      {session!.role === "master" && (
+        <ErasureActions
+          type="customer"
+          code={customer.code}
+          anonymized={customer.contact === null && customer.email === null}
+          onAnonymize={anonymizeCustomerAction}
+        />
+      )}
     </div>
   );
 }

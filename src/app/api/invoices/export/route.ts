@@ -57,6 +57,19 @@ export async function GET(request: NextRequest) {
   ]);
   if (!customer) return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
 
+  // Same reason as the PDF route: a spreadsheet of one customer's billing
+  // history leaves the system, and a breach notice has to be able to say
+  // whose data went where.
+  const { error: auditError } = await supabase.rpc('log_audit', {
+    p_action: 'INVOICE_EXPORTED',
+    p_target_table: 'invoices',
+    p_target_id: customerCode,
+    p_details: { role: session.role, rows: invoices.length },
+  });
+  if (auditError) {
+    console.error('audit log failed for invoice export', auditError);
+  }
+
   const labels = LABELS[locale];
   const workbook = new ExcelJS.Workbook();
   workbook.creator = 'BCT Total IT Care';

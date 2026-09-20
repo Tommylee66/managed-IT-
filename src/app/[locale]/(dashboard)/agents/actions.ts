@@ -8,6 +8,7 @@ import {
   changeAgentRate,
   setAgentActive,
   updateAgentInfo,
+  anonymizeAgent,
   type CreateAgentInput,
   type UpdateAgentInfoInput,
 } from '@/lib/data-access/agents';
@@ -80,4 +81,12 @@ export async function setAgentActiveAction(code: string, active: boolean) {
   revalidatePath('/agents');
   revalidatePath(`/agents/${code}`);
   return agent;
+}
+
+export async function anonymizeAgentAction(code: string) {
+  await requireMaster();
+  const supabase = await createClient();
+  await anonymizeAgent(supabase, code);
+  revalidatePath('/agents');
+  revalidatePath(`/agents/${code}`);
 }

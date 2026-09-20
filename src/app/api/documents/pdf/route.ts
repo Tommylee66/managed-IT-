@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionContext } from "@/lib/auth/session";
 import { canAccessPath } from "@/lib/auth/permissions";
+import { createClient } from "@/lib/supabase/server";
 import { generateDocumentPdf } from "@/lib/pdf/generate-document-pdf";
 
 export const runtime = "nodejs";
@@ -45,6 +46,25 @@ export async function GET(req: NextRequest) {
 
   try {
     const pdf = await generateDocumentPdf(url, cookies);
+
+    // A PDF leaves the system with a person's data in it (an agreement
+    // carries an agent's bank account; an invoice, a customer's billing
+    // contact). UU PDP art. 46 gives 3x24 hours to tell people what was
+    // exposed in a breach, which is unanswerable without a record of who
+    // took what out. Logged after the render so a failed generation isn't
+    // recorded as an export, and awaited so the log can't be lost with the
+    // response — this is the audit trail, not telemetry.
+    const supabase = await createClient();
+    const { error: auditError } = await supabase.rpc("log_audit", {
+      p_action: "DOCUMENT_EXPORTED",
+      p_target_table: null,
+      p_target_id: pathWithoutLocale,
+      p_details: { role: session.role },
+    });
+    if (auditError) {
+      console.error("audit log failed for document export", auditError);
+    }
+
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         "content-type": "application/pdf",

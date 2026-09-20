@@ -1090,7 +1090,6 @@
     "prev": "Sebelumnya",
     "next": "Selanjutnya",
     "restart": "Mulai dari awal",
-
     "mockAppName": "BCT Total IT Care",
     "mockStaffBadge": "Staf",
     "mockHomeButton": "Beranda",
@@ -1107,13 +1106,11 @@
     "mockExampleTag": "(contoh)",
     "mockAutoTag": "(otomatis)",
     "perMonthSuffix": "/bln",
-
     "step0Eyebrow": "Mulai",
     "step0Title": "Apa yang bisa dilakukan dengan panduan ini?",
     "step0Lede": "Panduan ini mengikuti layar yang sesungguhnya akan Anda lihat saat login dengan akun agen penjualan (sales_agent), mulai dari pendaftaran pelanggan hingga kontrak dan pengecekan komisi. Klik daftar di sebelah kiri atau gunakan tombol \"Selanjutnya\" di bawah untuk berpindah.",
     "step0TipTitle": "Yang dapat Anda lakukan dengan akun agen penjualan",
     "step0TipBody": "① Pendaftaran dan pencarian pelanggan · ② Pembuatan penawaran · ③ Pengecekan kontrak · ④ Pendaftaran permintaan perubahan · ⑤ Pengecekan status komisi Anda sendiri. Menu selain kelima hal ini (pengaturan tarif, manajemen staf, dll.) khusus untuk admin dan tidak akan muncul.",
-
     "step1Eyebrow": "Langkah 1",
     "step1Title": "Login",
     "step1Lede": "Login menggunakan email dan kata sandi sementara yang diberikan oleh admin. Anda dapat memilih bahasa di kanan atas: Bahasa Indonesia / 한국어 / English.",
@@ -1124,7 +1121,6 @@
     "mockLoginButton": "Login",
     "step1TipTitle": "Jika ini login pertama Anda",
     "step1TipBody": "Masukkan kata sandi sementara yang diberikan admin apa adanya untuk login, lalu demi keamanan segera klik \"Lupa kata sandi?\" untuk menggantinya dengan kata sandi yang hanya Anda ketahui.",
-
     "step2Eyebrow": "Langkah 2",
     "step2Title": "Melihat dashboard",
     "step2Lede": "Ini adalah layar pertama yang muncul setelah login. Bagian atas menampilkan ringkasan kinerja bulan ini, bagian bawah menampilkan kartu menu yang benar-benar akan Anda pakai. Akun agen penjualan hanya menampilkan menu yang diperlukan, dikelompokkan rapi dalam dua bagian.",
@@ -1136,7 +1132,6 @@
     "mockStatPendingActivation": "Menunggu Aktivasi Bulan Ini",
     "step2TipTitle": "Menu lain tidak terlihat?",
     "step2TipBody": "Itu wajar. Menu khusus admin seperti pengaturan tarif dan manajemen staf memang tidak pernah muncul di akun agen penjualan. Hanya menu yang benar-benar bisa digunakan yang ditampilkan, tanpa ruang kosong.",
-
     "step3Eyebrow": "Langkah 3",
     "step3Title": "Mendaftarkan pelanggan",
     "step3Lede": "Masuk ke \"① Pelanggan · Penjualan → Pelanggan/Pendaftaran\" untuk melihat daftar pelanggan yang selama ini Anda tangani. Gunakan tombol \"Pelanggan Baru\" di kanan atas untuk mendaftarkan pelanggan baru.",
@@ -1157,7 +1152,6 @@
     "mockContactLabel": "Kontak",
     "mockAgentLabel": "Agen Penjualan Penanggung Jawab",
     "mockRegisterButton": "Daftar",
-
     "step4Eyebrow": "Langkah 4",
     "step4Title": "Membuat penawaran",
     "step4Lede": "Di \"② Pengajuan · Penawaran · Kontrak → Pengajuan Baru (Penawaran)\", pilih pelanggan dan masukkan ketentuan kontrak. Di sini juga agen penjualan otomatis terkunci ke nama Anda.",
@@ -1170,7 +1164,6 @@
     "mockCategoryRouter": "[Router]",
     "mockDescriptionAP": "OMADA 300Mbps Wireless N Mount AP",
     "mockCalculateButton": "Hitung",
-
     "step5Eyebrow": "Langkah 5",
     "step5Title": "Mengecek hasil penawaran",
     "step5Lede": "Setelah menekan \"Hitung\", total tagihan bulanan langsung dihitung per item di sebelah kanan. PPN juga otomatis dihitung dan ditampilkan.",
@@ -1181,7 +1174,6 @@
     "mockRowVisitCost": "Biaya Kunjungan Rutin 1x/Bulan",
     "step5TipTitle": "Jangan lupa menyimpan",
     "step5TipBody": "Jika hasilnya sudah sesuai, pastikan menekan tombol \"Simpan Penawaran\" di bawah agar nomor penawaran dibuat dan dapat dilanjutkan ke kontrak.",
-
     "step6Eyebrow": "Langkah 6",
     "step6Title": "Simpan Penawaran → Buat Kontrak",
     "step6Lede": "Setelah penawaran disimpan, nomor penawaran (QUO...) dibuat, dan Anda bisa langsung membuat dokumen penawaran cetak untuk pelanggan. Setelah pelanggan menyetujui, kontrak resmi dibuat hanya dengan menekan tombol \"Buat Kontrak\" di layar yang sama.",
@@ -1195,7 +1187,6 @@
     "mockQuoteFooterLabel": "Penawaran QUO20260805-001",
     "mockQuoteFooterSummary": "Total Bulanan Rp 4.922.000 · 36 bulan",
     "mockCreateContractButton": "Buat Kontrak",
-
     "step7Eyebrow": "Langkah 7",
     "step7Title": "Mengecek kontrak",
     "step7Lede": "Setelah menekan \"Buat Kontrak\", nomor kontrak (CTR...) dibuat otomatis dan dapat dilihat kembali kapan saja di menu \"② Pengajuan · Penawaran · Kontrak → Kontrak\". Dari sini juga Anda dapat memulai pendaftaran aktivasi, permintaan perubahan, dan proses pengakhiran.",
@@ -1212,7 +1203,6 @@
     "mockTerminationButton": "Ajukan Pengakhiran",
     "step7TipTitle": "Jumlah komisi tidak ditampilkan di sini",
     "step7TipBody": "\"Komisi Penjualan\" di layar kontrak disembunyikan dan hanya dapat dilihat oleh admin. Jika ingin tahu komisi Anda, gunakan menu \"Komisi Saya\" di langkah 10 — di sana Anda dapat melihat bagian Anda secara akurat.",
-
     "step8Eyebrow": "Langkah 8",
     "step8Title": "Mendaftarkan permintaan perubahan",
     "step8Lede": "Jika perlu menambah atau mengubah perangkat/layanan setelah kontrak berjalan, mulai dari tombol \"Daftarkan Permintaan Perubahan\" di layar detail kontrak. Riwayat perubahan sejauh ini dapat dilihat di \"② Pengajuan · Penawaran · Kontrak → Permintaan Perubahan\".",
@@ -1224,7 +1214,6 @@
     "mockColChangeBefore": "Sebelum",
     "mockColChangeAfter": "Sesudah",
     "mockChangeRequestEmpty": "Belum ada riwayat permintaan perubahan.",
-
     "step9Eyebrow": "Langkah 9",
     "step9Title": "Mengecek status komisi saya",
     "step9Lede": "Di \"① Pelanggan · Penjualan → Komisi Saya\", Anda dapat melihat sekilas komisi kumulatif per kontrak dan riwayat bulanan dari seluruh pelanggan yang Anda dapatkan sejauh ini. Komisi agen penjualan lain tidak ditampilkan, hanya bagian Anda sendiri.",
@@ -1238,11 +1227,22 @@
     "mockViewHistory": "▸ Lihat riwayat bulanan ({count} bulan)",
     "step9TipTitle": "Apa maksud \"termasuk riwayat\"?",
     "step9TipBody": "Membuka \"Lihat riwayat bulanan\" akan menampilkan seluruh nominal yang terkumpul setiap bulan, dari bulan kontrak dimulai hingga bulan ini.",
-
     "step10Eyebrow": "Langkah Terakhir",
     "step10Title": "Rangkuman",
     "step10Lede": "Inilah keseluruhan alur kerja yang dapat dilakukan dengan akun agen penjualan. Berikut ringkasan urutannya sekali lagi.",
     "step10Flow": "1 Daftarkan pelanggan → 2 Buat penawaran → 3 Simpan penawaran → 4 Buat kontrak → 5 Ajukan perubahan bila perlu → 6 Cek di Komisi Saya",
     "step10Final": "Jika layar membingungkan atau ada masalah, jangan ragu menghubungi admin. Jangan bagikan informasi login (email/kata sandi) kepada siapa pun, dan selalu tekan \"Keluar\" di kanan atas saat meninggalkan tempat duduk."
+  },
+  "privacy": {
+    "title": "Pemenuhan hak data pribadi",
+    "description": "Menangani permintaan akses, pemindahan, dan penghapusan dari subjek data. Penghapusan bersifat permanen dan tidak dapat dijalankan selama kontrak masih berlaku.",
+    "export": "Ekspor data (JSON)",
+    "anonymize": "Anonimkan data pribadi",
+    "anonymizeConfirmTitle": "Anonimkan data pribadi?",
+    "anonymizeConfirmBody": "Nama, kontak, alamat, rekening, dan NPWP {code} akan dihapus permanen. Catatan kontrak dan tagihan tetap disimpan sebagai bukti perpajakan. Tindakan ini tidak dapat dibatalkan.",
+    "anonymizeConfirmPrompt": "Ketik {code} untuk konfirmasi",
+    "anonymizeSuccess": "Data pribadi telah dianonimkan.",
+    "anonymizeError": "Gagal menganonimkan data.",
+    "cancel": "Batal"
   }
 }

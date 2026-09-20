@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AgentDetailActions } from "@/components/agents/agent-detail-actions";
 import { EditAgentForm } from "@/components/agents/edit-agent-form";
+import { ErasureActions } from "@/components/privacy/erasure-actions";
+import { anonymizeAgentAction } from "@/app/[locale]/(dashboard)/agents/actions";
 
 export default async function AgentDetailPage({
   params,
@@ -121,6 +123,14 @@ export default async function AgentDetailPage({
 
       {session!.role === "master" && <EditAgentForm agent={agent} />}
       {session!.role === "master" && <AgentDetailActions code={agent.code} active={agent.active} />}
+      {session!.role === "master" && (
+        <ErasureActions
+          type="agent"
+          code={agent.code}
+          anonymized={agent.name === "(dihapus)"}
+          onAnonymize={anonymizeAgentAction}
+        />
+      )}
     </div>
   );
 }

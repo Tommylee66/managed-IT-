@@ -103,3 +103,37 @@ export async function updateCustomer(
   if (error) throw error;
   return data as Customer;
 }
+
+/** See anonymizeAgent. Clears the individual contact behind the company,
+ * keeps the company's own name and tax id (not personal data, and named on
+ * tax documents that must stay readable), and drops their staff's phone
+ * extensions and system credentials outright. */
+export async function anonymizeCustomer(supabase: SupabaseClient, code: string): Promise<void> {
+  const { error } = await supabase.rpc('anonymize_customer', { p_code: code });
+  if (error) throw error;
+}
+
+/** Everything held about one customer, for the data-portability right. */
+export async function exportCustomerPersonalData(
+  supabase: SupabaseClient,
+  code: string
+): Promise<Record<string, unknown>> {
+  const [customer, contracts, invoices, extensions] = await Promise.all([
+    supabase.from('customers').select('*').eq('code', code).single(),
+    supabase.from('contracts').select('no, start_date, months, status, created_at').eq('customer_code', code),
+    supabase.from('invoices').select('no, month, total, paid_at, created_at').eq('customer_code', code),
+    supabase.from('ip_phone_extensions').select('employee_name, extension_number, device_type').eq('customer_code', code),
+  ]);
+  for (const r of [customer, contracts, invoices, extensions]) {
+    if (r.error) throw r.error;
+  }
+
+  return {
+    exported_at: new Date().toISOString(),
+    subject: { type: 'customer', code },
+    customer: customer.data,
+    contracts: contracts.data,
+    invoices: invoices.data,
+    phone_extensions: extensions.data,
+  };
+}

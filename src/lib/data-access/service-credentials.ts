@@ -97,5 +97,20 @@ export async function revealServiceCredentialPassword(
     .single();
   if (error) throw error;
   const row = data as { password_encrypted: EncryptedPayload | null };
-  return row.password_encrypted ? decryptCredential(row.password_encrypted) : null;
+  if (!row.password_encrypted) return null;
+
+  // Decrypting one of these turns a customer's system password back into
+  // plaintext — the single most sensitive read in this codebase, and the
+  // one a breach investigation would most need to reconstruct. Logged
+  // before the plaintext is handed back, so a caller that throws
+  // afterwards still leaves the read on the record.
+  const { error: auditError } = await supabase.rpc('log_audit', {
+    p_action: 'CREDENTIAL_REVEALED',
+    p_target_table: 'service_credentials',
+    p_target_id: id,
+    p_details: { role },
+  });
+  if (auditError) throw auditError;
+
+  return decryptCredential(row.password_encrypted);
 }

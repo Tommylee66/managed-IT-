@@ -149,3 +149,40 @@ export async function setAgentActive(
   if (error) throw error;
   return data as Agent;
 }
+
+/** Irreversibly clears an agent's identifying fields, keeping the code and
+ * commission figures the contracts and payout records depend on. Enforced
+ * in Postgres (master-only, refuses while a contract is in force) — see
+ * 20260920000002_personal_data_erasure.sql. */
+export async function anonymizeAgent(supabase: SupabaseClient, code: string): Promise<void> {
+  const { error } = await supabase.rpc('anonymize_agent', { p_code: code });
+  if (error) throw error;
+}
+
+/** Everything held about one agent, for the data-portability right
+ * (UU PDP art. 13). Their own record plus the contracts their commission
+ * was calculated from — not the customers behind those contracts, which are
+ * someone else's personal data. */
+export async function exportAgentPersonalData(
+  supabase: SupabaseClient,
+  code: string
+): Promise<Record<string, unknown>> {
+  const [{ data: agent, error: agentError }, { data: contracts, error: contractsError }] =
+    await Promise.all([
+      supabase.from('agents').select('*').eq('code', code).single(),
+      supabase
+        .from('contracts')
+        .select('no, customer_code, start_date, months, status, confirmed_at, created_at')
+        .eq('agent_code', code)
+        .order('created_at', { ascending: false }),
+    ]);
+  if (agentError) throw agentError;
+  if (contractsError) throw contractsError;
+
+  return {
+    exported_at: new Date().toISOString(),
+    subject: { type: 'agent', code },
+    agent,
+    contracts,
+  };
+}

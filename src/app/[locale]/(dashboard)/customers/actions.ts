@@ -2,8 +2,14 @@
 
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
-import { getSessionContext } from '@/lib/auth/session';
-import { createCustomer, updateCustomer, type CreateCustomerInput, type UpdateCustomerInput } from '@/lib/data-access/customers';
+import { getSessionContext, requireMaster } from '@/lib/auth/session';
+import {
+  createCustomer,
+  updateCustomer,
+  anonymizeCustomer,
+  type CreateCustomerInput,
+  type UpdateCustomerInput,
+} from '@/lib/data-access/customers';
 
 export async function createCustomerAction(input: Omit<CreateCustomerInput, 'created_by'>) {
   const session = await getSessionContext();
@@ -22,4 +28,12 @@ export async function updateCustomerAction(code: string, input: UpdateCustomerIn
   revalidatePath('/customers');
   revalidatePath(`/customers/${code}`);
   return customer;
+}
+
+export async function anonymizeCustomerAction(code: string) {
+  await requireMaster();
+  const supabase = await createClient();
+  await anonymizeCustomer(supabase, code);
+  revalidatePath('/customers');
+  revalidatePath(`/customers/${code}`);
 }
