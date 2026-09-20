@@ -148,5 +148,15 @@ export async function createTerminationPlan(
     .eq('no', input.contract_no);
   if (contractError) throw contractError;
 
+  // Runs after the status flip on purpose: the RPC decides whether to purge
+  // by counting the customer's remaining non-terminated contracts, and this
+  // contract has to already be one of the terminated ones for that count to
+  // be right. A customer with another contract still running keeps their
+  // credentials — see 20260920000001_purge_credentials_on_termination.sql.
+  const { error: purgeError } = await supabase.rpc('purge_customer_credentials', {
+    p_customer_code: input.customer_code,
+  });
+  if (purgeError) throw purgeError;
+
   return data as TerminationPlan;
 }
