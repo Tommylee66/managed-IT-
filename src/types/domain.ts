@@ -710,3 +710,30 @@ export interface ChangeRequest {
   created_by: string | null;
   created_at: string;
 }
+
+/** Fixed set — each key maps to specific SQL in purge_expired_personal_data()
+ * (see 20260920000003_retention_policies.sql), so adding one is a migration. */
+export type RetentionKey =
+  | 'quotes_unconverted'
+  | 'customer_contacts'
+  | 'agent_records'
+  | 'service_logs'
+  | 'incident_logs'
+  | 'audit_log';
+
+export interface RetentionPolicy {
+  key: RetentionKey;
+  /** Months after the category's own anchor date. */
+  months: number;
+  enabled: boolean;
+  updated_at: string;
+  updated_by: string | null;
+}
+
+/** A policy plus how many rows a purge would touch right now. */
+export interface RetentionPreview {
+  key: RetentionKey;
+  months: number;
+  enabled: boolean;
+  affected: number;
+}

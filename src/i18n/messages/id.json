@@ -46,7 +46,8 @@
     "adminRates": "Pengaturan Tarif",
     "adminAuditLog": "Log Audit",
     "adminApprovals": "Persetujuan Pendaftaran",
-    "incidentLogs": "Penanganan Gangguan & Pemeriksaan Rutin"
+    "incidentLogs": "Penanganan Gangguan & Pemeriksaan Rutin",
+    "adminRetention": "Masa penyimpanan"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -988,7 +989,8 @@
     "chartSignupCancelTitle": "Status Pendaftaran/Pengakhiran per Bulan",
     "chartSignupCancelCaption": "Daftar=tanggal mulai kontrak, Akhiri=tanggal pengajuan pengakhiran disimpan",
     "cardAdminApprovalsDesc": "Setujui atau tolak permintaan pendaftaran staf baru.",
-    "cardIncidentLogsDesc": "Catat penanganan gangguan dan pemeriksaan rutin per pelanggan, dan buat laporan bulanan."
+    "cardIncidentLogsDesc": "Catat penanganan gangguan dan pemeriksaan rutin per pelanggan, dan buat laporan bulanan.",
+    "cardAdminRetentionDesc": "Tetapkan masa penyimpanan dan hapus data pribadi yang telah lewat masa."
   },
   "meterReadings": {
     "title": "Pencatatan Meter Printer",
@@ -1244,5 +1246,42 @@
     "anonymizeSuccess": "Data pribadi telah dianonimkan.",
     "anonymizeError": "Gagal menganonimkan data.",
     "cancel": "Batal"
+  },
+  "retention": {
+    "title": "Masa penyimpanan data",
+    "intro": "Menghapus data pribadi yang masa penyimpanannya telah berakhir, sesuai Pasal 43 UU PDP. Masa berbeda per kategori, dan tidak ada yang dihapus sebelum diaktifkan.",
+    "policiesTitle": "Masa penyimpanan per kategori",
+    "category": "Kategori",
+    "anchor": "Dihitung dari",
+    "months": "Bulan",
+    "affected": "Terdampak",
+    "enabled": "Aktif",
+    "save": "Simpan",
+    "saveSuccess": "Tersimpan.",
+    "saveError": "Gagal menyimpan.",
+    "purge": "Jalankan penghapusan",
+    "purgeConfirmTitle": "Hapus data yang telah melewati masa simpan?",
+    "purgeConfirmBody": "Sekitar {count} data pada kategori aktif akan dihapus atau dianonimkan. Tindakan ini tidak dapat dibatalkan.",
+    "purgeSuccess": "{count} data telah dihapus.",
+    "purgeError": "Penghapusan gagal.",
+    "cancel": "Batal",
+    "notKeptTitle": "Yang tidak dihapus",
+    "notKeptBody": "Kontrak, faktur pajak, penawaran yang menjadi kontrak, dan tagihan adalah bukti perpajakan sehingga tidak dihapus. Data pribadi di dalamnya ditangani dengan menganonimkan catatan agen atau pelanggan, bukan dengan menghapus dokumennya.",
+    "key": {
+      "quotes_unconverted": "Penawaran tanpa kontrak",
+      "customer_contacts": "Kontak pelanggan",
+      "agent_records": "Data pribadi agen",
+      "service_logs": "Catatan layanan",
+      "incident_logs": "Catatan gangguan & inspeksi",
+      "audit_log": "Log audit"
+    },
+    "anchorText": {
+      "quotes_unconverted": "Dari tanggal penawaran. Yang menjadi kontrak dikecualikan",
+      "customer_contacts": "Dari tanggal pengakhiran terakhir. Dikecualikan bila masih ada kontrak",
+      "agent_records": "Dari perubahan terakhir. Dikecualikan bila masih ada kontrak",
+      "service_logs": "Dari tanggal catatan",
+      "incident_logs": "Dari tanggal kejadian",
+      "audit_log": "Dari waktu pencatatan"
+    }
   }
 }

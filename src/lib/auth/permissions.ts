@@ -21,6 +21,7 @@ const ALL_ROLE_PATHS = [
   '/guide',
   '/admin/staff',
   '/admin/rates',
+  '/admin/retention',
   '/admin/audit-log',
   '/admin/approvals',
 ];
@@ -33,7 +34,8 @@ export const ROLE_PATHS: Record<StaffRole, string[]> = {
   // Everything except rates (요율설정), activations (개통), and the new
   // incident-logs (장애처리 및 정기점검) menu.
   admin_dept: ALL_ROLE_PATHS.filter(
-    (p) => !['/admin/rates', '/activations', '/incident-logs'].includes(p)
+    (p) =>
+      !['/admin/rates', '/admin/retention', '/activations', '/incident-logs'].includes(p)
   ),
   // 조회(customer lookup) + 개통 + 장애처리 및 정기점검 only.
   activation_dept: ['/dashboard', '/customers', '/activations', '/incident-logs'],

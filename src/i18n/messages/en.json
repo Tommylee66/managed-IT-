@@ -46,7 +46,8 @@
     "adminRates": "Rate Settings",
     "adminAuditLog": "Audit Log",
     "adminApprovals": "Signup Approvals",
-    "incidentLogs": "Incident Handling & Regular Inspection"
+    "incidentLogs": "Incident Handling & Regular Inspection",
+    "adminRetention": "Data retention"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -988,7 +989,8 @@
     "chartSignupCancelTitle": "Signups/Cancellations by Month",
     "chartSignupCancelCaption": "Signup = contract start date, Cancel = termination request save date",
     "cardAdminApprovalsDesc": "Approve or reject new staff signup requests.",
-    "cardIncidentLogsDesc": "Log incident handling and regular inspections per customer, and generate monthly reports."
+    "cardIncidentLogsDesc": "Log incident handling and regular inspections per customer, and generate monthly reports.",
+    "cardAdminRetentionDesc": "Set retention periods and purge personal data past them."
   },
   "meterReadings": {
     "title": "Printer Meter Readings",
@@ -1244,5 +1246,42 @@
     "anonymizeSuccess": "Personal data anonymised.",
     "anonymizeError": "Could not anonymise the record.",
     "cancel": "Cancel"
+  },
+  "retention": {
+    "title": "Data retention",
+    "intro": "Removes personal data whose retention period has ended (UU PDP art. 43). Periods differ per category, and nothing is removed until a category is switched on.",
+    "policiesTitle": "Retention period per category",
+    "category": "Category",
+    "anchor": "Counted from",
+    "months": "Months",
+    "affected": "Affected",
+    "enabled": "Active",
+    "save": "Save",
+    "saveSuccess": "Saved.",
+    "saveError": "Could not save.",
+    "purge": "Run purge now",
+    "purgeConfirmTitle": "Purge data past its retention period?",
+    "purgeConfirmBody": "About {count} records in the active categories will be deleted or anonymised. This cannot be undone.",
+    "purgeSuccess": "Purged {count} records.",
+    "purgeError": "The purge failed.",
+    "cancel": "Cancel",
+    "notKeptTitle": "What is never purged",
+    "notKeptBody": "Contracts, tax invoices, quotes that became contracts, and bills are tax evidence and are not purged. The personal data on them is handled by anonymising the agent or customer record they point at, not by deleting the document.",
+    "key": {
+      "quotes_unconverted": "Quotes never converted",
+      "customer_contacts": "Customer contact details",
+      "agent_records": "Agent personal data",
+      "service_logs": "Service logs",
+      "incident_logs": "Incident & inspection logs",
+      "audit_log": "Audit log"
+    },
+    "anchorText": {
+      "quotes_unconverted": "From the quote date. Quotes that became contracts are excluded",
+      "customer_contacts": "From the last termination date. Excluded while a contract is in force",
+      "agent_records": "From the last change. Excluded while a contract is in force",
+      "service_logs": "From the log date",
+      "incident_logs": "From the date it occurred",
+      "audit_log": "From when it was recorded"
+    }
   }
 }

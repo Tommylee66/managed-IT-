@@ -46,7 +46,8 @@
     "adminRates": "요율 설정",
     "adminAuditLog": "감사 로그",
     "adminApprovals": "가입 승인",
-    "incidentLogs": "장애처리 및 정기점검"
+    "incidentLogs": "장애처리 및 정기점검",
+    "adminRetention": "보유기간 설정"
   },
   "auth": {
     "title": "BCT Total IT Care",
@@ -988,7 +989,8 @@
     "chartSignupCancelTitle": "월별 가입/해지 현황",
     "chartSignupCancelCaption": "가입=계약 시작일, 해지=해지신청 저장일 기준",
     "cardAdminApprovalsDesc": "새 직원 가입 신청을 승인하거나 거절합니다.",
-    "cardIncidentLogsDesc": "고객별 장애처리 및 정기점검 내용을 기록하고 월간 리포트를 생성합니다."
+    "cardIncidentLogsDesc": "고객별 장애처리 및 정기점검 내용을 기록하고 월간 리포트를 생성합니다.",
+    "cardAdminRetentionDesc": "항목별 보유기간을 정하고, 기간이 지난 개인정보를 파기합니다."
   },
   "meterReadings": {
     "title": "프린터 검침 입력",
@@ -1244,5 +1246,42 @@
     "anonymizeSuccess": "익명화되었습니다.",
     "anonymizeError": "익명화에 실패했습니다.",
     "cancel": "취소"
+  },
+  "retention": {
+    "title": "보유기간 설정",
+    "intro": "UU PDP 제43조에 따라 보유기간이 지난 개인정보를 파기합니다. 기간은 항목별로 다르며, 켜기 전까지는 아무것도 지워지지 않습니다.",
+    "policiesTitle": "항목별 보유기간",
+    "category": "항목",
+    "anchor": "기산점",
+    "months": "보유(개월)",
+    "affected": "대상 건수",
+    "enabled": "적용",
+    "save": "저장",
+    "saveSuccess": "저장했습니다.",
+    "saveError": "저장에 실패했습니다.",
+    "purge": "지금 파기 실행",
+    "purgeConfirmTitle": "보유기간이 지난 데이터를 파기할까요?",
+    "purgeConfirmBody": "적용 중인 항목에서 약 {count}건이 삭제되거나 익명화됩니다. 되돌릴 수 없습니다.",
+    "purgeSuccess": "{count}건을 파기했습니다.",
+    "purgeError": "파기에 실패했습니다.",
+    "cancel": "취소",
+    "notKeptTitle": "파기하지 않는 것",
+    "notKeptBody": "계약서, 세금계산서, 계약으로 이어진 견적, 청구서는 세무 증빙이므로 파기 대상이 아닙니다. 이 문서들에 담긴 개인정보는 문서를 지우는 대신 대리점·고객사 기록을 익명화하는 방식으로 처리합니다.",
+    "key": {
+      "quotes_unconverted": "미전환 견적",
+      "customer_contacts": "고객사 담당자 정보",
+      "agent_records": "대리점 개인정보",
+      "service_logs": "서비스 기록",
+      "incident_logs": "장애·점검 기록",
+      "audit_log": "감사 로그"
+    },
+    "anchorText": {
+      "quotes_unconverted": "견적 작성일 기준. 계약으로 이어진 견적은 제외",
+      "customer_contacts": "마지막 해지일 기준. 유효 계약이 있으면 제외",
+      "agent_records": "최종 변경일 기준. 유효 계약이 있으면 제외",
+      "service_logs": "기록 일자 기준",
+      "incident_logs": "발생 일자 기준",
+      "audit_log": "기록 시각 기준"
+    }
   }
 }

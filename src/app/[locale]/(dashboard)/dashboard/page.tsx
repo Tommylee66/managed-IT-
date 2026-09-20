@@ -173,6 +173,7 @@ export default async function DashboardPage({
             <MenuCard href={p("/admin/approvals")} icon="✅" color="green" title={tNav("adminApprovals")} description={tHome("cardAdminApprovalsDesc")} />
             <MenuCard href={p("/admin/rates")} icon="⚙️" color="green" title={tNav("adminRates")} description={tHome("cardAdminRatesDesc")} />
             <MenuCard href={p("/admin/audit-log")} icon="📋" color="green" title={tNav("adminAuditLog")} description={tHome("cardAdminAuditLogDesc")} />
+            <MenuCard href={p("/admin/retention")} icon="🗂️" color="green" title={tNav("adminRetention")} description={tHome("cardAdminRetentionDesc")} />
           </Fragment>
         ),
       ].filter(Boolean),
