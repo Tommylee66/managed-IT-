@@ -180,6 +180,46 @@ export function equipmentPricedRows(selections: EquipmentSelection[]): QuoteRowR
   return rows;
 }
 
+/** The two row keys equipmentPricedRows emits for usage, so callers that
+ * need to recognise or replace them (invoice-calc, when an actual meter
+ * reading supersedes the quoted estimate) don't re-hardcode the strings. */
+export function isOverageRowKey(key: string | undefined): boolean {
+  return !!key && (key.startsWith('equipment-overage:') || key.startsWith('equipment-overage-color:'));
+}
+
+/** The catalogId a row key addresses — whatever follows the first ':', so
+ * it reads the same on all three shapes ('equipment', 'equipment-overage',
+ * 'equipment-overage-color'). */
+export function equipmentRowCatalogId(key: string | undefined): string | null {
+  if (!key) return null;
+  const i = key.indexOf(':');
+  return i === -1 ? null : key.slice(i + 1);
+}
+
+/** Usage actually metered for one item in one month, replacing the estimate
+ * snapshotted at quote time. */
+export interface MeteredUsage {
+  monoQty: number;
+  colorQty: number;
+}
+
+/** Returns the selections with their usage figures swapped for what was
+ * actually metered, leaving rate/allowance/qty — the agreed commercial
+ * terms — untouched. Feeding the result back through equipmentPricedRows
+ * prices the real month; items with no reading are returned unchanged, so
+ * they keep billing the quoted estimate rather than silently dropping to
+ * zero on a month nobody read their counter. */
+export function withMeteredUsage(
+  selections: EquipmentSelection[],
+  usageByCatalogId: Map<string, MeteredUsage>
+): EquipmentSelection[] {
+  return selections.map((s) => {
+    const usage = usageByCatalogId.get(s.catalogId);
+    if (!usage) return s;
+    return { ...s, overageQty: usage.monoQty, colorOverageQty: usage.colorQty };
+  });
+}
+
 /** Folds priced equipment rows into an already-computed quote/change-request
  * calc — equipment rental has no init/amortization component, so only
  * monthly/monthlyCost/totalCost/margin/commissionBase shift. */

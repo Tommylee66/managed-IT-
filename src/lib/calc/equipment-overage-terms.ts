@@ -3,6 +3,8 @@ import {
   includedAllowance,
   isColorTiered,
   overageTierLabel,
+  withMeteredUsage,
+  type MeteredUsage,
   type OverageTier,
 } from '@/lib/calc/equipment-pricing';
 import { formatRupiah } from '@/lib/utils/currency';
@@ -33,12 +35,13 @@ export interface OverageTermRow {
   qty: number;
   /** Customer price per unit beyond the allowance. */
   rate: number;
-  /** Usage this tier is priced at, as entered on the quote — the raw
-   * figure, before the allowance is deducted. Note this is the *contracted*
-   * usage: monthly invoices are generated from the frozen quote snapshot,
-   * not from a meter read each month (see OVERAGE_ESTIMATE_NOTE), so a
-   * document must not present it as that month's actual reading. */
+  /** Usage this tier is priced at, before the allowance is deducted. */
   usedQty: number;
+  /** Whether usedQty came from an engineer's actual meter reading for the
+   * month, or from the estimate frozen on the quote. Documents label the
+   * two differently — presenting a contracted estimate as a real reading
+   * would be a claim the data does not support. */
+  metered: boolean;
   /** What actually bills: max(0, usedQty - includedQty). */
   billableQty: number;
   /** billableQty x rate. */
@@ -58,7 +61,8 @@ function termRow(
   tier: OverageTier,
   rate: number,
   includedPerUnit: number,
-  usedQty: number
+  usedQty: number,
+  metered: boolean
 ): OverageTermRow {
   const billableQty = billableOverage(usedQty, includedPerUnit, s.qty);
   return {
@@ -70,25 +74,51 @@ function termRow(
     qty: s.qty,
     rate,
     usedQty: usedQty ?? 0,
+    metered,
     billableQty,
     amount: billableQty * rate,
   };
 }
 
 /** One row per metered tier that has a price, in the same order the priced
- * rows are emitted (mono/plain first, then color). */
-export function equipmentOverageTerms(selections: EquipmentSelection[]): OverageTermRow[] {
+ * rows are emitted (mono/plain first, then color).
+ *
+ * `usageByCatalogId` carries a month's actual meter readings: an item with
+ * one is priced on what was really printed, an item without keeps the
+ * quoted estimate — the same fallback invoicing applies (see
+ * withMeterReadings in invoice-calc.ts), so a document shows exactly the
+ * figures its invoice bills. Callers with no readings (the quote and
+ * contract, issued before any month is metered) pass nothing. */
+export function equipmentOverageTerms(
+  selections: EquipmentSelection[],
+  usageByCatalogId: Map<string, MeteredUsage> = new Map()
+): OverageTermRow[] {
   const rows: OverageTermRow[] = [];
-  for (const s of selections) {
+  for (const s of withMeteredUsage(selections, usageByCatalogId)) {
+    const metered = usageByCatalogId.has(s.catalogId);
     const colorTiered = isColorTiered(s.colorOverageRate, s.colorIncludedQty);
     if (s.overageRate != null) {
       rows.push(
-        termRow(s, colorTiered ? 'mono' : null, s.overageRate, s.includedQty ?? 0, s.overageQty ?? 0)
+        termRow(
+          s,
+          colorTiered ? 'mono' : null,
+          s.overageRate,
+          s.includedQty ?? 0,
+          s.overageQty ?? 0,
+          metered
+        )
       );
     }
     if (colorTiered && s.colorOverageRate != null) {
       rows.push(
-        termRow(s, 'color', s.colorOverageRate, s.colorIncludedQty ?? 0, s.colorOverageQty ?? 0)
+        termRow(
+          s,
+          'color',
+          s.colorOverageRate,
+          s.colorIncludedQty ?? 0,
+          s.colorOverageQty ?? 0,
+          metered
+        )
       );
     }
   }
@@ -120,22 +150,23 @@ function ratePhrase(row: OverageTermRow): { id: string; ko: string } {
 
 /** How the quoted monthly amount relates to these per-page terms. Worth
  * stating precisely, because the two can otherwise look contradictory: the
- * monthly figure is a single fixed number that already contains a usage
- * estimate. Monthly invoices are generated from the contract's frozen quote
- * snapshot (see invoice-calc.ts), NOT from a meter read each month — so the
- * quoted overage repeats every month until a change request revises it.
- * Promising "billed per actual usage" here would describe behavior this
- * system does not have. */
+ * quoted monthly figure is a single fixed number containing a usage
+ * estimate, while the per-page rate is what usage actually costs.
+ *
+ * Kept in step with invoice-calc.ts's withMeterReadings: a month whose
+ * counter an engineer recorded bills that reading, and a month with no
+ * reading falls back to the quoted estimate. Wording that promised either
+ * one unconditionally would misdescribe half the months. */
 const ESTIMATE_NOTE_ID =
-  'Kelebihan pemakaian yang termasuk dalam tagihan bulanan di atas dihitung dari perkiraan pemakaian pada saat penawaran dibuat, ' +
-  'dan ditagih dengan jumlah yang sama setiap bulan. Jika pemakaian aktual berbeda dari perkiraan, penyesuaian dilakukan melalui permintaan perubahan layanan.';
+  'Angka pemakaian pada penawaran ini adalah perkiraan. Setiap bulan, kelebihan pemakaian ditagih berdasarkan hasil pembacaan meter ' +
+  'yang dicatat petugas saat pemeriksaan rutin; untuk bulan yang meternya belum dibaca, ditagih sebesar perkiraan tersebut.';
 
 /** For the quote, which addresses the customer in polite register. */
 export const OVERAGE_ESTIMATE_NOTE = {
   id: ESTIMATE_NOTE_ID,
   ko:
-    '위 월 청구액에 포함된 초과 사용량은 견적 시점의 예상 사용량을 기준으로 산정되며, 매월 동일 금액으로 청구됩니다. ' +
-    '실제 사용량이 예상과 달라지는 경우 변경요청을 통해 조정합니다.',
+    '위 사용량은 예상치입니다. 매월 초과 사용량은 정기점검 시 점검자가 기록한 실제 검침값을 기준으로 청구되며, ' +
+    '검침이 이루어지지 않은 달은 위 예상 사용량 기준으로 청구됩니다.',
 };
 
 /** Same statement as a contract clause. Only the Korean differs — every
@@ -144,8 +175,8 @@ export const OVERAGE_ESTIMATE_NOTE = {
 const OVERAGE_ESTIMATE_CLAUSE = {
   id: ESTIMATE_NOTE_ID,
   ko:
-    '위 월 청구액에 포함된 초과 사용량은 견적 시점의 예상 사용량을 기준으로 산정되며, 매월 동일 금액으로 청구된다. ' +
-    '실제 사용량이 예상과 달라지는 경우 변경요청을 통해 조정한다.',
+    '위 사용량은 예상치이다. 매월 초과 사용량은 정기점검 시 점검자가 기록한 실제 검침값을 기준으로 청구하며, ' +
+    '검침이 이루어지지 않은 달은 위 예상 사용량 기준으로 청구한다.',
 };
 
 /** The same terms as one contract clause per rented item. The contract

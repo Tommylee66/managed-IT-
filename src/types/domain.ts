@@ -275,6 +275,35 @@ export interface EquipmentSelection {
   commissionRateOverride: number | null;
 }
 
+/** An engineer's actual counter reading for one rented, usage-billed model
+ * in one month — the real alternative to the usage estimate frozen on a
+ * contract's quote snapshot. When a month has a reading, that month's
+ * invoice bills from it instead of the estimate (see invoice-calc.ts).
+ *
+ * Keyed by contract, not customer alone: a customer can hold several
+ * contracts and rent the same model under more than one, and the reading
+ * has to bill against the right one. */
+export interface MeterReading {
+  id: string;
+  contract_no: string;
+  customer_code: string;
+  /** Matches EquipmentSelection.catalogId on the contract's snapshot. */
+  catalog_id: string;
+  /** 'YYYY-MM', the month being billed. */
+  month: string;
+  /** Pages counted, before the included allowance is deducted. mono_qty is
+   * the only tier on a mono printer; a color printer meters both. */
+  mono_qty: number;
+  color_qty: number;
+  /** When the counter was read, which can fall outside `month`. */
+  reading_date: string | null;
+  engineer: string | null;
+  memo: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ServiceCatalogItem {
   id: string;
   name_id: string;

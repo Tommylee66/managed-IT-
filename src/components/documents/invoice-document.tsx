@@ -6,6 +6,7 @@ import {
   EquipmentDetailSection,
   PrinterUsageSection,
 } from "@/components/documents/equipment-detail-table";
+import type { MeteredUsage } from "@/lib/calc/equipment-pricing";
 import type { EquipmentSelection, Invoice } from "@/types/domain";
 
 /** equipmentSelections comes from the invoiced contract's quote snapshot,
@@ -16,9 +17,14 @@ import type { EquipmentSelection, Invoice } from "@/types/domain";
 export function InvoiceDocument({
   invoice,
   equipmentSelections = [],
+  usageByCatalogId,
 }: {
   invoice: Invoice;
   equipmentSelections?: EquipmentSelection[];
+  /** This month's actual meter readings — the same ones the line items
+   * above were billed from, so the usage breakdown reconciles with the
+   * charge instead of restating the quote's estimate. */
+  usageByCatalogId?: Map<string, MeteredUsage>;
 }) {
   return (
     <DocumentShell
@@ -81,7 +87,11 @@ export function InvoiceDocument({
 
       <EquipmentDetailSection selections={equipmentSelections} lang="ko" />
 
-      <PrinterUsageSection selections={equipmentSelections} lang="ko" />
+      <PrinterUsageSection
+        selections={equipmentSelections}
+        usageByCatalogId={usageByCatalogId}
+        lang="ko"
+      />
 
       <p className="text-muted-foreground">{invoice.memo}</p>
     </DocumentShell>

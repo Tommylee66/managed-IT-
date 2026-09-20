@@ -5,6 +5,10 @@ import { getSessionContext } from "@/lib/auth/session";
 import { getCustomer } from "@/lib/data-access/customers";
 import { listContractsByCustomer } from "@/lib/data-access/contracts";
 import { listIncidentLogsByCustomerAndMonth } from "@/lib/data-access/incident-logs";
+import {
+  listMeterReadingsByCustomerMonth,
+  usageByCatalogId,
+} from "@/lib/data-access/meter-readings";
 import { MonthlyReportDocument } from "@/components/documents/monthly-report-document";
 import type { Contract, EquipmentSelection } from "@/types/domain";
 
@@ -36,10 +40,11 @@ export default async function MonthlyReportPrintPage({
 
   const session = await getSessionContext();
   const supabase = await createClient();
-  const [customer, records, contracts] = await Promise.all([
+  const [customer, records, contracts, readings] = await Promise.all([
     getCustomer(supabase, customerCode, session!.role),
     listIncidentLogsByCustomerAndMonth(supabase, customerCode, month),
     listContractsByCustomer(supabase, customerCode, session!.role),
+    listMeterReadingsByCustomerMonth(supabase, customerCode, month),
   ]);
   if (!customer) notFound();
 
@@ -56,6 +61,7 @@ export default async function MonthlyReportPrintPage({
       month={month}
       records={records}
       equipmentSelections={equipmentSelections}
+      usageByCatalogId={usageByCatalogId(readings)}
     />
   );
 }

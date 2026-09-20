@@ -1,4 +1,11 @@
 import { addDays, addMonths, differenceInCalendarMonths, format } from 'date-fns';
+import {
+  equipmentPricedRows,
+  equipmentRowCatalogId,
+  isOverageRowKey,
+  withMeteredUsage,
+  type MeteredUsage,
+} from '@/lib/calc/equipment-pricing';
 import type { Contract, QuoteRowRecord } from '@/types/domain';
 
 // Kept in sync with the frozen quote_snapshot.rows key convention (see
@@ -48,7 +55,7 @@ function isPrinterRow(contract: Contract, row: QuoteRowRecord): boolean {
   // prefix length read 'overage:<id>' as the id and never matched a
   // selection — which quietly gave printer per-page rows the non-printer
   // post-term discount below, contradicting this function's whole purpose.
-  const catalogId = row.key?.slice(row.key.indexOf(':') + 1);
+  const catalogId = equipmentRowCatalogId(row.key);
   const selection = (contract.quote_snapshot?.equipment_selections ?? []).find(
     (e) => e.catalogId === catalogId
   );
@@ -105,16 +112,59 @@ function isDiscountExpired(contract: Contract, month: string): boolean {
  * full row — including key/commissionable/commissionRate — to compute that
  * month's commissionable base. Exported as commissionableRowsForMonth since
  * outside this file that's the only reason to call it. */
-function effectiveRowsForMonth(contract: Contract, month: string): QuoteRowRecord[] {
+/** Swaps the quoted usage rows for ones priced from what was actually
+ * metered this month. Only items with a reading are touched: one without
+ * keeps its quoted row, because "nobody read this counter" is not the same
+ * claim as "this printer printed nothing", and only the former should keep
+ * billing the estimate.
+ *
+ * A measured item's frozen rows are dropped before the recomputed ones are
+ * added, so a month that came in under the allowance correctly bills
+ * nothing rather than leaving the estimate's row standing — and a month
+ * that went over gets a row even if the estimate never produced one. Only
+ * the usage rows are taken from the recompute; the flat rental line is
+ * already in the frozen list and must not be duplicated. */
+function withMeterReadings(
+  contract: Contract,
+  rows: QuoteRowRecord[],
+  usageByCatalogId: Map<string, MeteredUsage>
+): QuoteRowRecord[] {
+  if (usageByCatalogId.size === 0) return rows;
+  const selections = contract.quote_snapshot?.equipment_selections ?? [];
+  const measured = selections.filter((s) => usageByCatalogId.has(s.catalogId));
+  if (measured.length === 0) return rows;
+
+  const measuredIds = new Set(measured.map((s) => s.catalogId));
+  const kept = rows.filter(
+    (r) => !(isOverageRowKey(r.key) && measuredIds.has(equipmentRowCatalogId(r.key) ?? ''))
+  );
+  const remetered = equipmentPricedRows(withMeteredUsage(measured, usageByCatalogId)).filter((r) =>
+    isOverageRowKey(r.key)
+  );
+  return [...kept, ...remetered];
+}
+
+function effectiveRowsForMonth(
+  contract: Contract,
+  month: string,
+  usageByCatalogId: Map<string, MeteredUsage> = new Map()
+): QuoteRowRecord[] {
   if (!isContractActiveInMonth(contract, month)) {
     const postTermItems = postTermEquipmentRows(contract).map((r) => ({
       ...r,
       amount: Math.round(r.amount * POST_TERM_EQUIPMENT_RATE),
     }));
-    return [...postTermItems, ...postTermPrinterRows(contract)];
+    // Printers keep billing at full rate past the term, per-page usage
+    // included — so a post-term month's readings apply here too.
+    const printerItems = withMeterReadings(
+      contract,
+      postTermPrinterRows(contract),
+      usageByCatalogId
+    );
+    return [...postTermItems, ...printerItems];
   }
 
-  const rows: QuoteRowRecord[] = contract.quote_snapshot?.rows ?? [];
+  const rows = withMeterReadings(contract, contract.quote_snapshot?.rows ?? [], usageByCatalogId);
   const effectiveRows = isDiscountExpired(contract, month)
     ? rows.filter((r) => r.key !== 'discount')
     : rows;
@@ -155,9 +205,13 @@ export interface InvoiceLineItem {
 // when the contract's quote snapshot has no nonzero rows. Extended with two
 // time-aware cases: a time-limited discount that has expired (drop that
 // row), and post-term equipment-only billing at a reduced rate.
-export function invoiceLineItems(contract: Contract, month: string): InvoiceLineItem[] {
+export function invoiceLineItems(
+  contract: Contract,
+  month: string,
+  usageByCatalogId: Map<string, MeteredUsage> = new Map()
+): InvoiceLineItem[] {
   const isPostTerm = !isContractActiveInMonth(contract, month);
-  return effectiveRowsForMonth(contract, month).map((r) => ({
+  return effectiveRowsForMonth(contract, month, usageByCatalogId).map((r) => ({
     label: r.label,
     labelKey: r.labelKey,
     labelId: r.labelId,
@@ -174,8 +228,16 @@ export interface InvoiceTotals {
   total: number;
 }
 
-export function invoiceTotals(contract: Contract, month: string, ppnRate: number): InvoiceTotals {
-  const subtotal = effectiveRowsForMonth(contract, month).reduce((sum, r) => sum + r.amount, 0);
+export function invoiceTotals(
+  contract: Contract,
+  month: string,
+  ppnRate: number,
+  usageByCatalogId: Map<string, MeteredUsage> = new Map()
+): InvoiceTotals {
+  const subtotal = effectiveRowsForMonth(contract, month, usageByCatalogId).reduce(
+    (sum, r) => sum + r.amount,
+    0
+  );
   const ppn = Math.round((subtotal * Number(ppnRate || 0)) / 100);
   return { subtotal, ppn, total: subtotal + ppn };
 }

@@ -7,6 +7,7 @@ import { listAgents } from '@/lib/data-access/agents';
 import { listInvoicesByContracts } from '@/lib/data-access/invoices';
 import { getRates } from '@/lib/data-access/rates';
 import { calcMonthlyCommissionReport } from '@/lib/calc/commission-report';
+import { meterUsageLookupForContracts } from '@/lib/data-access/meter-readings';
 import type { Rates } from '@/types/domain';
 
 export async function GET(request: Request) {
@@ -31,9 +32,20 @@ export async function GET(request: Request) {
   // Same confirmed-only rule as the on-screen commission report — see
   // agents/commission/page.tsx.
   const confirmedContracts = contracts.filter((c) => c.confirmed_at !== null);
-  const invoicesByKey = await listInvoicesByContracts(supabase, confirmedContracts.map((c) => c.no));
+  const contractNos = confirmedContracts.map((c) => c.no);
+  const [invoicesByKey, usageLookup] = await Promise.all([
+    listInvoicesByContracts(supabase, contractNos),
+    meterUsageLookupForContracts(supabase, contractNos),
+  ]);
   const commissionItems = rates.commission_items as unknown as Record<string, boolean>;
-  const groups = calcMonthlyCommissionReport(confirmedContracts, month, invoicesByKey, commissionItems, npwpByAgentCode);
+  const groups = calcMonthlyCommissionReport(
+    confirmedContracts,
+    month,
+    invoicesByKey,
+    commissionItems,
+    npwpByAgentCode,
+    usageLookup
+  );
   const grandTotal = groups.reduce((s, g) => s + g.subtotal, 0);
 
   const workbook = new ExcelJS.Workbook();
