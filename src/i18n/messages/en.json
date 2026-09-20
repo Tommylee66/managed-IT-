@@ -1283,5 +1283,12 @@
       "incident_logs": "From the date it occurred",
       "audit_log": "From when it was recorded"
     }
+  },
+  "privacyPage": {
+    "title": "Privacy Notice",
+    "effectiveOn": "In effect from {date} · Version {version}",
+    "draftNotice": "A draft under legal review. The effective date will appear here once it is set.",
+    "backToLogin": "Back to sign in",
+    "link": "Privacy Notice"
   }
 }

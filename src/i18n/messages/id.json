@@ -1283,5 +1283,12 @@
       "incident_logs": "Dari tanggal kejadian",
       "audit_log": "Dari waktu pencatatan"
     }
+  },
+  "privacyPage": {
+    "title": "Kebijakan Pelindungan Data Pribadi",
+    "effectiveOn": "Berlaku sejak {date} · Versi {version}",
+    "draftNotice": "Rancangan yang sedang ditinjau secara hukum. Tanggal berlaku akan ditampilkan di sini setelah ditetapkan.",
+    "backToLogin": "Kembali ke halaman masuk",
+    "link": "Kebijakan Data Pribadi"
   }
 }

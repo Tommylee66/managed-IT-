@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { setRequestLocale } from "next-intl/server";
+import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LoginForm } from "@/components/auth/login-form";
 
 export default async function LoginPage({
@@ -9,11 +10,21 @@ export default async function LoginPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("privacyPage");
   return (
-    <div className="flex flex-1 items-center justify-center bg-muted/40 p-4">
+    <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-muted/40 p-4">
       <Suspense>
         <LoginForm />
       </Suspense>
+      {/* The sign-in screen is the one page every data subject with an account
+          passes through, and the only public surface this app has besides the
+          notice itself — so it carries the link. */}
+      <Link
+        className="text-xs text-muted-foreground underline"
+        href={`/${locale}/privacy`}
+      >
+        {t("link")}
+      </Link>
     </div>
   );
 }

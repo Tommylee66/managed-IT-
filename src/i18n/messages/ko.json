@@ -1283,5 +1283,12 @@
       "incident_logs": "발생 일자 기준",
       "audit_log": "기록 시각 기준"
     }
+  },
+  "privacyPage": {
+    "title": "개인정보처리방침",
+    "effectiveOn": "{date} 시행 · 버전 {version}",
+    "draftNotice": "법무 검토 중인 초안입니다. 시행일이 정해지면 이 자리에 표시됩니다.",
+    "backToLogin": "로그인으로 돌아가기",
+    "link": "개인정보처리방침"
   }
 }
