@@ -12,6 +12,28 @@ export const maxDuration = 60;
 const ALLOWED_PATH_PATTERN =
   /^\/(ko|id|en)\/(quotes|contracts|invoices|termination)\/[^/?]+\/print(\?[^/]*)?$|^\/(ko|id|en)\/incident-logs\/report\/print(\?[^/]*)?$|^\/(ko|id|en)\/agents\/[^/?]+\/agreement\/print(\?[^/]*)?$/;
 
+const PDF_STREAM_CHUNK_SIZE = 64 * 1024;
+
+function streamPdf(pdf: Buffer): ReadableStream<Uint8Array> {
+  let offset = 0;
+
+  return new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (offset >= pdf.length) {
+        controller.close();
+        return;
+      }
+
+      const end = Math.min(offset + PDF_STREAM_CHUNK_SIZE, pdf.length);
+      controller.enqueue(Uint8Array.from(pdf.subarray(offset, end)));
+      offset = end;
+    },
+    cancel() {
+      offset = pdf.length;
+    },
+  });
+}
+
 export async function GET(req: NextRequest) {
   const session = await getSessionContext();
   if (!session || !session.isActive) {
@@ -59,17 +81,20 @@ export async function GET(req: NextRequest) {
       p_action: "DOCUMENT_EXPORTED",
       p_target_table: null,
       p_target_id: pathWithoutLocale,
-      p_details: { role: session.role },
+      p_details: { role: session.role, bytes: pdf.length },
     });
     if (auditError) {
       console.error("audit log failed for document export", auditError);
     }
 
-    return new NextResponse(new Uint8Array(pdf), {
+    // Vercel rejects buffered Function responses larger than 4.5 MB. Korean
+    // web-font subsets embedded by Chromium can push otherwise small legal
+    // documents over that limit. Stream the completed PDF in bounded chunks
+    // so the platform never treats it as one oversized response payload.
+    return new Response(streamPdf(pdf), {
       headers: {
         "content-type": "application/pdf",
         "content-disposition": 'attachment; filename="document.pdf"',
-        "content-length": String(pdf.length),
         "cache-control": "private, no-store",
         "x-content-type-options": "nosniff",
       },
