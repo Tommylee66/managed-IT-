@@ -19,13 +19,28 @@ export function PrintButton() {
       if (!res.ok) throw new Error(await res.text());
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      // Navigate the current tab (instead of window.open) so this never
-      // depends on a popup blocker's user-activation heuristics — the browser's
-      // built-in PDF viewer opens in-place with its own print/download controls.
-      window.location.href = url;
+
+      // A blob URL belongs to the current document. Navigating this tab to the
+      // blob unloads its owner, so Chrome's PDF viewer can display the file but
+      // later fail to download it with "Check internet connection". Download
+      // it while this document is still alive, then release the URL after the
+      // browser has had enough time to copy the blob into its download task.
+      const title = document.title
+        .replace(/\.pdf$/i, "")
+        .replace(/[<>:"/\\|?*]/g, "_")
+        .trim();
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${title || "BCT-document"}.pdf`;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch {
       toast.error(t("pdfGenerationError"));
       window.print();
+    } finally {
       setIsGenerating(false);
     }
   }

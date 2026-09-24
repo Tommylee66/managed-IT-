@@ -68,7 +68,10 @@ export async function GET(req: NextRequest) {
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         "content-type": "application/pdf",
-        "content-disposition": 'inline; filename="document.pdf"',
+        "content-disposition": 'attachment; filename="document.pdf"',
+        "content-length": String(pdf.length),
+        "cache-control": "private, no-store",
+        "x-content-type-options": "nosniff",
       },
     });
   } catch (error) {
