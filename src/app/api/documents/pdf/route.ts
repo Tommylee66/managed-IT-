@@ -34,6 +34,57 @@ function streamPdf(pdf: Buffer): ReadableStream<Uint8Array> {
   });
 }
 
+function getPathWithoutLocale(path: string) {
+  return path.split("?")[0].replace(/^\/(ko|id|en)/, "");
+}
+
+async function auditBrowserPrint(
+  pathWithoutLocale: string,
+  role: string,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("log_audit", {
+    p_action: "DOCUMENT_EXPORTED",
+    p_target_table: null,
+    p_target_id: pathWithoutLocale,
+    p_details: { role, delivery: "browser_print" },
+  });
+
+  if (error) {
+    console.error("audit log failed for browser document print", error);
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const session = await getSessionContext();
+  if (!session || !session.isActive) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  let path: string | null = null;
+  try {
+    const body = (await req.json()) as { path?: unknown };
+    path = typeof body.path === "string" ? body.path : null;
+  } catch {
+    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+  }
+
+  if (!path || !ALLOWED_PATH_PATTERN.test(path)) {
+    return NextResponse.json({ error: "Invalid path" }, { status: 400 });
+  }
+
+  const pathWithoutLocale = getPathWithoutLocale(path);
+  if (!canAccessPath(session.role, pathWithoutLocale)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  await auditBrowserPrint(pathWithoutLocale, session.role);
+  return new Response(null, {
+    status: 204,
+    headers: { "cache-control": "private, no-store" },
+  });
+}
+
 export async function GET(req: NextRequest) {
   const session = await getSessionContext();
   if (!session || !session.isActive) {
@@ -54,7 +105,7 @@ export async function GET(req: NextRequest) {
   // tables RLS scopes per sales_agent, so row access wouldn't stop it
   // either. The print pages themselves render unmasked (role "master")
   // on purpose, which leaves this the only check standing.
-  const pathWithoutLocale = path.split("?")[0].replace(/^\/(ko|id|en)/, "");
+  const pathWithoutLocale = getPathWithoutLocale(path);
   if (!canAccessPath(session.role, pathWithoutLocale)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
