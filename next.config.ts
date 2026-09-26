@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const CANONICAL_SITE_URL = "https://bctcare.net";
 
 const nextConfig: NextConfig = {
   // Pin the workspace root explicitly — an unrelated package-lock.json in
@@ -21,6 +22,16 @@ const nextConfig: NextConfig = {
   // entirely ("input directory .../chromium/bin does not exist").
   outputFileTracingIncludes: {
     "/api/documents/pdf": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "managed-it.vercel.app" }],
+        destination: `${CANONICAL_SITE_URL}/:path*`,
+        permanent: true,
+      },
+    ];
   },
 };
 

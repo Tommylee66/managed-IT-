@@ -18,7 +18,8 @@ export function buildReportEmailHtml(params: {
   bodyText: string;
 }): string {
   const { customerName, monthLabel, bodyText } = params;
-  const logoUrl = `${process.env.NEXT_PUBLIC_APP_URL}/bct-logo.png`;
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://bctcare.net').replace(/\/$/, '');
+  const logoUrl = `${appUrl}/bct-logo.png`;
   const paragraphs = bodyText
     .split(/\n\s*\n/)
     .map((p) => escapeHtml(p.trim()).replace(/\n/g, '<br />'))
